@@ -1,0 +1,24 @@
+# IDEs
+.idea
+.settings
+.project
+
+# Python
+*.pyc
+.tox
+
+# Doc
+_build
+
+# Editors
+*.swp
+*~
+
+# Bundle
+Gemfile.lock
+.bundled_gems
+.bundle
+
+# Misc
+*.log
+.librarian
