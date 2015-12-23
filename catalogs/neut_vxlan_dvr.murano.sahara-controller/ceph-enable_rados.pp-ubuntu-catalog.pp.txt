@@ -1,0 +1,20 @@
+class { 'Ceph::Params' :
+}
+
+package { 'ceph-deploy' :
+  ensure => 'installed',
+}
+
+package { 'ceph' :
+  ensure => 'installed',
+}
+
+service { 'radosgw' :
+  ensure   => 'running',
+  enable   => true,
+  provider => 'debian',
+}
+
+stage { 'main' :
+}
+

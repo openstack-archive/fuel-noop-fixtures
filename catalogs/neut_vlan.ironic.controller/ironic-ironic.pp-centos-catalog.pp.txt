@@ -1,0 +1,403 @@
+class { 'Ironic::Api' :
+  admin_password    => 'BnjNRET8AjjYSYiUFKQd8MiT',
+  admin_tenant_name => 'services',
+  admin_user        => 'ironic',
+  auth_admin_prefix => false,
+  auth_host         => '192.168.0.2',
+  auth_port         => '35357',
+  auth_protocol     => 'http',
+  auth_uri          => false,
+  auth_version      => false,
+  enabled           => true,
+  host_ip           => '192.168.0.3',
+  max_limit         => '1000',
+  neutron_url       => 'http://192.168.0.2:9696',
+  package_ensure    => 'present',
+  port              => '6385',
+}
+
+class { 'Ironic::Client' :
+  package_ensure => 'present',
+}
+
+class { 'Ironic::Db::Sync' :
+}
+
+class { 'Ironic::Params' :
+}
+
+class { 'Ironic::Policy' :
+  notify      => 'Service[ironic-api]',
+  policies    => {  },
+  policy_path => '/etc/ironic/policy.json',
+}
+
+class { 'Ironic' :
+  amqp_durable_queues         => true,
+  auth_strategy               => 'keystone',
+  control_exchange            => 'openstack',
+  database_connection         => 'mysql://ironic:6WfFFkO2XOLPmgtLhIWyf1kN@192.168.0.2/ironic?charset=utf8&read_timeout=60',
+  database_idle_timeout       => '3600',
+  database_max_retries        => '10',
+  database_reconnect_interval => '10',
+  database_retry_interval     => '10',
+  debug                       => false,
+  enabled                     => true,
+  enabled_drivers             => 'pxe_ipmitool',
+  glance_api_insecure         => false,
+  glance_api_servers          => '192.168.0.2:9292',
+  glance_num_retries          => '0',
+  kombu_ssl_version           => 'TLSv1',
+  log_facility                => 'LOG_USER',
+  package_ensure              => 'present',
+  qpid_heartbeat              => '60',
+  qpid_hostname               => 'localhost',
+  qpid_password               => 'guest',
+  qpid_port                   => '5672',
+  qpid_protocol               => 'tcp',
+  qpid_reconnect              => true,
+  qpid_reconnect_interval     => '0',
+  qpid_reconnect_interval_max => '0',
+  qpid_reconnect_interval_min => '0',
+  qpid_reconnect_limit        => '0',
+  qpid_reconnect_timeout      => '0',
+  qpid_tcp_nodelay            => true,
+  qpid_username               => 'guest',
+  rabbit_host                 => 'localhost',
+  rabbit_hosts                => '192.168.0.3:5673',
+  rabbit_password             => 'OLCrvt99FgutnBs63PeFJchF',
+  rabbit_port                 => '5673',
+  rabbit_use_ssl              => false,
+  rabbit_userid               => 'nova',
+  rabbit_virtual_host         => '/',
+  require                     => [ Class[Mysql::Bindings], Class[Mysql::Bindings::Python] ],
+  rpc_backend                 => 'ironic.openstack.common.rpc.impl_kombu',
+  sync_db                     => true,
+  use_syslog                  => true,
+  verbose                     => true,
+}
+
+class { 'Mysql::Bindings::Python' :
+}
+
+class { 'Mysql::Bindings' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'MySQL-python',
+}
+
+exec { 'ironic-dbsync' :
+  command     => 'ironic-dbsync --config-file /etc/ironic/ironic.conf',
+  logoutput   => 'on_failure',
+  path        => '/usr/bin',
+  refreshonly => true,
+  user        => 'root',
+}
+
+file { '/etc/ironic/ironic.conf' :
+  group   => 'ironic',
+  require => Package[ironic-common],
+}
+
+file { '/etc/ironic' :
+  ensure  => 'directory',
+  group   => 'ironic',
+  require => Package[ironic-common],
+}
+
+ironic_config { 'DEFAULT/amqp_durable_queues' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => true,
+}
+
+ironic_config { 'DEFAULT/auth_strategy' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'keystone',
+}
+
+ironic_config { 'DEFAULT/control_exchange' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'openstack',
+}
+
+ironic_config { 'DEFAULT/debug' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => false,
+}
+
+ironic_config { 'DEFAULT/default_log_levels' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'amqp=WARN,amqplib=WARN,boto=WARN,iso8601=WARN,keystonemiddleware=WARN,oslo.messaging=INFO,oslo_messaging=INFO,qpid=WARN,requests.packages.urllib3.connectionpool=WARN,requests.packages.urllib3.util.retry=WARN,routes.middleware=WARN,sqlalchemy=WARN,stevedore=WARN,suds=INFO,taskflow=WARN,urllib3.connectionpool=WARN,urllib3.util.retry=WARN,websocket=WARN',
+}
+
+ironic_config { 'DEFAULT/enabled_drivers' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'pxe_ipmitool',
+}
+
+ironic_config { 'DEFAULT/rpc_backend' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'ironic.openstack.common.rpc.impl_kombu',
+}
+
+ironic_config { 'DEFAULT/syslog_log_facility' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'LOG_USER',
+}
+
+ironic_config { 'DEFAULT/use_syslog' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => true,
+}
+
+ironic_config { 'DEFAULT/verbose' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => true,
+}
+
+ironic_config { 'api/host_ip' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '192.168.0.3',
+}
+
+ironic_config { 'api/max_limit' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '1000',
+}
+
+ironic_config { 'api/port' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '6385',
+}
+
+ironic_config { 'database/connection' :
+  before => 'Exec[ironic-dbsync]',
+  notify => [ 'Exec[ironic-dbsync]', 'Service[ironic-api]' ],
+  secret => true,
+  value  => 'mysql://ironic:6WfFFkO2XOLPmgtLhIWyf1kN@192.168.0.2/ironic?charset=utf8&read_timeout=60',
+}
+
+ironic_config { 'database/idle_timeout' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '3600',
+}
+
+ironic_config { 'database/max_retries' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '10',
+}
+
+ironic_config { 'database/retry_interval' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '10',
+}
+
+ironic_config { 'glance/glance_api_insecure' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => false,
+}
+
+ironic_config { 'glance/glance_api_servers' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '192.168.0.2:9292',
+}
+
+ironic_config { 'glance/glance_num_retries' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '0',
+}
+
+ironic_config { 'keystone_authtoken/admin_password' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  secret => true,
+  value  => 'BnjNRET8AjjYSYiUFKQd8MiT',
+}
+
+ironic_config { 'keystone_authtoken/admin_tenant_name' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'services',
+}
+
+ironic_config { 'keystone_authtoken/admin_user' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'ironic',
+}
+
+ironic_config { 'keystone_authtoken/auth_admin_prefix' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'keystone_authtoken/auth_host' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '192.168.0.2',
+}
+
+ironic_config { 'keystone_authtoken/auth_port' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '35357',
+}
+
+ironic_config { 'keystone_authtoken/auth_protocol' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'http',
+}
+
+ironic_config { 'keystone_authtoken/auth_uri' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'http://192.168.0.2:5000/',
+}
+
+ironic_config { 'keystone_authtoken/auth_version' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'neutron/url' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'http://192.168.0.2:9696',
+}
+
+ironic_config { 'oslo_messaging_rabbit/kombu_ssl_ca_certs' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/kombu_ssl_certfile' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/kombu_ssl_keyfile' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/kombu_ssl_version' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_ha_queues' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => true,
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_host' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_hosts' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '192.168.0.3:5673',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_password' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  secret => true,
+  value  => 'OLCrvt99FgutnBs63PeFJchF',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_port' :
+  ensure => 'absent',
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_use_ssl' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => false,
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_userid' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => 'nova',
+}
+
+ironic_config { 'oslo_messaging_rabbit/rabbit_virtual_host' :
+  before => 'Exec[ironic-dbsync]',
+  notify => 'Service[ironic-api]',
+  value  => '/',
+}
+
+package { 'ironic-api' :
+  ensure => 'present',
+  before => [ 'Class[Ironic::Policy]', 'Service[ironic-api]', 'Ironic_config[glance/glance_api_servers]', 'Ironic_config[DEFAULT/verbose]', 'Ironic_config[DEFAULT/debug]', 'Ironic_config[DEFAULT/auth_strategy]', 'Ironic_config[DEFAULT/rpc_backend]', 'Ironic_config[DEFAULT/enabled_drivers]', 'Ironic_config[database/connection]', 'Ironic_config[database/idle_timeout]', 'Ironic_config[database/retry_interval]', 'Ironic_config[database/max_retries]', 'Ironic_config[glance/glance_num_retries]', 'Ironic_config[glance/glance_api_insecure]', 'Ironic_config[oslo_messaging_rabbit/rabbit_userid]', 'Ironic_config[oslo_messaging_rabbit/rabbit_password]', 'Ironic_config[oslo_messaging_rabbit/rabbit_virtual_host]', 'Ironic_config[oslo_messaging_rabbit/rabbit_use_ssl]', 'Ironic_config[DEFAULT/control_exchange]', 'Ironic_config[DEFAULT/amqp_durable_queues]', 'Ironic_config[oslo_messaging_rabbit/rabbit_hosts]', 'Ironic_config[oslo_messaging_rabbit/rabbit_ha_queues]', 'Ironic_config[oslo_messaging_rabbit/rabbit_host]', 'Ironic_config[oslo_messaging_rabbit/rabbit_port]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_ca_certs]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_certfile]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_keyfile]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_version]', 'Ironic_config[DEFAULT/use_syslog]', 'Ironic_config[DEFAULT/syslog_log_facility]', 'Ironic_config[DEFAULT/default_log_levels]', 'Ironic_config[api/host_ip]', 'Ironic_config[api/port]', 'Ironic_config[api/max_limit]', 'Ironic_config[neutron/url]', 'Ironic_config[keystone_authtoken/auth_uri]', 'Ironic_config[keystone_authtoken/auth_version]', 'Ironic_config[keystone_authtoken/auth_host]', 'Ironic_config[keystone_authtoken/auth_port]', 'Ironic_config[keystone_authtoken/auth_protocol]', 'Ironic_config[keystone_authtoken/admin_tenant_name]', 'Ironic_config[keystone_authtoken/admin_user]', 'Ironic_config[keystone_authtoken/admin_password]', 'Ironic_config[keystone_authtoken/auth_admin_prefix]' ],
+  name   => 'openstack-ironic-api',
+  tag    => 'openstack',
+}
+
+package { 'ironic-common' :
+  ensure => 'present',
+  before => [ 'Ironic_config[glance/glance_api_servers]', 'Ironic_config[DEFAULT/verbose]', 'Ironic_config[DEFAULT/debug]', 'Ironic_config[DEFAULT/auth_strategy]', 'Ironic_config[DEFAULT/rpc_backend]', 'Ironic_config[DEFAULT/enabled_drivers]', 'Ironic_config[database/connection]', 'Ironic_config[database/idle_timeout]', 'Ironic_config[database/retry_interval]', 'Ironic_config[database/max_retries]', 'Ironic_config[glance/glance_num_retries]', 'Ironic_config[glance/glance_api_insecure]', 'Ironic_config[oslo_messaging_rabbit/rabbit_userid]', 'Ironic_config[oslo_messaging_rabbit/rabbit_password]', 'Ironic_config[oslo_messaging_rabbit/rabbit_virtual_host]', 'Ironic_config[oslo_messaging_rabbit/rabbit_use_ssl]', 'Ironic_config[DEFAULT/control_exchange]', 'Ironic_config[DEFAULT/amqp_durable_queues]', 'Ironic_config[oslo_messaging_rabbit/rabbit_hosts]', 'Ironic_config[oslo_messaging_rabbit/rabbit_ha_queues]', 'Ironic_config[oslo_messaging_rabbit/rabbit_host]', 'Ironic_config[oslo_messaging_rabbit/rabbit_port]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_ca_certs]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_certfile]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_keyfile]', 'Ironic_config[oslo_messaging_rabbit/kombu_ssl_version]', 'Ironic_config[DEFAULT/use_syslog]', 'Ironic_config[DEFAULT/syslog_log_facility]', 'Ironic_config[DEFAULT/default_log_levels]', 'Ironic_config[api/host_ip]', 'Ironic_config[api/port]', 'Ironic_config[api/max_limit]', 'Ironic_config[neutron/url]', 'Ironic_config[keystone_authtoken/auth_uri]', 'Ironic_config[keystone_authtoken/auth_version]', 'Ironic_config[keystone_authtoken/auth_host]', 'Ironic_config[keystone_authtoken/auth_port]', 'Ironic_config[keystone_authtoken/auth_protocol]', 'Ironic_config[keystone_authtoken/admin_tenant_name]', 'Ironic_config[keystone_authtoken/admin_user]', 'Ironic_config[keystone_authtoken/admin_password]', 'Ironic_config[keystone_authtoken/auth_admin_prefix]' ],
+  name   => 'openstack-ironic-common',
+  notify => Exec[ironic-dbsync],
+  tag    => 'openstack',
+}
+
+package { 'python-ironicclient' :
+  ensure => 'present',
+  name   => 'python-ironicclient',
+  tag    => 'openstack',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'MySQL-python',
+}
+
+service { 'ironic-api' :
+  ensure    => 'running',
+  enable    => true,
+  hasstatus => true,
+  name      => 'openstack-ironic-api',
+}
+
+stage { 'main' :
+}
+

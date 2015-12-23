@@ -1,0 +1,8 @@
+host { 'public.fuel.local' :
+  ensure => 'present',
+  ip     => '10.108.1.2',
+}
+
+stage { 'main' :
+}
+

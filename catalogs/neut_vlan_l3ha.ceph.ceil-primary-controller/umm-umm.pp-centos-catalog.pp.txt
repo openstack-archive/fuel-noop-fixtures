@@ -1,0 +1,23 @@
+class { 'Umm' :
+  umm_counter_reset_time => '10',
+  umm_enabled            => 'yes',
+  umm_reboot_count       => '2',
+}
+
+file { 'umm_config' :
+  ensure  => 'present',
+  content => 'UMM=yes
+REBOOT_COUNT=2
+COUNTER_RESET_TIME=10
+',
+  path    => '/etc/umm.conf',
+  require => Package[fuel-umm],
+}
+
+package { 'fuel-umm' :
+  ensure => 'installed',
+}
+
+stage { 'main' :
+}
+

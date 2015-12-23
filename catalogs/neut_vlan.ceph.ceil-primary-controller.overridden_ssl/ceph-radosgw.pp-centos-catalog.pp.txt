@@ -1,0 +1,2395 @@
+apache::listen { '10.108.0.8:8888' :
+}
+
+apache::listen { '127.0.0.1:80' :
+}
+
+apache::listen { '192.168.0.3:35357' :
+}
+
+apache::listen { '192.168.0.3:5000' :
+}
+
+apache::listen { '192.168.0.3:80' :
+}
+
+apache::mod { 'actions' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'auth_basic' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'auth_digest' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_anon' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_dbm' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_default' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_file' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_dbm' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_default' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_groupfile' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_host' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_owner' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_user' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'autoindex' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'cache' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dav' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dav_fs' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'deflate' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dir' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'env' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'expires' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'ext_filter' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'include' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'log_config' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'logio' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'mime' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'mime_magic' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'negotiation' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'rewrite' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'setenvif' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'speling' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'substitute' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'suexec' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'usertrack' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'version' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'vhost_alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::vhost { 'default-ssl' :
+  ensure               => 'absent',
+  access_log           => true,
+  access_log_env_var   => false,
+  access_log_file      => 'ssl_access_log',
+  access_log_format    => false,
+  access_log_pipe      => false,
+  access_log_syslog    => false,
+  add_listen           => true,
+  additional_includes  => [  ],
+  apache_version       => '2.2',
+  block                => [  ],
+  default_vhost        => false,
+  directoryindex       => '',
+  docroot              => '/var/www/html',
+  docroot_group        => 'root',
+  docroot_owner        => 'root',
+  error_documents      => [  ],
+  error_log            => true,
+  ip_based             => false,
+  logroot              => '/var/log/httpd',
+  logroot_ensure       => 'directory',
+  manage_docroot       => false,
+  no_proxy_uris        => [  ],
+  no_proxy_uris_match  => [  ],
+  options              => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override             => 'None',
+  php_admin_flags      => {  },
+  php_admin_values     => {  },
+  php_flags            => {  },
+  php_values           => {  },
+  port                 => '443',
+  priority             => '15',
+  proxy_error_override => false,
+  proxy_preserve_host  => false,
+  redirect_source      => '/',
+  scriptalias          => '/var/www/cgi-bin',
+  scriptaliases        => { 'alias' => '/cgi-bin', 'path' => '/var/www/cgi-bin' },
+  serveradmin          => 'root@localhost',
+  serveraliases        => [  ],
+  servername           => 'default-ssl',
+  setenv               => [  ],
+  setenvif             => [  ],
+  ssl                  => true,
+  ssl_cert             => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir        => '/etc/pki/tls/certs',
+  ssl_key              => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine      => false,
+  suphp_addhandler     => 'php5-script',
+  suphp_engine         => 'off',
+  vhost_name           => '*',
+  virtual_docroot      => false,
+}
+
+apache::vhost { 'default' :
+  ensure               => 'absent',
+  access_log           => true,
+  access_log_env_var   => false,
+  access_log_file      => 'access_log',
+  access_log_format    => false,
+  access_log_pipe      => false,
+  access_log_syslog    => false,
+  add_listen           => true,
+  additional_includes  => [  ],
+  apache_version       => '2.2',
+  block                => [  ],
+  default_vhost        => false,
+  directoryindex       => '',
+  docroot              => '/var/www/html',
+  docroot_group        => 'root',
+  docroot_owner        => 'root',
+  error_documents      => [  ],
+  error_log            => true,
+  ip_based             => false,
+  logroot              => '/var/log/httpd',
+  logroot_ensure       => 'directory',
+  manage_docroot       => false,
+  no_proxy_uris        => [  ],
+  no_proxy_uris_match  => [  ],
+  options              => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override             => 'None',
+  php_admin_flags      => {  },
+  php_admin_values     => {  },
+  php_flags            => {  },
+  php_values           => {  },
+  port                 => '80',
+  priority             => '15',
+  proxy_error_override => false,
+  proxy_preserve_host  => false,
+  redirect_source      => '/',
+  scriptalias          => '/var/www/cgi-bin',
+  scriptaliases        => { 'alias' => '/cgi-bin', 'path' => '/var/www/cgi-bin' },
+  serveradmin          => 'root@localhost',
+  serveraliases        => [  ],
+  servername           => 'default',
+  setenv               => [  ],
+  setenvif             => [  ],
+  ssl                  => false,
+  ssl_cert             => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir        => '/etc/pki/tls/certs',
+  ssl_key              => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine      => false,
+  suphp_addhandler     => 'php5-script',
+  suphp_engine         => 'off',
+  vhost_name           => '*',
+  virtual_docroot      => false,
+}
+
+ceph_conf { 'client.radosgw.gateway/host' :
+  before => 'Package[httpd]',
+  value  => 'node-125',
+}
+
+ceph_conf { 'client.radosgw.gateway/keyring' :
+  before => 'Package[httpd]',
+  value  => '/etc/ceph/keyring.radosgw.gateway',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_data' :
+  before => 'Package[httpd]',
+  value  => '/var/lib/ceph/radosgw',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_dns_name' :
+  before => 'Package[httpd]',
+  value  => '*.pp',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_keystone_accepted_roles' :
+  before => 'Package[httpd]',
+  value  => '_member_, Member, admin, swiftoperator',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_keystone_admin_token' :
+  before => 'Package[httpd]',
+  value  => 'UxFQFw3m',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_keystone_revocation_interval' :
+  before => 'Package[httpd]',
+  value  => '1000000',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_keystone_token_cache_size' :
+  before => 'Package[httpd]',
+  value  => '10',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_keystone_url' :
+  before => 'Package[httpd]',
+  value  => '192.168.0.7:35357',
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_print_continue' :
+  before => 'Package[httpd]',
+  value  => true,
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_s3_auth_use_keystone' :
+  before => 'Package[httpd]',
+  value  => true,
+}
+
+ceph_conf { 'client.radosgw.gateway/rgw_socket_path' :
+  before => 'Package[httpd]',
+  value  => '/tmp/radosgw.sock',
+}
+
+ceph_conf { 'client.radosgw.gateway/user' :
+  before => 'Package[httpd]',
+  value  => 'apache',
+}
+
+class { 'Apache::Default_confd_files' :
+  all => true,
+}
+
+class { 'Apache::Default_mods' :
+  all            => true,
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Actions' :
+}
+
+class { 'Apache::Mod::Alias' :
+  apache_version => '2.2',
+  icons_options  => 'Indexes MultiViews',
+}
+
+class { 'Apache::Mod::Authn_core' :
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Authn_file' :
+}
+
+class { 'Apache::Mod::Authz_default' :
+}
+
+class { 'Apache::Mod::Authz_user' :
+}
+
+class { 'Apache::Mod::Autoindex' :
+}
+
+class { 'Apache::Mod::Cache' :
+}
+
+class { 'Apache::Mod::Dav' :
+  before => 'Class[Apache::Mod::Dav_fs]',
+}
+
+class { 'Apache::Mod::Dav_fs' :
+}
+
+class { 'Apache::Mod::Deflate' :
+  notes => { 'Input' => 'instream', 'Output' => 'outstream', 'Ratio' => 'ratio' },
+  types => [ 'text/html text/plain text/xml', 'text/css', 'application/x-javascript application/javascript application/ecmascript', 'application/rss+xml' ],
+}
+
+class { 'Apache::Mod::Dir' :
+  dir     => 'public_html',
+  indexes => [ 'index.html', 'index.html.var', 'index.cgi', 'index.pl', 'index.php', 'index.xhtml' ],
+}
+
+class { 'Apache::Mod::Mime' :
+  mime_support_package => 'mailcap',
+  mime_types_config    => '/etc/mime.types',
+}
+
+class { 'Apache::Mod::Mime_magic' :
+  magic_file => '/etc/httpd/conf/magic',
+}
+
+class { 'Apache::Mod::Negotiation' :
+  force_language_priority => 'Prefer Fallback',
+  language_priority       => [ 'en', 'ca', 'cs', 'da', 'de', 'el', 'eo', 'es', 'et', 'fr', 'he', 'hr', 'it', 'ja', 'ko', 'ltz', 'nl', 'nn', 'no', 'pl', 'pt', 'pt-BR', 'ru', 'sv', 'zh-CN', 'zh-TW' ],
+}
+
+class { 'Apache::Mod::Rewrite' :
+}
+
+class { 'Apache::Mod::Setenvif' :
+}
+
+class { 'Apache::Mod::Speling' :
+}
+
+class { 'Apache::Mod::Suexec' :
+}
+
+class { 'Apache::Mod::Version' :
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Vhost_alias' :
+}
+
+class { 'Apache::Params' :
+}
+
+class { 'Apache::Service' :
+  service_enable => true,
+  service_ensure => 'running',
+  service_manage => true,
+  service_name   => 'httpd',
+}
+
+class { 'Apache::Version' :
+}
+
+class { 'Apache' :
+  apache_name            => 'httpd',
+  apache_version         => '2.2',
+  conf_dir               => '/etc/httpd/conf',
+  conf_template          => 'apache/httpd.conf.erb',
+  confd_dir              => '/etc/httpd/conf.d',
+  default_confd_files    => true,
+  default_mods           => true,
+  default_ssl_cert       => '/etc/pki/tls/certs/localhost.crt',
+  default_ssl_key        => '/etc/pki/tls/private/localhost.key',
+  default_ssl_vhost      => false,
+  default_type           => 'none',
+  default_vhost          => false,
+  docroot                => '/var/www/html',
+  error_documents        => false,
+  group                  => 'apache',
+  httpd_dir              => '/etc/httpd',
+  keepalive              => 'Off',
+  keepalive_timeout      => '15',
+  lib_path               => 'modules',
+  log_formats            => {  },
+  log_level              => 'warn',
+  logroot                => '/var/log/httpd',
+  manage_group           => true,
+  manage_user            => true,
+  max_keepalive_requests => '100',
+  mod_dir                => '/etc/httpd/conf.d',
+  mpm_module             => false,
+  package_ensure         => 'installed',
+  ports_file             => '/etc/httpd/conf/ports.conf',
+  purge_configs          => false,
+  purge_vdir             => false,
+  sendfile               => 'On',
+  server_root            => '/etc/httpd',
+  server_signature       => 'Off',
+  server_tokens          => 'Prod',
+  serveradmin            => 'root@localhost',
+  servername             => 'node-125',
+  service_enable         => true,
+  service_ensure         => 'running',
+  service_manage         => true,
+  service_name           => 'httpd',
+  timeout                => '120',
+  trace_enable           => 'Off',
+  use_optional_includes  => false,
+  user                   => 'apache',
+  vhost_dir              => '/etc/httpd/conf.d',
+}
+
+class { 'Ceph::Keystone' :
+  adm_ip              => '192.168.0.7',
+  int_ip              => '192.168.0.7',
+  pub_ip              => '172.16.0.3',
+  pub_protocol        => 'https',
+  region              => 'RegionOne',
+  swift_endpoint_port => '8080',
+}
+
+class { 'Ceph::Params' :
+}
+
+class { 'Ceph::Radosgw' :
+  adm_ip                           => '192.168.0.7',
+  int_ip                           => '192.168.0.7',
+  primary_mon                      => 'node-125',
+  pub_ip                           => '172.16.0.3',
+  public_ssl                       => true,
+  rgw_data                         => '/var/lib/ceph/radosgw',
+  rgw_dns_name                     => '*.pp',
+  rgw_host                         => 'node-125',
+  rgw_id                           => 'radosgw.gateway',
+  rgw_keyring_path                 => '/etc/ceph/keyring.radosgw.gateway',
+  rgw_keystone_accepted_roles      => '_member_, Member, admin, swiftoperator',
+  rgw_keystone_admin_token         => 'UxFQFw3m',
+  rgw_keystone_revocation_interval => '1000000',
+  rgw_keystone_token_cache_size    => '10',
+  rgw_keystone_url                 => '192.168.0.7:35357',
+  rgw_log_file                     => '/var/log/ceph/radosgw.log',
+  rgw_nss_db_path                  => '/etc/ceph/nss',
+  rgw_port                         => '6780',
+  rgw_print_continue               => true,
+  rgw_s3_auth_use_keystone         => true,
+  rgw_socket_path                  => '/tmp/radosgw.sock',
+  rgw_use_keystone                 => true,
+  rgw_use_pki                      => false,
+  rgw_user                         => 'apache',
+  swift_endpoint_port              => '8080',
+  syslog_facility                  => 'LOG_LOCAL0',
+  syslog_level                     => 'info',
+  use_ssl                          => false,
+  use_syslog                       => true,
+}
+
+class { 'Concat::Setup' :
+}
+
+class { 'Osnailyfacter::Apache' :
+  listen_ports     => [ '127.0.0.1:80', '192.168.0.3:80', '10.108.0.8:8888', '192.168.0.3:5000', '192.168.0.3:35357' ],
+  logrotate_rotate => '52',
+  purge_configs    => false,
+}
+
+class { 'Tweaks::Apache_wrappers' :
+}
+
+concat::fragment { 'Apache ports header' :
+  ensure  => 'present',
+  content => '# ************************************
+# Listen & NameVirtualHost resources in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 10.108.0.8:8888' :
+  ensure  => 'present',
+  content => 'Listen 10.108.0.8:8888
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 127.0.0.1:80' :
+  ensure  => 'present',
+  content => 'Listen 127.0.0.1:80
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.3:35357' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.3:35357
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.3:5000' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.3:5000
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.3:80' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.3:80
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'default-access_log' :
+  content => '  CustomLog "/var/log/httpd/access_log" combined
+',
+  order   => '100',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:80>
+  ServerName default
+  ServerAdmin root@localhost
+',
+  order   => '0',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  order   => '10',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default_error.log"
+',
+  order   => '80',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-scriptalias' :
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  order   => '180',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-ssl-access_log' :
+  content => '  CustomLog "/var/log/httpd/ssl_access_log" combined
+',
+  order   => '100',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:443>
+  ServerName default-ssl
+  ServerAdmin root@localhost
+',
+  order   => '0',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  order   => '10',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default-ssl_error_ssl.log"
+',
+  order   => '80',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-scriptalias' :
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  order   => '180',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-ssl' :
+  content => '
+  ## SSL directives
+  SSLEngine on
+  SSLCertificateFile      "/etc/pki/tls/certs/localhost.crt"
+  SSLCertificateKeyFile   "/etc/pki/tls/private/localhost.key"
+  SSLCACertificatePath    "/etc/pki/tls/certs"
+',
+  order   => '210',
+  target  => '15-default-ssl.conf',
+}
+
+concat { '/etc/httpd/conf/ports.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'alpha',
+  owner          => 'root',
+  path           => '/etc/httpd/conf/ports.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '15-default-ssl.conf' :
+  ensure         => 'absent',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/15-default-ssl.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '15-default.conf' :
+  ensure         => 'absent',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/15-default.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+exec { 'Populate client.radosgw.gateway keyring' :
+  before  => 'File[/etc/ceph/keyring.radosgw.gateway]',
+  command => 'ceph auth get-or-create client.radosgw.gateway > /etc/ceph/keyring.radosgw.gateway',
+  creates => '/etc/ceph/keyring.radosgw.gateway',
+  cwd     => '/root',
+  path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
+}
+
+exec { 'ceph create client.radosgw.gateway' :
+  before  => 'Exec[Populate client.radosgw.gateway keyring]',
+  command => 'ceph auth get-or-create client.radosgw.gateway osd \'allow rwx\' mon \'allow rw\'',
+  cwd     => '/root',
+  path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
+}
+
+exec { 'concat_/etc/httpd/conf/ports.conf' :
+  alias     => 'concat_/tmp//_etc_httpd_conf_ports.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out" -d "/tmp//_etc_httpd_conf_ports.conf"',
+  cwd       => '/root',
+  notify    => File[/etc/httpd/conf/ports.conf],
+  require   => [ File[/tmp//_etc_httpd_conf_ports.conf], File[/tmp//_etc_httpd_conf_ports.conf/fragments], File[/tmp//_etc_httpd_conf_ports.conf/fragments.concat] ],
+  subscribe => File[/tmp//_etc_httpd_conf_ports.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out" -d "/tmp//_etc_httpd_conf_ports.conf" -t',
+}
+
+exec { 'concat_15-default-ssl.conf' :
+  alias   => 'concat_/tmp//15-default-ssl.conf',
+  command => 'true',
+  cwd     => '/root',
+  path    => '/bin:/usr/bin',
+  unless  => 'true',
+}
+
+exec { 'concat_15-default.conf' :
+  alias   => 'concat_/tmp//15-default.conf',
+  command => 'true',
+  cwd     => '/root',
+  path    => '/bin:/usr/bin',
+  unless  => 'true',
+}
+
+exec { 'mkdir /etc/httpd/conf.d' :
+  creates => '/etc/httpd/conf.d',
+  cwd     => '/root',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  require => Package[httpd],
+}
+
+file { '/etc/ceph/keyring.radosgw.gateway' :
+  before => 'Firewall[012 RadosGW allow]',
+  group  => 'apache',
+  mode   => '0640',
+  owner  => 'apache',
+}
+
+file { '/etc/ceph/nss' :
+  ensure  => 'directory',
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+  recurse => true,
+}
+
+file { '/etc/httpd/conf.d//fastcgi.conf' :
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  content => '# This file is managed by Puppet
+
+# WARNING: this is a kludge:
+## The User/Group for httpd need to be set before we can load mod_fastcgi,
+## but /etc/httpd/conf.d/fastcgi.conf on RHEL gets loaded before
+## /etc/httpd/conf/httpd.conf, so we need to set them here :(
+## mod_fcgid does not have this bug,
+## but it does not handle child PHP processes appropriately per
+## http://serverfault.com/questions/303535/a-single-php-fastcgi-process-blocks-all-other-php-requests/305093#305093
+
+User apache
+Group apache
+
+LoadModule fastcgi_module modules/mod_fastcgi.so
+
+# dir for IPC socket files
+FastCgiIpcDir /var/run/mod_fastcgi
+
+# wrap all fastcgi script calls in suexec
+# Must be off in RHEL
+FastCgiWrapper Off
+
+# global FastCgiConfig can be overridden by FastCgiServer options in vhost config
+FastCgiConfig -idle-timeout 20 -maxClassProcesses 1
+
+',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+}
+
+file { '/etc/httpd/conf.d//rgw.conf' :
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  content => 'Listen :6780
+FastCgiExternalServer /var/www/radosgw/s3gw.fcgi -socket /tmp/radosgw.sock
+
+<VirtualHost :6780>
+  ServerName node-125.test.domain.local
+  DocumentRoot /var/www/radosgw
+
+  RewriteEngine On
+  RewriteRule ^/([a-zA-Z0-9-_.]*)([/]?.*) /s3gw.fcgi?page=$1&params=$2&%{QUERY_STRING} [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+
+  <IfModule mod_fastcgi.c>
+    <Directory /var/www/radosgw>
+      Options +ExecCGI
+      AllowOverride All
+      SetHandler fastcgi-script
+      Order allow,deny
+      Allow from all
+      AuthBasicAuthoritative Off
+    </Directory>
+  </IfModule>
+
+  AllowEncodedSlashes On
+  ServerSignature Off
+</VirtualHost>
+',
+  group   => 'apache',
+  owner   => 'apache',
+}
+
+file { '/etc/httpd/conf.d/15-default-ssl.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+}
+
+file { '/etc/httpd/conf.d/15-default.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+}
+
+file { '/etc/httpd/conf.d' :
+  ensure  => 'directory',
+  notify  => Class[Apache::Service],
+  purge   => false,
+  recurse => true,
+  require => Package[httpd],
+}
+
+file { '/etc/httpd/conf/httpd.conf' :
+  ensure  => 'file',
+  content => '# Security
+ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+
+ServerName "node-125"
+ServerRoot "/etc/httpd"
+PidFile run/httpd.pid
+Timeout 120
+KeepAlive Off
+MaxKeepAliveRequests 100
+KeepAliveTimeout 15
+
+User apache
+Group apache
+
+AccessFileName .htaccess
+<FilesMatch "^\.ht">
+     Order allow,deny
+     Deny from all
+     Satisfy all
+</FilesMatch>
+
+<Directory />
+  Options FollowSymLinks
+  AllowOverride None
+</Directory>
+
+
+DefaultType none
+HostnameLookups Off
+ErrorLog "/var/log/httpd/error_log"
+LogLevel warn
+EnableSendfile On
+
+#Listen 80
+
+
+Include "/etc/httpd/conf.d/*.load"
+Include "/etc/httpd/conf/ports.conf"
+
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+LogFormat "%h %l %u %t \"%r\" %>s %b" common
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+
+Include "/etc/httpd/conf.d/*.conf"
+
+',
+  notify  => Class[Apache::Service],
+  require => Package[httpd],
+}
+
+file { '/etc/httpd/conf/ports.conf' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/httpd/conf/ports.conf',
+  backup  => 'puppet',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/httpd/conf/ports.conf',
+  replace => true,
+  source  => '/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out',
+}
+
+file { '/etc/httpd/ssl/' :
+  ensure  => 'directory',
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+  recurse => true,
+}
+
+file { '/etc/logrotate.d/apache2' :
+  ensure  => 'file',
+  content => '# This file managed via puppet
+/var/log/apache2/*.log {
+    weekly
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 640 root adm
+    sharedscripts
+    postrotate
+       if /etc/init.d/apache2 status > /dev/null ; then \
+           (/usr/sbin/apachectl graceful) || (/usr/sbin/apachectl restart)
+       fi;
+    endscript
+    prerotate
+        if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+            run-parts /etc/logrotate.d/httpd-prerotate; \
+        fi; \
+    endscript
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => Package[httpd],
+}
+
+file { '/etc/logrotate.d/httpd-prerotate/apache2' :
+  ensure  => 'file',
+  content => '#!/bin/sh
+# This is a prerotate script for apache2 that will add a delay to the log
+# rotation to spread out the apache2 restarts. The goal of this script is to
+# stager the apache restarts to prevent all services from being down at the
+# same time. LP#1491576
+
+sleep 0
+',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+}
+
+file { '/etc/logrotate.d/httpd-prerotate' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/etc/sudoers.d/ceph' :
+  content => '# This is required for ceph-deploy
+Defaults !requiretty
+',
+}
+
+file { '/tmp//15-default-ssl.conf/fragments.concat.out' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments.concat' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/0_default-ssl-apache-header' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:443>
+  ServerName default-ssl
+  ServerAdmin root@localhost
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/100_default-ssl-access_log' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/ssl_access_log" combined
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/10_default-ssl-docroot' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/180_default-ssl-scriptalias' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-scriptalias',
+  backup  => 'puppet',
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/210_default-ssl-ssl' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-ssl',
+  backup  => 'puppet',
+  content => '
+  ## SSL directives
+  SSLEngine on
+  SSLCertificateFile      "/etc/pki/tls/certs/localhost.crt"
+  SSLCertificateKeyFile   "/etc/pki/tls/private/localhost.key"
+  SSLCACertificatePath    "/etc/pki/tls/certs"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/60_default-ssl-directories' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/80_default-ssl-logging' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default-ssl_error_ssl.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/90_default-ssl-serversignature' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/999_default-ssl-file_footer' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments.concat.out' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments.concat' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments/0_default-apache-header' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:80>
+  ServerName default
+  ServerAdmin root@localhost
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/100_default-access_log' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/access_log" combined
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/10_default-docroot' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/180_default-scriptalias' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-scriptalias',
+  backup  => 'puppet',
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/60_default-directories' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/80_default-logging' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default_error.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/90_default-serversignature' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/999_default-file_footer' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Apache ports header' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Apache ports header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Listen & NameVirtualHost resources in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 10.108.0.8_8888' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 10.108.0.8:8888',
+  backup  => 'puppet',
+  content => 'Listen 10.108.0.8:8888
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 127.0.0.1_80' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 127.0.0.1:80',
+  backup  => 'puppet',
+  content => 'Listen 127.0.0.1:80
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.3_35357' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.3:35357',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.3:35357
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.3_5000' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.3:5000',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.3:5000
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.3_80' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.3:80',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.3:80
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/var/lib/ceph/radosgw/ceph-radosgw.gateway' :
+  ensure  => 'directory',
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+  recurse => true,
+}
+
+file { '/var/lib/ceph/radosgw' :
+  ensure  => 'directory',
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+  recurse => true,
+}
+
+file { '/var/log/ceph/radosgw.log' :
+  ensure => 'absent',
+  before => 'Exec[ceph create client.radosgw.gateway]',
+  group  => 'apache',
+  owner  => 'apache',
+}
+
+file { '/var/log/httpd' :
+  ensure  => 'directory',
+  before  => Concat[15-default.conf],
+  require => Package[httpd],
+}
+
+file { '/var/www/radosgw/s3gw.fcgi' :
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  content => '#!/bin/sh
+exec /usr/bin/radosgw -c /etc/ceph/ceph.conf -n client.radosgw.gateway
+',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+}
+
+file { '/var/www/radosgw' :
+  ensure  => 'directory',
+  before  => 'Exec[ceph create client.radosgw.gateway]',
+  group   => 'apache',
+  mode    => '0755',
+  owner   => 'apache',
+  recurse => true,
+}
+
+file { 'actions.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule actions_module modules/mod_actions.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/actions.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'alias.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => '<IfModule alias_module>
+Alias /icons/ "/var/www/icons/"
+<Directory "/var/www/icons">
+    Options Indexes MultiViews
+    AllowOverride None
+     Order allow,deny
+     Allow from all
+</Directory>
+</IfModule>
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/alias.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule alias_module modules/mod_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'auth_basic.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule auth_basic_module modules/mod_auth_basic.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/auth_basic.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'auth_digest.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule auth_digest_module modules/mod_auth_digest.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/auth_digest.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_alias_module modules/mod_authn_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_anon.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_anon_module modules/mod_authn_anon.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_anon.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_dbm.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_dbm_module modules/mod_authn_dbm.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_dbm.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_default.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_default_module modules/mod_authn_default.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_default.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_file.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_file_module modules/mod_authn_file.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_file.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_dbm.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_dbm_module modules/mod_authz_dbm.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_dbm.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_default.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_default_module modules/mod_authz_default.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_default.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_groupfile.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_groupfile.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_host.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_host_module modules/mod_authz_host.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_host.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_owner.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_owner_module modules/mod_authz_owner.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_owner.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_user.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_user_module modules/mod_authz_user.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_user.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'autoindex.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* Charset=UTF-8
+AddIconByEncoding (CMP,/icons/compressed.gif) x-compress x-gzip x-bzip2
+
+AddIconByType (TXT,/icons/text.gif) text/*
+AddIconByType (IMG,/icons/image2.gif) image/*
+AddIconByType (SND,/icons/sound2.gif) audio/*
+AddIconByType (VID,/icons/movie.gif) video/*
+
+AddIcon /icons/binary.gif .bin .exe
+AddIcon /icons/binhex.gif .hqx
+AddIcon /icons/tar.gif .tar
+AddIcon /icons/world2.gif .wrl .wrl.gz .vrml .vrm .iv
+AddIcon /icons/compressed.gif .Z .z .tgz .gz .zip
+AddIcon /icons/a.gif .ps .ai .eps
+AddIcon /icons/layout.gif .html .shtml .htm .pdf
+AddIcon /icons/text.gif .txt
+AddIcon /icons/c.gif .c
+AddIcon /icons/p.gif .pl .py
+AddIcon /icons/f.gif .for
+AddIcon /icons/dvi.gif .dvi
+AddIcon /icons/uuencoded.gif .uu
+AddIcon /icons/script.gif .conf .sh .shar .csh .ksh .tcl
+AddIcon /icons/tex.gif .tex
+AddIcon /icons/bomb.gif /core
+AddIcon (SND,/icons/sound2.gif) .ogg
+AddIcon (VID,/icons/movie.gif) .ogm
+
+AddIcon /icons/back.gif ..
+AddIcon /icons/hand.right.gif README
+AddIcon /icons/folder.gif ^^DIRECTORY^^
+AddIcon /icons/blank.gif ^^BLANKICON^^
+
+AddIcon /icons/odf6odt-20x22.png .odt
+AddIcon /icons/odf6ods-20x22.png .ods
+AddIcon /icons/odf6odp-20x22.png .odp
+AddIcon /icons/odf6odg-20x22.png .odg
+AddIcon /icons/odf6odc-20x22.png .odc
+AddIcon /icons/odf6odf-20x22.png .odf
+AddIcon /icons/odf6odb-20x22.png .odb
+AddIcon /icons/odf6odi-20x22.png .odi
+AddIcon /icons/odf6odm-20x22.png .odm
+
+AddIcon /icons/odf6ott-20x22.png .ott
+AddIcon /icons/odf6ots-20x22.png .ots
+AddIcon /icons/odf6otp-20x22.png .otp
+AddIcon /icons/odf6otg-20x22.png .otg
+AddIcon /icons/odf6otc-20x22.png .otc
+AddIcon /icons/odf6otf-20x22.png .otf
+AddIcon /icons/odf6oti-20x22.png .oti
+AddIcon /icons/odf6oth-20x22.png .oth
+
+DefaultIcon /icons/unknown.gif
+ReadmeName README.html
+HeaderName HEADER.html
+
+IndexIgnore .??* *~ *# HEADER* README* RCS CVS *,v *,t
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/autoindex.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'autoindex.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule autoindex_module modules/mod_autoindex.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/autoindex.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'cache.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule cache_module modules/mod_cache.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/cache.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dav.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dav_module modules/mod_dav.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dav.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dav_fs.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'DAVLockDB "/var/lib/dav/lockdb"
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/dav_fs.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'dav_fs.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dav_fs_module modules/mod_dav_fs.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dav_fs.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'deflate.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/x-javascript application/javascript application/ecmascript
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE text/html text/plain text/xml
+
+DeflateFilterNote Input instream
+DeflateFilterNote Output outstream
+DeflateFilterNote Ratio ratio
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/deflate.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'deflate.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule deflate_module modules/mod_deflate.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/deflate.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dir.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'DirectoryIndex index.html index.html.var index.cgi index.pl index.php index.xhtml
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/dir.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'dir.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dir_module modules/mod_dir.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dir.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'env.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule env_module modules/mod_env.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/env.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'expires.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule expires_module modules/mod_expires.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/expires.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'ext_filter.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule ext_filter_module modules/mod_ext_filter.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/ext_filter.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'include.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule include_module modules/mod_include.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/include.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'log_config.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule log_config_module modules/mod_log_config.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/log_config.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'logio.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule logio_module modules/mod_logio.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/logio.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'mime.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'TypesConfig /etc/mime.types
+
+AddType application/x-compress .Z
+AddType application/x-gzip .gz .tgz
+AddType application/x-bzip2 .bz2
+
+AddLanguage ca .ca
+AddLanguage cs .cz .cs
+AddLanguage da .dk
+AddLanguage de .de
+AddLanguage el .el
+AddLanguage en .en
+AddLanguage eo .eo
+AddLanguage es .es
+AddLanguage et .et
+AddLanguage fr .fr
+AddLanguage he .he
+AddLanguage hr .hr
+AddLanguage it .it
+AddLanguage ja .ja
+AddLanguage ko .ko
+AddLanguage ltz .ltz
+AddLanguage nl .nl
+AddLanguage nn .nn
+AddLanguage no .no
+AddLanguage pl .po
+AddLanguage pt .pt
+AddLanguage pt-BR .pt-br
+AddLanguage ru .ru
+AddLanguage sv .sv
+AddLanguage zh-CN .zh-cn
+AddLanguage zh-TW .zh-tw
+
+AddHandler type-map var
+AddType text/html .shtml
+AddOutputFilter INCLUDES .shtml
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/mime.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'mime.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule mime_module modules/mod_mime.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/mime.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'mime_magic.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'MIMEMagicFile "/etc/httpd/conf/magic"
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/mime_magic.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'mime_magic.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule mime_magic_module modules/mod_mime_magic.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/mime_magic.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'negotiation.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LanguagePriority en ca cs da de el eo es et fr he hr it ja ko ltz nl nn no pl pt pt-BR ru sv zh-CN zh-TW
+ForceLanguagePriority Prefer Fallback
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/negotiation.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'negotiation.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule negotiation_module modules/mod_negotiation.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/negotiation.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'rewrite.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule rewrite_module modules/mod_rewrite.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/rewrite.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'setenvif.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => '#
+# The following directives modify normal HTTP response behavior to
+# handle known problems with browser implementations.
+#
+BrowserMatch "Mozilla/2" nokeepalive
+BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
+BrowserMatch "RealPlayer 4\.0" force-response-1.0
+BrowserMatch "Java/1\.0" force-response-1.0
+BrowserMatch "JDK/1\.0" force-response-1.0
+
+#
+# The following directive disables redirects on non-GET requests for
+# a directory that does not include the trailing slash.  This fixes a
+# problem with Microsoft WebFolders which does not appropriately handle
+# redirects for folders with DAV methods.
+# Same deal with Apple\'s DAV filesystem and Gnome VFS support for DAV.
+#
+BrowserMatch "Microsoft Data Access Internet Publishing Provider" redirect-carefully
+BrowserMatch "MS FrontPage" redirect-carefully
+BrowserMatch "^WebDrive" redirect-carefully
+BrowserMatch "^WebDAVFS/1.[0123]" redirect-carefully
+BrowserMatch "^gnome-vfs/1.0" redirect-carefully
+BrowserMatch "^gvfs/1" redirect-carefully
+BrowserMatch "^XML Spy" redirect-carefully
+BrowserMatch "^Dreamweaver-WebDAV-SCM1" redirect-carefully
+BrowserMatch " Konqueror/4" redirect-carefully
+
+<IfModule mod_ssl.c>
+  BrowserMatch "MSIE [2-6]" \
+    nokeepalive ssl-unclean-shutdown \
+    downgrade-1.0 force-response-1.0
+  # MSIE 7 and newer should be able to use keepalive
+  BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+</IfModule>
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/setenvif.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'setenvif.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule setenvif_module modules/mod_setenvif.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/setenvif.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'speling.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule speling_module modules/mod_speling.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/speling.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'substitute.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule substitute_module modules/mod_substitute.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/substitute.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'suexec.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule suexec_module modules/mod_suexec.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/suexec.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'usertrack.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule usertrack_module modules/mod_usertrack.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/usertrack.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'version.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule version_module modules/mod_version.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/version.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'vhost_alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule vhost_alias_module modules/mod_vhost_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/vhost_alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+firewall { '012 RadosGW allow' :
+  action => 'accept',
+  chain  => 'INPUT',
+  dport  => [ '6780', '8080' ],
+  notify => 'Service[httpd]',
+  proto  => 'tcp',
+}
+
+group { 'apache' :
+  ensure  => 'present',
+  require => Package[httpd],
+}
+
+haproxy_backend_status { 'keystone-admin' :
+  before => 'Class[Ceph::Keystone]',
+  count  => '200',
+  name   => 'keystone-2',
+  step   => '6',
+  url    => 'http://192.168.0.7:10000/;csv',
+}
+
+haproxy_backend_status { 'keystone-public' :
+  before => 'Class[Ceph::Keystone]',
+  count  => '200',
+  name   => 'keystone-1',
+  step   => '6',
+  url    => 'http://192.168.0.7:10000/;csv',
+}
+
+keystone_endpoint { 'RegionOne/swift' :
+  ensure       => 'present',
+  admin_url    => 'http://192.168.0.7:8080/swift/v1',
+  internal_url => 'http://192.168.0.7:8080/swift/v1',
+  public_url   => 'https://172.16.0.3:8080/swift/v1',
+}
+
+keystone_service { 'swift' :
+  ensure      => 'present',
+  description => 'Openstack Object-Store Service',
+  type        => 'object-store',
+}
+
+package { 'ceph-deploy' :
+  ensure => 'installed',
+}
+
+package { 'ceph-radosgw' :
+  ensure => 'installed',
+  before => [ 'File[/etc/httpd/conf.d//rgw.conf]', 'File[/etc/httpd/conf.d//fastcgi.conf]', 'File[/var/www/radosgw/s3gw.fcgi]', 'File[/etc/httpd/ssl/]', 'File[/var/lib/ceph/radosgw/ceph-radosgw.gateway]', 'File[/var/lib/ceph/radosgw]', 'File[/var/www/radosgw]', 'File[/etc/ceph/nss]', 'File[/var/log/ceph/radosgw.log]' ],
+}
+
+package { 'ceph' :
+  ensure => 'installed',
+}
+
+package { 'httpd' :
+  ensure => 'installed',
+  before => [ 'Package[ceph-radosgw]', 'Package[mod_fastcgi]', 'Package[nss-tools]' ],
+  name   => 'httpd',
+  notify => Class[Apache::Service],
+}
+
+package { 'mailcap' :
+  ensure => 'installed',
+  before => File[mime.conf],
+}
+
+package { 'mod_fastcgi' :
+  ensure => 'installed',
+  before => [ 'File[/etc/httpd/conf.d//rgw.conf]', 'File[/etc/httpd/conf.d//fastcgi.conf]', 'File[/var/www/radosgw/s3gw.fcgi]', 'File[/etc/httpd/ssl/]', 'File[/var/lib/ceph/radosgw/ceph-radosgw.gateway]', 'File[/var/lib/ceph/radosgw]', 'File[/var/www/radosgw]', 'File[/etc/ceph/nss]', 'File[/var/log/ceph/radosgw.log]' ],
+}
+
+package { 'nss-tools' :
+  ensure => 'installed',
+  before => [ 'File[/etc/httpd/conf.d//rgw.conf]', 'File[/etc/httpd/conf.d//fastcgi.conf]', 'File[/var/www/radosgw/s3gw.fcgi]', 'File[/etc/httpd/ssl/]', 'File[/var/lib/ceph/radosgw/ceph-radosgw.gateway]', 'File[/var/lib/ceph/radosgw]', 'File[/var/www/radosgw]', 'File[/etc/ceph/nss]', 'File[/var/log/ceph/radosgw.log]' ],
+}
+
+package { 'redhat-lsb-core' :
+  ensure => 'installed',
+}
+
+service { 'httpd' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  name       => 'httpd',
+  restart    => 'sleep 30 && apachectl graceful || apachectl restart',
+}
+
+stage { 'main' :
+}
+
+user { 'apache' :
+  ensure  => 'present',
+  gid     => 'apache',
+  require => Package[httpd],
+}
+

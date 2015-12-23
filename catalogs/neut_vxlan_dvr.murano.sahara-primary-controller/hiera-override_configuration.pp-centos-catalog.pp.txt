@@ -1,0 +1,17 @@
+file { '/etc/hiera/override/configuration' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/etc/hiera/override' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+stage { 'main' :
+}
+

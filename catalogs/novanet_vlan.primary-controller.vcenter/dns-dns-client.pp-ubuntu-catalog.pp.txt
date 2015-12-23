@@ -1,0 +1,40 @@
+class { 'Osnailyfacter::Resolvconf' :
+  management_vip => '172.16.1.1',
+}
+
+exec { 'dpkg-reconfigure resolvconf' :
+  command     => '/usr/sbin/dpkg-reconfigure -f noninteractive resolvconf',
+  refreshonly => true,
+}
+
+file { '/etc/default/resolvconf' :
+  content => 'REPORT_ABSENT_SYMLINK="yes"',
+}
+
+file { '/etc/resolv.conf' :
+  ensure => 'link',
+  notify => 'Exec[dpkg-reconfigure resolvconf]',
+  target => '/run/resolvconf/resolv.conf',
+}
+
+file { '/etc/resolvconf/resolv.conf.d/head' :
+  ensure  => 'file',
+  content => 'search pp
+nameserver 172.16.1.1
+',
+}
+
+package { 'resolvconf' :
+  ensure => 'present',
+  before => 'File[/etc/resolv.conf]',
+}
+
+service { 'resolvconf' :
+  ensure    => 'running',
+  enable    => true,
+  subscribe => [ File[/etc/resolvconf/resolv.conf.d/head], File[/etc/default/resolvconf] ],
+}
+
+stage { 'main' :
+}
+

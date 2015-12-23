@@ -1,0 +1,24 @@
+file { '/etc/dnsmasq.d/default.conf' :
+  content => '
+dhcp-range=default,10.109.0.3,10.109.0.254,255.255.255.0,120m
+dhcp-option=net:default,option:router,10.109.0.1
+dhcp-boot=net:default,pxelinux.0,boothost,10.109.0.2
+dhcp-option-force=210,http://10.109.0.2/cobbler/boot/
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+nailgun::dnsmasq::dhcp_range { 'default' :
+  dhcp_end_address   => '10.109.0.254',
+  dhcp_gateway       => '10.109.0.1',
+  dhcp_netmask       => '255.255.255.0',
+  dhcp_start_address => '10.109.0.3',
+  lease_time         => '120m',
+  next_server        => '10.109.0.2',
+}
+
+stage { 'main' :
+}
+

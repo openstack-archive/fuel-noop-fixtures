@@ -1,0 +1,11 @@
+package { 'fuel-ha-utils' :
+  ensure => 'latest',
+}
+
+package { 'fuel-misc' :
+  ensure => 'latest',
+}
+
+stage { 'main' :
+}
+

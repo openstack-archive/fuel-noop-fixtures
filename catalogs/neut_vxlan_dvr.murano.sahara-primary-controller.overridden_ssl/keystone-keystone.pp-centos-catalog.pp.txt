@@ -1,0 +1,3878 @@
+anchor { 'keystone_started' :
+  require => Service[openstack-keystone],
+}
+
+apache::listen { '10.108.0.3:8888' :
+}
+
+apache::listen { '127.0.0.1:80' :
+}
+
+apache::listen { '192.168.0.2:35357' :
+}
+
+apache::listen { '192.168.0.2:5000' :
+}
+
+apache::listen { '192.168.0.2:80' :
+}
+
+apache::mod { 'actions' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'auth_basic' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'auth_digest' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_anon' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_dbm' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_default' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authn_file' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_dbm' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_default' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_groupfile' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_host' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_owner' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'authz_user' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'autoindex' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'cache' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dav' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dav_fs' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'deflate' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'dir' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'env' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'expires' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'ext_filter' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'include' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'log_config' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'logio' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'mime' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'mime_magic' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'negotiation' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'rewrite' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'setenvif' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'speling' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'substitute' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'suexec' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'usertrack' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'version' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'vhost_alias' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::mod { 'wsgi' :
+  lib_path       => 'modules',
+  package_ensure => 'present',
+}
+
+apache::namevirtualhost { '192.168.0.2:35357' :
+}
+
+apache::namevirtualhost { '192.168.0.2:5000' :
+}
+
+apache::vhost { 'default-ssl' :
+  ensure               => 'absent',
+  access_log           => true,
+  access_log_env_var   => false,
+  access_log_file      => 'ssl_access_log',
+  access_log_format    => false,
+  access_log_pipe      => false,
+  access_log_syslog    => false,
+  add_listen           => true,
+  additional_includes  => [  ],
+  apache_version       => '2.2',
+  block                => [  ],
+  default_vhost        => false,
+  directoryindex       => '',
+  docroot              => '/var/www/html',
+  docroot_group        => 'root',
+  docroot_owner        => 'root',
+  error_documents      => [  ],
+  error_log            => true,
+  ip_based             => false,
+  logroot              => '/var/log/httpd',
+  logroot_ensure       => 'directory',
+  manage_docroot       => false,
+  no_proxy_uris        => [  ],
+  no_proxy_uris_match  => [  ],
+  options              => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override             => 'None',
+  php_admin_flags      => {  },
+  php_admin_values     => {  },
+  php_flags            => {  },
+  php_values           => {  },
+  port                 => '443',
+  priority             => '15',
+  proxy_error_override => false,
+  proxy_preserve_host  => false,
+  redirect_source      => '/',
+  scriptalias          => '/var/www/cgi-bin',
+  scriptaliases        => { 'alias' => '/cgi-bin', 'path' => '/var/www/cgi-bin' },
+  serveradmin          => 'root@localhost',
+  serveraliases        => [  ],
+  servername           => 'default-ssl',
+  setenv               => [  ],
+  setenvif             => [  ],
+  ssl                  => true,
+  ssl_cert             => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir        => '/etc/pki/tls/certs',
+  ssl_key              => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine      => false,
+  suphp_addhandler     => 'php5-script',
+  suphp_engine         => 'off',
+  vhost_name           => '*',
+  virtual_docroot      => false,
+}
+
+apache::vhost { 'default' :
+  ensure               => 'absent',
+  access_log           => true,
+  access_log_env_var   => false,
+  access_log_file      => 'access_log',
+  access_log_format    => false,
+  access_log_pipe      => false,
+  access_log_syslog    => false,
+  add_listen           => true,
+  additional_includes  => [  ],
+  apache_version       => '2.2',
+  block                => [  ],
+  default_vhost        => false,
+  directoryindex       => '',
+  docroot              => '/var/www/html',
+  docroot_group        => 'root',
+  docroot_owner        => 'root',
+  error_documents      => [  ],
+  error_log            => true,
+  ip_based             => false,
+  logroot              => '/var/log/httpd',
+  logroot_ensure       => 'directory',
+  manage_docroot       => false,
+  no_proxy_uris        => [  ],
+  no_proxy_uris_match  => [  ],
+  options              => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override             => 'None',
+  php_admin_flags      => {  },
+  php_admin_values     => {  },
+  php_flags            => {  },
+  php_values           => {  },
+  port                 => '80',
+  priority             => '15',
+  proxy_error_override => false,
+  proxy_preserve_host  => false,
+  redirect_source      => '/',
+  scriptalias          => '/var/www/cgi-bin',
+  scriptaliases        => { 'alias' => '/cgi-bin', 'path' => '/var/www/cgi-bin' },
+  serveradmin          => 'root@localhost',
+  serveraliases        => [  ],
+  servername           => 'default',
+  setenv               => [  ],
+  setenvif             => [  ],
+  ssl                  => false,
+  ssl_cert             => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir        => '/etc/pki/tls/certs',
+  ssl_key              => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine      => false,
+  suphp_addhandler     => 'php5-script',
+  suphp_engine         => 'off',
+  vhost_name           => '*',
+  virtual_docroot      => false,
+}
+
+apache::vhost { 'keystone_wsgi_admin' :
+  ensure                      => 'present',
+  access_log                  => true,
+  access_log_env_var          => false,
+  access_log_file             => false,
+  access_log_format           => '%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"',
+  access_log_pipe             => false,
+  access_log_syslog           => false,
+  add_listen                  => true,
+  additional_includes         => [  ],
+  apache_version              => '2.2',
+  block                       => [  ],
+  custom_fragment             => 'LimitRequestFieldSize 81900',
+  default_vhost               => false,
+  directoryindex              => '',
+  docroot                     => '/var/www/cgi-bin/keystone',
+  docroot_group               => 'keystone',
+  docroot_owner               => 'keystone',
+  error_documents             => [  ],
+  error_log                   => true,
+  ip                          => '192.168.0.2',
+  ip_based                    => false,
+  logroot                     => '/var/log/httpd',
+  logroot_ensure              => 'directory',
+  manage_docroot              => true,
+  no_proxy_uris               => [  ],
+  no_proxy_uris_match         => [  ],
+  options                     => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override                    => 'None',
+  php_admin_flags             => {  },
+  php_admin_values            => {  },
+  php_flags                   => {  },
+  php_values                  => {  },
+  port                        => '35357',
+  priority                    => '05',
+  proxy_error_override        => false,
+  proxy_preserve_host         => false,
+  redirect_source             => '/',
+  require                     => File[keystone_wsgi_admin],
+  scriptaliases               => [  ],
+  serveraliases               => [  ],
+  servername                  => 'node-128.test.domain.local',
+  setenv                      => [  ],
+  setenvif                    => [  ],
+  ssl                         => false,
+  ssl_cert                    => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir               => '/etc/pki/tls/certs',
+  ssl_key                     => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine             => false,
+  suphp_addhandler            => 'php5-script',
+  suphp_engine                => 'off',
+  vhost_name                  => '*',
+  virtual_docroot             => false,
+  wsgi_application_group      => '%{GLOBAL}',
+  wsgi_daemon_process         => 'keystone_admin',
+  wsgi_daemon_process_options => { 'display-name' => 'keystone-admin', 'group' => 'keystone', 'processes' => '4', 'threads' => '3', 'user' => 'keystone' },
+  wsgi_pass_authorization     => 'On',
+  wsgi_process_group          => 'keystone_admin',
+  wsgi_script_aliases         => { '/' => '/var/www/cgi-bin/keystone/admin' },
+}
+
+apache::vhost { 'keystone_wsgi_main' :
+  ensure                      => 'present',
+  access_log                  => true,
+  access_log_env_var          => false,
+  access_log_file             => false,
+  access_log_format           => '%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"',
+  access_log_pipe             => false,
+  access_log_syslog           => false,
+  add_listen                  => true,
+  additional_includes         => [  ],
+  apache_version              => '2.2',
+  block                       => [  ],
+  custom_fragment             => 'LimitRequestFieldSize 81900',
+  default_vhost               => false,
+  directoryindex              => '',
+  docroot                     => '/var/www/cgi-bin/keystone',
+  docroot_group               => 'keystone',
+  docroot_owner               => 'keystone',
+  error_documents             => [  ],
+  error_log                   => true,
+  ip                          => '192.168.0.2',
+  ip_based                    => false,
+  logroot                     => '/var/log/httpd',
+  logroot_ensure              => 'directory',
+  manage_docroot              => true,
+  no_proxy_uris               => [  ],
+  no_proxy_uris_match         => [  ],
+  options                     => [ 'Indexes', 'FollowSymLinks', 'MultiViews' ],
+  override                    => 'None',
+  php_admin_flags             => {  },
+  php_admin_values            => {  },
+  php_flags                   => {  },
+  php_values                  => {  },
+  port                        => '5000',
+  priority                    => '05',
+  proxy_error_override        => false,
+  proxy_preserve_host         => false,
+  redirect_source             => '/',
+  require                     => File[keystone_wsgi_main],
+  scriptaliases               => [  ],
+  serveraliases               => [  ],
+  servername                  => 'node-128.test.domain.local',
+  setenv                      => [  ],
+  setenvif                    => [  ],
+  ssl                         => false,
+  ssl_cert                    => '/etc/pki/tls/certs/localhost.crt',
+  ssl_certs_dir               => '/etc/pki/tls/certs',
+  ssl_key                     => '/etc/pki/tls/private/localhost.key',
+  ssl_proxyengine             => false,
+  suphp_addhandler            => 'php5-script',
+  suphp_engine                => 'off',
+  vhost_name                  => '*',
+  virtual_docroot             => false,
+  wsgi_application_group      => '%{GLOBAL}',
+  wsgi_daemon_process         => 'keystone_main',
+  wsgi_daemon_process_options => { 'display-name' => 'keystone-main', 'group' => 'keystone', 'processes' => '4', 'threads' => '3', 'user' => 'keystone' },
+  wsgi_pass_authorization     => 'On',
+  wsgi_process_group          => 'keystone_main',
+  wsgi_script_aliases         => { '/' => '/var/www/cgi-bin/keystone/main' },
+}
+
+class { 'Apache::Default_confd_files' :
+  all => true,
+}
+
+class { 'Apache::Default_mods' :
+  all            => true,
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Actions' :
+}
+
+class { 'Apache::Mod::Alias' :
+  apache_version => '2.2',
+  icons_options  => 'Indexes MultiViews',
+}
+
+class { 'Apache::Mod::Authn_core' :
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Authn_file' :
+}
+
+class { 'Apache::Mod::Authz_default' :
+}
+
+class { 'Apache::Mod::Authz_user' :
+}
+
+class { 'Apache::Mod::Autoindex' :
+}
+
+class { 'Apache::Mod::Cache' :
+}
+
+class { 'Apache::Mod::Dav' :
+  before => 'Class[Apache::Mod::Dav_fs]',
+}
+
+class { 'Apache::Mod::Dav_fs' :
+}
+
+class { 'Apache::Mod::Deflate' :
+  notes => { 'Input' => 'instream', 'Output' => 'outstream', 'Ratio' => 'ratio' },
+  types => [ 'text/html text/plain text/xml', 'text/css', 'application/x-javascript application/javascript application/ecmascript', 'application/rss+xml' ],
+}
+
+class { 'Apache::Mod::Dir' :
+  dir     => 'public_html',
+  indexes => [ 'index.html', 'index.html.var', 'index.cgi', 'index.pl', 'index.php', 'index.xhtml' ],
+}
+
+class { 'Apache::Mod::Mime' :
+  mime_support_package => 'mailcap',
+  mime_types_config    => '/etc/mime.types',
+}
+
+class { 'Apache::Mod::Mime_magic' :
+  magic_file => '/etc/httpd/conf/magic',
+}
+
+class { 'Apache::Mod::Negotiation' :
+  force_language_priority => 'Prefer Fallback',
+  language_priority       => [ 'en', 'ca', 'cs', 'da', 'de', 'el', 'eo', 'es', 'et', 'fr', 'he', 'hr', 'it', 'ja', 'ko', 'ltz', 'nl', 'nn', 'no', 'pl', 'pt', 'pt-BR', 'ru', 'sv', 'zh-CN', 'zh-TW' ],
+}
+
+class { 'Apache::Mod::Rewrite' :
+}
+
+class { 'Apache::Mod::Setenvif' :
+}
+
+class { 'Apache::Mod::Speling' :
+}
+
+class { 'Apache::Mod::Suexec' :
+}
+
+class { 'Apache::Mod::Version' :
+  apache_version => '2.2',
+}
+
+class { 'Apache::Mod::Vhost_alias' :
+}
+
+class { 'Apache::Mod::Wsgi' :
+  wsgi_socket_prefix => '/var/run/wsgi',
+}
+
+class { 'Apache::Params' :
+}
+
+class { 'Apache::Service' :
+  service_enable => true,
+  service_ensure => 'running',
+  service_manage => true,
+  service_name   => 'httpd',
+}
+
+class { 'Apache::Version' :
+}
+
+class { 'Apache' :
+  apache_name            => 'httpd',
+  apache_version         => '2.2',
+  conf_dir               => '/etc/httpd/conf',
+  conf_template          => 'apache/httpd.conf.erb',
+  confd_dir              => '/etc/httpd/conf.d',
+  default_confd_files    => true,
+  default_mods           => true,
+  default_ssl_cert       => '/etc/pki/tls/certs/localhost.crt',
+  default_ssl_key        => '/etc/pki/tls/private/localhost.key',
+  default_ssl_vhost      => false,
+  default_type           => 'none',
+  default_vhost          => false,
+  docroot                => '/var/www/html',
+  error_documents        => false,
+  group                  => 'apache',
+  httpd_dir              => '/etc/httpd',
+  keepalive              => 'Off',
+  keepalive_timeout      => '15',
+  lib_path               => 'modules',
+  log_formats            => {  },
+  log_level              => 'warn',
+  logroot                => '/var/log/httpd',
+  manage_group           => true,
+  manage_user            => true,
+  max_keepalive_requests => '100',
+  mod_dir                => '/etc/httpd/conf.d',
+  mpm_module             => false,
+  package_ensure         => 'installed',
+  ports_file             => '/etc/httpd/conf/ports.conf',
+  purge_configs          => false,
+  purge_vdir             => false,
+  sendfile               => 'On',
+  server_root            => '/etc/httpd',
+  server_signature       => 'Off',
+  server_tokens          => 'Prod',
+  serveradmin            => 'root@localhost',
+  servername             => 'node-128',
+  service_enable         => true,
+  service_ensure         => 'running',
+  service_manage         => true,
+  service_name           => 'httpd',
+  timeout                => '120',
+  trace_enable           => 'Off',
+  use_optional_includes  => false,
+  user                   => 'apache',
+  vhost_dir              => '/etc/httpd/conf.d',
+}
+
+class { 'Concat::Setup' :
+}
+
+class { 'Keystone::Client' :
+  ensure => 'present',
+}
+
+class { 'Keystone::Db::Sync' :
+  notify => 'Service[openstack-keystone]',
+}
+
+class { 'Keystone::Endpoint' :
+  admin_url    => 'http://192.168.0.2:35357',
+  internal_url => 'http://192.168.0.2:5000',
+  public_url   => 'https://public.fuel.local:5000',
+  region       => 'RegionOne',
+  version      => 'v2.0',
+}
+
+class { 'Keystone::Logging' :
+  default_log_levels => { 'amqp' => 'WARN', 'amqplib' => 'WARN', 'boto' => 'WARN', 'iso8601' => 'WARN', 'keystonemiddleware' => 'WARN', 'oslo.messaging' => 'INFO', 'oslo_messaging' => 'INFO', 'qpid' => 'WARN', 'requests.packages.urllib3.connectionpool' => 'WARN', 'requests.packages.urllib3.util.retry' => 'WARN', 'routes.middleware' => 'WARN', 'sqlalchemy' => 'WARN', 'stevedore' => 'WARN', 'suds' => 'INFO', 'taskflow' => 'WARN', 'urllib3.connectionpool' => 'WARN', 'urllib3.util.retry' => 'WARN', 'websocket' => 'WARN' },
+}
+
+class { 'Keystone::Params' :
+}
+
+class { 'Keystone::Roles::Admin' :
+  admin                 => 'admin',
+  admin_roles           => 'admin',
+  admin_tenant          => 'admin',
+  admin_tenant_desc     => 'admin tenant',
+  before                => 'Class[Openstack::Auth_file]',
+  configure_user        => true,
+  configure_user_role   => true,
+  email                 => 'admin@localhost',
+  ignore_default_tenant => false,
+  password              => 'admin',
+  service_tenant        => 'services',
+  service_tenant_desc   => 'Tenant for the openstack services',
+}
+
+class { 'Keystone::Service' :
+  ensure         => 'stopped',
+  admin_endpoint => 'http://localhost:35357/v2.0',
+  delay          => '2',
+  enable         => false,
+  hasrestart     => true,
+  hasstatus      => true,
+  insecure       => false,
+  retries        => '10',
+  service_name   => 'openstack-keystone',
+  validate       => false,
+}
+
+class { 'Keystone::Wsgi::Apache' :
+  access_log_format       => '%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"',
+  admin_path              => '/',
+  admin_port              => '35357',
+  bind_host               => '192.168.0.2',
+  priority                => '05',
+  public_path             => '/',
+  public_port             => '5000',
+  servername              => 'node-128.test.domain.local',
+  ssl                     => false,
+  threads                 => '3',
+  vhost_custom_fragment   => 'LimitRequestFieldSize 81900',
+  workers                 => '4',
+  wsgi_application_group  => '%{GLOBAL}',
+  wsgi_pass_authorization => 'On',
+  wsgi_script_ensure      => 'link',
+  wsgi_script_source      => '/usr/share/keystone/keystone.wsgi',
+}
+
+class { 'Keystone' :
+  admin_bind_host                    => '192.168.0.2',
+  admin_endpoint                     => false,
+  admin_port                         => '35357',
+  admin_token                        => '0be9G8hj',
+  admin_workers                      => '4',
+  cache_backend                      => 'keystone.cache.memcache_pool',
+  cache_dir                          => '/var/cache/keystone',
+  catalog_driver                     => false,
+  catalog_template_file              => '/etc/keystone/default_catalog.templates',
+  catalog_type                       => 'sql',
+  client_package_ensure              => 'present',
+  control_exchange                   => false,
+  database_connection                => 'mysql://keystone:32TWl29R@192.168.0.2/keystone?read_timeout=60',
+  database_idle_timeout              => '3600',
+  debug                              => false,
+  debug_cache_backend                => false,
+  enable_fernet_setup                => false,
+  enable_pki_setup                   => true,
+  enable_ssl                         => false,
+  enabled                            => false,
+  fernet_key_repository              => '/etc/keystone/fernet-keys',
+  kombu_ssl_version                  => 'TLSv1',
+  log_dir                            => '/var/log/keystone',
+  log_facility                       => 'LOG_USER',
+  log_file                           => false,
+  manage_service                     => true,
+  memcache_dead_retry                => '60',
+  memcache_pool_maxsize              => '1000',
+  memcache_pool_unused_timeout       => '60',
+  memcache_servers                   => [ '192.168.0.2:11211', '192.168.0.3:11211', '192.168.0.4:11211' ],
+  memcache_socket_timeout            => '1',
+  notification_driver                => false,
+  notification_topics                => false,
+  package_ensure                     => 'present',
+  paste_config                       => '/usr/share/keystone/keystone-dist-paste.ini',
+  public_bind_host                   => '192.168.0.2',
+  public_endpoint                    => false,
+  public_port                        => '5000',
+  public_workers                     => '4',
+  rabbit_heartbeat_rate              => '2',
+  rabbit_heartbeat_timeout_threshold => '0',
+  rabbit_host                        => 'localhost',
+  rabbit_hosts                       => [ '192.168.0.2:5673', ' 192.168.0.4:5673', ' 192.168.0.3:5673' ],
+  rabbit_password                    => 'c7fQJeSe',
+  rabbit_port                        => '5672',
+  rabbit_use_ssl                     => false,
+  rabbit_userid                      => 'nova',
+  rabbit_virtual_host                => '/',
+  require                            => [ Class[Mysql::Bindings], Class[Mysql::Bindings::Python] ],
+  revoke_driver                      => 'keystone.contrib.revoke.backends.sql.Revoke',
+  service_name                       => 'openstack-keystone',
+  signing_ca_certs                   => '/etc/keystone/ssl/certs/ca.pem',
+  signing_ca_key                     => '/etc/keystone/ssl/private/cakey.pem',
+  signing_cert_subject               => '/C=US/ST=Unset/L=Unset/O=Unset/CN=www.example.com',
+  signing_certfile                   => '/etc/keystone/ssl/certs/signing_cert.pem',
+  signing_key_size                   => '2048',
+  signing_keyfile                    => '/etc/keystone/ssl/private/signing_key.pem',
+  ssl_ca_certs                       => '/etc/keystone/ssl/certs/ca.pem',
+  ssl_ca_key                         => '/etc/keystone/ssl/private/cakey.pem',
+  ssl_cert_subject                   => '/C=US/ST=Unset/L=Unset/O=Unset/CN=localhost',
+  ssl_certfile                       => '/etc/keystone/ssl/certs/keystone.pem',
+  ssl_keyfile                        => '/etc/keystone/ssl/private/keystonekey.pem',
+  sync_db                            => true,
+  token_caching                      => false,
+  token_driver                       => 'keystone.token.persistence.backends.memcache_pool.Token',
+  token_expiration                   => '3600',
+  token_provider                     => 'keystone.token.providers.fernet.Provider',
+  use_stderr                         => false,
+  use_syslog                         => true,
+  validate_auth_url                  => false,
+  validate_insecure                  => false,
+  validate_service                   => false,
+  verbose                            => true,
+}
+
+class { 'Mysql::Bindings::Python' :
+}
+
+class { 'Mysql::Bindings' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'MySQL-python',
+}
+
+class { 'Openstack::Auth_file' :
+  admin_password         => 'admin',
+  admin_tenant           => 'admin',
+  admin_user             => 'admin',
+  cacert                 => '/etc/pki/tls/certs/public_haproxy.pem',
+  cinder_endpoint_type   => 'internalURL',
+  controller_node        => '192.168.0.2',
+  glance_endpoint_type   => 'internalURL',
+  keystone_endpoint_type => 'internalURL',
+  murano_repo_url        => 'http://catalog.openstack.org/',
+  neutron_endpoint_type  => 'internalURL',
+  nova_endpoint_type     => 'internalURL',
+  os_endpoint_type       => 'internalURL',
+  region_name            => 'RegionOne',
+  use_no_cache           => true,
+}
+
+class { 'Openstack::Keystone' :
+  admin_address         => '192.168.0.2',
+  admin_bind_host       => '192.168.0.2',
+  admin_token           => '0be9G8hj',
+  admin_url             => 'http://192.168.0.2:35357',
+  cache_backend         => 'keystone.cache.memcache_pool',
+  ceilometer            => false,
+  database_idle_timeout => '3600',
+  db_host               => '192.168.0.2',
+  db_name               => 'keystone',
+  db_password           => '32TWl29R',
+  db_type               => 'mysql',
+  db_user               => 'keystone',
+  debug                 => false,
+  default_log_levels    => { 'amqp' => 'WARN', 'amqplib' => 'WARN', 'boto' => 'WARN', 'iso8601' => 'WARN', 'keystonemiddleware' => 'WARN', 'oslo.messaging' => 'INFO', 'oslo_messaging' => 'INFO', 'qpid' => 'WARN', 'requests.packages.urllib3.connectionpool' => 'WARN', 'requests.packages.urllib3.util.retry' => 'WARN', 'routes.middleware' => 'WARN', 'sqlalchemy' => 'WARN', 'stevedore' => 'WARN', 'suds' => 'INFO', 'taskflow' => 'WARN', 'urllib3.connectionpool' => 'WARN', 'urllib3.util.retry' => 'WARN', 'websocket' => 'WARN' },
+  enabled               => true,
+  fernet_key_repository => '/etc/keystone/fernet-keys',
+  fernet_src_repository => '/var/lib/astute/keystone',
+  internal_address      => '192.168.0.2',
+  internal_url          => 'http://192.168.0.2:5000',
+  max_overflow          => '20',
+  max_pool_size         => '20',
+  max_retries           => '-1',
+  memcache_pool_maxsize => '100',
+  memcache_server_port  => '11211',
+  memcache_servers      => [ '192.168.0.2', '192.168.0.3', '192.168.0.4' ],
+  package_ensure        => 'present',
+  primary_controller    => true,
+  public_address        => 'public.fuel.local',
+  public_bind_host      => '192.168.0.2',
+  public_hostname       => 'public.fuel.local',
+  public_ssl            => true,
+  public_url            => 'https://public.fuel.local:5000',
+  rabbit_hosts          => [ '192.168.0.2:5673', ' 192.168.0.4:5673', ' 192.168.0.3:5673' ],
+  rabbit_password       => 'c7fQJeSe',
+  rabbit_userid         => 'nova',
+  rabbit_virtual_host   => '/',
+  region                => 'RegionOne',
+  revoke_driver         => 'keystone.contrib.revoke.backends.sql.Revoke',
+  service_workers       => '4',
+  syslog_log_facility   => 'LOG_LOCAL7',
+  token_caching         => false,
+  token_provider        => 'keystone.token.providers.fernet.Provider',
+  use_stderr            => false,
+  use_syslog            => true,
+  verbose               => true,
+}
+
+class { 'Openstacklib::Openstackclient' :
+  package_ensure => 'present',
+}
+
+class { 'Osnailyfacter::Apache' :
+  listen_ports     => [ '127.0.0.1:80', '192.168.0.2:80', '10.108.0.3:8888', '192.168.0.2:5000', '192.168.0.2:35357' ],
+  logrotate_rotate => '52',
+  purge_configs    => false,
+}
+
+class { 'Tweaks::Apache_wrappers' :
+}
+
+concat::fragment { 'Apache ports header' :
+  ensure  => 'present',
+  content => '# ************************************
+# Listen & NameVirtualHost resources in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 10.108.0.3:8888' :
+  ensure  => 'present',
+  content => 'Listen 10.108.0.3:8888
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 127.0.0.1:80' :
+  ensure  => 'present',
+  content => 'Listen 127.0.0.1:80
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.2:35357' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.2:35357
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.2:5000' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.2:5000
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'Listen 192.168.0.2:80' :
+  ensure  => 'present',
+  content => 'Listen 192.168.0.2:80
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'NameVirtualHost 192.168.0.2:35357' :
+  ensure  => 'present',
+  content => 'NameVirtualHost 192.168.0.2:35357
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'NameVirtualHost 192.168.0.2:5000' :
+  ensure  => 'present',
+  content => 'NameVirtualHost 192.168.0.2:5000
+',
+  order   => '10',
+  target  => '/etc/httpd/conf/ports.conf',
+}
+
+concat::fragment { 'default-access_log' :
+  content => '  CustomLog "/var/log/httpd/access_log" combined
+',
+  order   => '100',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:80>
+  ServerName default
+  ServerAdmin root@localhost
+',
+  order   => '0',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  order   => '10',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default_error.log"
+',
+  order   => '80',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-scriptalias' :
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  order   => '180',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '15-default.conf',
+}
+
+concat::fragment { 'default-ssl-access_log' :
+  content => '  CustomLog "/var/log/httpd/ssl_access_log" combined
+',
+  order   => '100',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:443>
+  ServerName default-ssl
+  ServerAdmin root@localhost
+',
+  order   => '0',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  order   => '10',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default-ssl_error_ssl.log"
+',
+  order   => '80',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-scriptalias' :
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  order   => '180',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'default-ssl-ssl' :
+  content => '
+  ## SSL directives
+  SSLEngine on
+  SSLCertificateFile      "/etc/pki/tls/certs/localhost.crt"
+  SSLCertificateKeyFile   "/etc/pki/tls/private/localhost.key"
+  SSLCACertificatePath    "/etc/pki/tls/certs"
+',
+  order   => '210',
+  target  => '15-default-ssl.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-access_log' :
+  content => '  CustomLog "/var/log/httpd/keystone_wsgi_admin_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+',
+  order   => '100',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost 192.168.0.2:35357>
+  ServerName node-128.test.domain.local
+',
+  order   => '0',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-custom_fragment' :
+  content => '
+  ## Custom fragment
+LimitRequestFieldSize 81900
+',
+  order   => '270',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/cgi-bin/keystone
+
+  <Directory "/var/www/cgi-bin/keystone">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/cgi-bin/keystone"
+',
+  order   => '10',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/keystone_wsgi_admin_error.log"
+',
+  order   => '80',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_admin-wsgi' :
+  content => '  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess keystone_admin display-name=keystone-admin group=keystone processes=4 threads=3 user=keystone
+  WSGIProcessGroup keystone_admin
+  WSGIScriptAlias / "/var/www/cgi-bin/keystone/admin"
+  WSGIPassAuthorization On
+',
+  order   => '260',
+  target  => '05-keystone_wsgi_admin.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-access_log' :
+  content => '  CustomLog "/var/log/httpd/keystone_wsgi_main_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+',
+  order   => '100',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-apache-header' :
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost 192.168.0.2:5000>
+  ServerName node-128.test.domain.local
+',
+  order   => '0',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-custom_fragment' :
+  content => '
+  ## Custom fragment
+LimitRequestFieldSize 81900
+',
+  order   => '270',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-directories' :
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/cgi-bin/keystone
+
+  <Directory "/var/www/cgi-bin/keystone">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  order   => '60',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-docroot' :
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/cgi-bin/keystone"
+',
+  order   => '10',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-file_footer' :
+  content => '</VirtualHost>
+',
+  order   => '999',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-logging' :
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/keystone_wsgi_main_error.log"
+',
+  order   => '80',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-serversignature' :
+  content => '  ServerSignature Off
+',
+  order   => '90',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat::fragment { 'keystone_wsgi_main-wsgi' :
+  content => '  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess keystone_main display-name=keystone-main group=keystone processes=4 threads=3 user=keystone
+  WSGIProcessGroup keystone_main
+  WSGIScriptAlias / "/var/www/cgi-bin/keystone/main"
+  WSGIPassAuthorization On
+',
+  order   => '260',
+  target  => '05-keystone_wsgi_main.conf',
+}
+
+concat { '/etc/httpd/conf/ports.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'alpha',
+  owner          => 'root',
+  path           => '/etc/httpd/conf/ports.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '05-keystone_wsgi_admin.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/05-keystone_wsgi_admin.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '05-keystone_wsgi_main.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/05-keystone_wsgi_main.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '15-default-ssl.conf' :
+  ensure         => 'absent',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/15-default-ssl.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+concat { '15-default.conf' :
+  ensure         => 'absent',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'root',
+  mode           => '0644',
+  notify         => Class[Apache::Service],
+  order          => 'numeric',
+  owner          => 'root',
+  path           => '/etc/httpd/conf.d/15-default.conf',
+  replace        => true,
+  require        => Package[httpd],
+  warn           => false,
+}
+
+exec { 'add_admin_token_auth_middleware' :
+  before  => 'Exec[keystone-manage db_sync]',
+  command => 'sed -i \'s/\( token_auth \)/\1admin_token_auth /\' /usr/share/keystone/keystone-dist-paste.ini',
+  path    => [ '/bin', '/usr/bin' ],
+  require => Package[keystone],
+  unless  => 'fgrep -q \' admin_token_auth\' /usr/share/keystone/keystone-dist-paste.ini',
+}
+
+exec { 'concat_/etc/httpd/conf/ports.conf' :
+  alias     => 'concat_/tmp//_etc_httpd_conf_ports.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out" -d "/tmp//_etc_httpd_conf_ports.conf"',
+  notify    => File[/etc/httpd/conf/ports.conf],
+  require   => [ File[/tmp//_etc_httpd_conf_ports.conf], File[/tmp//_etc_httpd_conf_ports.conf/fragments], File[/tmp//_etc_httpd_conf_ports.conf/fragments.concat] ],
+  subscribe => File[/tmp//_etc_httpd_conf_ports.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out" -d "/tmp//_etc_httpd_conf_ports.conf" -t',
+}
+
+exec { 'concat_05-keystone_wsgi_admin.conf' :
+  alias     => 'concat_/tmp//05-keystone_wsgi_admin.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//05-keystone_wsgi_admin.conf/fragments.concat.out" -d "/tmp//05-keystone_wsgi_admin.conf" -n',
+  notify    => File[05-keystone_wsgi_admin.conf],
+  require   => [ File[/tmp//05-keystone_wsgi_admin.conf], File[/tmp//05-keystone_wsgi_admin.conf/fragments], File[/tmp//05-keystone_wsgi_admin.conf/fragments.concat] ],
+  subscribe => File[/tmp//05-keystone_wsgi_admin.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//05-keystone_wsgi_admin.conf/fragments.concat.out" -d "/tmp//05-keystone_wsgi_admin.conf" -n -t',
+}
+
+exec { 'concat_05-keystone_wsgi_main.conf' :
+  alias     => 'concat_/tmp//05-keystone_wsgi_main.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//05-keystone_wsgi_main.conf/fragments.concat.out" -d "/tmp//05-keystone_wsgi_main.conf" -n',
+  notify    => File[05-keystone_wsgi_main.conf],
+  require   => [ File[/tmp//05-keystone_wsgi_main.conf], File[/tmp//05-keystone_wsgi_main.conf/fragments], File[/tmp//05-keystone_wsgi_main.conf/fragments.concat] ],
+  subscribe => File[/tmp//05-keystone_wsgi_main.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//05-keystone_wsgi_main.conf/fragments.concat.out" -d "/tmp//05-keystone_wsgi_main.conf" -n -t',
+}
+
+exec { 'concat_15-default-ssl.conf' :
+  alias   => 'concat_/tmp//15-default-ssl.conf',
+  command => 'true',
+  path    => '/bin:/usr/bin',
+  unless  => 'true',
+}
+
+exec { 'concat_15-default.conf' :
+  alias   => 'concat_/tmp//15-default.conf',
+  command => 'true',
+  path    => '/bin:/usr/bin',
+  unless  => 'true',
+}
+
+exec { 'keystone-manage db_sync' :
+  before      => [ 'Class[Keystone::Endpoint]', 'Exec[purge_openrc]' ],
+  command     => 'keystone-manage  db_sync',
+  notify      => [ 'Service[keystone]', 'Exec[purge_openrc]' ],
+  path        => '/usr/bin',
+  refreshonly => true,
+  require     => User[keystone],
+  subscribe   => [ Package[keystone], Keystone_config[database/connection] ],
+  user        => 'keystone',
+}
+
+exec { 'keystone-manage pki_setup' :
+  creates     => '/etc/keystone/ssl/private/signing_key.pem',
+  notify      => Service[openstack-keystone],
+  path        => '/usr/bin',
+  refreshonly => true,
+  require     => User[keystone],
+  subscribe   => Package[keystone],
+  user        => 'keystone',
+}
+
+exec { 'mkdir /etc/httpd/conf.d' :
+  creates => '/etc/httpd/conf.d',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  require => Package[httpd],
+}
+
+exec { 'purge_openrc' :
+  before  => 'Class[Keystone::Roles::Admin]',
+  command => 'rm -f /root/openrc',
+  onlyif  => 'test -f /root/openrc',
+  path    => '/bin:/usr/bin:/sbin:/usr/sbin',
+}
+
+file { '/etc/httpd/conf.d/15-default-ssl.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+}
+
+file { '/etc/httpd/conf.d/15-default.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+}
+
+file { '/etc/httpd/conf.d' :
+  ensure  => 'directory',
+  notify  => Class[Apache::Service],
+  purge   => false,
+  recurse => true,
+  require => Package[httpd],
+}
+
+file { '/etc/httpd/conf/httpd.conf' :
+  ensure  => 'file',
+  content => '# Security
+ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+
+ServerName "node-128"
+ServerRoot "/etc/httpd"
+PidFile run/httpd.pid
+Timeout 120
+KeepAlive Off
+MaxKeepAliveRequests 100
+KeepAliveTimeout 15
+
+User apache
+Group apache
+
+AccessFileName .htaccess
+<FilesMatch "^\.ht">
+     Order allow,deny
+     Deny from all
+     Satisfy all
+</FilesMatch>
+
+<Directory />
+  Options FollowSymLinks
+  AllowOverride None
+</Directory>
+
+
+DefaultType none
+HostnameLookups Off
+ErrorLog "/var/log/httpd/error_log"
+LogLevel warn
+EnableSendfile On
+
+#Listen 80
+
+
+Include "/etc/httpd/conf.d/*.load"
+Include "/etc/httpd/conf/ports.conf"
+
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+LogFormat "%h %l %u %t \"%r\" %>s %b" common
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+
+Include "/etc/httpd/conf.d/*.conf"
+
+',
+  notify  => Class[Apache::Service],
+  require => Package[httpd],
+}
+
+file { '/etc/httpd/conf/ports.conf' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/httpd/conf/ports.conf',
+  backup  => 'puppet',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/httpd/conf/ports.conf',
+  replace => true,
+  source  => '/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out',
+}
+
+file { '/etc/keystone/fernet-keys' :
+  group   => 'keystone',
+  mode    => '0600',
+  notify  => Service[httpd],
+  owner   => 'keystone',
+  recurse => true,
+  require => Class[Keystone],
+  source  => '/var/lib/astute/keystone',
+}
+
+file { '/etc/keystone/keystone.conf' :
+  ensure  => 'present',
+  group   => 'keystone',
+  mode    => '0600',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/etc/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/etc/logrotate.d/apache2' :
+  ensure  => 'file',
+  content => '# This file managed via puppet
+/var/log/apache2/*.log {
+    weekly
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 640 root adm
+    sharedscripts
+    postrotate
+       if /etc/init.d/apache2 status > /dev/null ; then \
+           (/usr/sbin/apachectl graceful) || (/usr/sbin/apachectl restart)
+       fi;
+    endscript
+    prerotate
+        if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+            run-parts /etc/logrotate.d/httpd-prerotate; \
+        fi; \
+    endscript
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => Package[httpd],
+}
+
+file { '/etc/logrotate.d/httpd-prerotate/apache2' :
+  ensure  => 'file',
+  content => '#!/bin/sh
+# This is a prerotate script for apache2 that will add a delay to the log
+# rotation to spread out the apache2 restarts. The goal of this script is to
+# stager the apache restarts to prevent all services from being down at the
+# same time. LP#1491576
+
+sleep 180
+',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+}
+
+file { '/etc/logrotate.d/httpd-prerotate' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/root/openrc' :
+  content => '#!/bin/sh
+export LC_ALL=C
+export OS_NO_CACHE=\'true\'
+export OS_TENANT_NAME=\'admin\'
+export OS_PROJECT_NAME=\'admin\'
+export OS_USERNAME=\'admin\'
+export OS_PASSWORD=\'admin\'
+export OS_AUTH_URL=\'http://192.168.0.2:5000/v2.0/\'
+export OS_DEFAULT_DOMAIN=\'default\'
+export OS_AUTH_STRATEGY=\'keystone\'
+export OS_REGION_NAME=\'RegionOne\'
+export CINDER_ENDPOINT_TYPE=\'internalURL\'
+export GLANCE_ENDPOINT_TYPE=\'internalURL\'
+export KEYSTONE_ENDPOINT_TYPE=\'internalURL\'
+export NOVA_ENDPOINT_TYPE=\'internalURL\'
+export NEUTRON_ENDPOINT_TYPE=\'internalURL\'
+export OS_ENDPOINT_TYPE=\'internalURL\'
+export MURANO_REPO_URL=\'http://catalog.openstack.org/\'
+export OS_CACERT=\'/etc/pki/tls/certs/public_haproxy.pem\'
+',
+  group   => 'root',
+  mode    => '0700',
+  owner   => 'root',
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/0_keystone_wsgi_admin-apache-header' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost 192.168.0.2:35357>
+  ServerName node-128.test.domain.local
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/100_keystone_wsgi_admin-access_log' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/keystone_wsgi_admin_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/10_keystone_wsgi_admin-docroot' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/cgi-bin/keystone"
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/260_keystone_wsgi_admin-wsgi' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-wsgi',
+  backup  => 'puppet',
+  content => '  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess keystone_admin display-name=keystone-admin group=keystone processes=4 threads=3 user=keystone
+  WSGIProcessGroup keystone_admin
+  WSGIScriptAlias / "/var/www/cgi-bin/keystone/admin"
+  WSGIPassAuthorization On
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/270_keystone_wsgi_admin-custom_fragment' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-custom_fragment',
+  backup  => 'puppet',
+  content => '
+  ## Custom fragment
+LimitRequestFieldSize 81900
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/60_keystone_wsgi_admin-directories' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/cgi-bin/keystone
+
+  <Directory "/var/www/cgi-bin/keystone">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/80_keystone_wsgi_admin-logging' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/keystone_wsgi_admin_error.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/90_keystone_wsgi_admin-serversignature' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments/999_keystone_wsgi_admin-file_footer' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_admin-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_05-keystone_wsgi_admin.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//05-keystone_wsgi_admin.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/0_keystone_wsgi_main-apache-header' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost 192.168.0.2:5000>
+  ServerName node-128.test.domain.local
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/100_keystone_wsgi_main-access_log' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/keystone_wsgi_main_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/10_keystone_wsgi_main-docroot' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/cgi-bin/keystone"
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/260_keystone_wsgi_main-wsgi' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-wsgi',
+  backup  => 'puppet',
+  content => '  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess keystone_main display-name=keystone-main group=keystone processes=4 threads=3 user=keystone
+  WSGIProcessGroup keystone_main
+  WSGIScriptAlias / "/var/www/cgi-bin/keystone/main"
+  WSGIPassAuthorization On
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/270_keystone_wsgi_main-custom_fragment' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-custom_fragment',
+  backup  => 'puppet',
+  content => '
+  ## Custom fragment
+LimitRequestFieldSize 81900
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/60_keystone_wsgi_main-directories' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/cgi-bin/keystone
+
+  <Directory "/var/www/cgi-bin/keystone">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/80_keystone_wsgi_main-logging' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/keystone_wsgi_main_error.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/90_keystone_wsgi_main-serversignature' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments/999_keystone_wsgi_main-file_footer' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_keystone_wsgi_main-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  replace => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_05-keystone_wsgi_main.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//05-keystone_wsgi_main.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//15-default-ssl.conf/fragments.concat.out' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments.concat' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/0_default-ssl-apache-header' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:443>
+  ServerName default-ssl
+  ServerAdmin root@localhost
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/100_default-ssl-access_log' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/ssl_access_log" combined
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/10_default-ssl-docroot' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/180_default-ssl-scriptalias' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-scriptalias',
+  backup  => 'puppet',
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/210_default-ssl-ssl' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-ssl',
+  backup  => 'puppet',
+  content => '
+  ## SSL directives
+  SSLEngine on
+  SSLCertificateFile      "/etc/pki/tls/certs/localhost.crt"
+  SSLCertificateKeyFile   "/etc/pki/tls/private/localhost.key"
+  SSLCACertificatePath    "/etc/pki/tls/certs"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/60_default-ssl-directories' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/80_default-ssl-logging' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default-ssl_error_ssl.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/90_default-ssl-serversignature' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments/999_default-ssl-file_footer' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-ssl-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default-ssl.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default-ssl.conf/fragments' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default-ssl.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments.concat.out' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments.concat' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf/fragments/0_default-apache-header' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-apache-header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Vhost template in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+<VirtualHost *:80>
+  ServerName default
+  ServerAdmin root@localhost
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/100_default-access_log' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-access_log',
+  backup  => 'puppet',
+  content => '  CustomLog "/var/log/httpd/access_log" combined
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/10_default-docroot' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-docroot',
+  backup  => 'puppet',
+  content => '
+  ## Vhost docroot
+  DocumentRoot "/var/www/html"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/180_default-scriptalias' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-scriptalias',
+  backup  => 'puppet',
+  content => '  ## Script alias directives
+  ScriptAlias /cgi-bin "/var/www/cgi-bin"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/60_default-directories' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-directories',
+  backup  => 'puppet',
+  content => '
+  ## Directories, there should at least be a declaration for /var/www/html
+
+  <Directory "/var/www/html">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/80_default-logging' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-logging',
+  backup  => 'puppet',
+  content => '
+  ## Logging
+  ErrorLog "/var/log/httpd/default_error.log"
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/90_default-serversignature' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-serversignature',
+  backup  => 'puppet',
+  content => '  ServerSignature Off
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments/999_default-file_footer' :
+  ensure  => 'absent',
+  alias   => 'concat_fragment_default-file_footer',
+  backup  => 'puppet',
+  content => '</VirtualHost>
+',
+  mode    => '0640',
+  notify  => Exec[concat_15-default.conf],
+  replace => true,
+}
+
+file { '/tmp//15-default.conf/fragments' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//15-default.conf' :
+  ensure => 'absent',
+  backup => 'puppet',
+  force  => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Apache ports header' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Apache ports header',
+  backup  => 'puppet',
+  content => '# ************************************
+# Listen & NameVirtualHost resources in module puppetlabs-apache
+# Managed by Puppet
+# ************************************
+
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 10.108.0.3_8888' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 10.108.0.3:8888',
+  backup  => 'puppet',
+  content => 'Listen 10.108.0.3:8888
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 127.0.0.1_80' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 127.0.0.1:80',
+  backup  => 'puppet',
+  content => 'Listen 127.0.0.1:80
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.2_35357' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.2:35357',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.2:35357
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.2_5000' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.2:5000',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.2:5000
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_Listen 192.168.0.2_80' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_Listen 192.168.0.2:80',
+  backup  => 'puppet',
+  content => 'Listen 192.168.0.2:80
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_NameVirtualHost 192.168.0.2_35357' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_NameVirtualHost 192.168.0.2:35357',
+  backup  => 'puppet',
+  content => 'NameVirtualHost 192.168.0.2:35357
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments/10_NameVirtualHost 192.168.0.2_5000' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_NameVirtualHost 192.168.0.2:5000',
+  backup  => 'puppet',
+  content => 'NameVirtualHost 192.168.0.2:5000
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  replace => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/httpd/conf/ports.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_httpd_conf_ports.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/var/cache/keystone' :
+  ensure => 'directory',
+}
+
+file { '/var/lib/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/var/log/httpd' :
+  ensure  => 'directory',
+  before  => Concat[15-default.conf],
+  require => Package[httpd],
+}
+
+file { '/var/log/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/var/www/cgi-bin/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  owner   => 'keystone',
+  require => Package[httpd],
+}
+
+file { '05-keystone_wsgi_admin.conf' :
+  ensure  => 'present',
+  alias   => 'concat_05-keystone_wsgi_admin.conf',
+  backup  => 'puppet',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/05-keystone_wsgi_admin.conf',
+  replace => true,
+  source  => '/tmp//05-keystone_wsgi_admin.conf/fragments.concat.out',
+}
+
+file { '05-keystone_wsgi_main.conf' :
+  ensure  => 'present',
+  alias   => 'concat_05-keystone_wsgi_main.conf',
+  backup  => 'puppet',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/05-keystone_wsgi_main.conf',
+  replace => true,
+  source  => '/tmp//05-keystone_wsgi_main.conf/fragments.concat.out',
+}
+
+file { 'actions.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule actions_module modules/mod_actions.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/actions.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'alias.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => '<IfModule alias_module>
+Alias /icons/ "/var/www/icons/"
+<Directory "/var/www/icons">
+    Options Indexes MultiViews
+    AllowOverride None
+     Order allow,deny
+     Allow from all
+</Directory>
+</IfModule>
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/alias.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule alias_module modules/mod_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'auth_basic.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule auth_basic_module modules/mod_auth_basic.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/auth_basic.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'auth_digest.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule auth_digest_module modules/mod_auth_digest.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/auth_digest.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_alias_module modules/mod_authn_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_anon.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_anon_module modules/mod_authn_anon.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_anon.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_dbm.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_dbm_module modules/mod_authn_dbm.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_dbm.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_default.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_default_module modules/mod_authn_default.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_default.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authn_file.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authn_file_module modules/mod_authn_file.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authn_file.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_dbm.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_dbm_module modules/mod_authz_dbm.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_dbm.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_default.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_default_module modules/mod_authz_default.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_default.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_groupfile.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_groupfile_module modules/mod_authz_groupfile.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_groupfile.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_host.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_host_module modules/mod_authz_host.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_host.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_owner.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_owner_module modules/mod_authz_owner.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_owner.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'authz_user.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule authz_user_module modules/mod_authz_user.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/authz_user.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'autoindex.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* Charset=UTF-8
+AddIconByEncoding (CMP,/icons/compressed.gif) x-compress x-gzip x-bzip2
+
+AddIconByType (TXT,/icons/text.gif) text/*
+AddIconByType (IMG,/icons/image2.gif) image/*
+AddIconByType (SND,/icons/sound2.gif) audio/*
+AddIconByType (VID,/icons/movie.gif) video/*
+
+AddIcon /icons/binary.gif .bin .exe
+AddIcon /icons/binhex.gif .hqx
+AddIcon /icons/tar.gif .tar
+AddIcon /icons/world2.gif .wrl .wrl.gz .vrml .vrm .iv
+AddIcon /icons/compressed.gif .Z .z .tgz .gz .zip
+AddIcon /icons/a.gif .ps .ai .eps
+AddIcon /icons/layout.gif .html .shtml .htm .pdf
+AddIcon /icons/text.gif .txt
+AddIcon /icons/c.gif .c
+AddIcon /icons/p.gif .pl .py
+AddIcon /icons/f.gif .for
+AddIcon /icons/dvi.gif .dvi
+AddIcon /icons/uuencoded.gif .uu
+AddIcon /icons/script.gif .conf .sh .shar .csh .ksh .tcl
+AddIcon /icons/tex.gif .tex
+AddIcon /icons/bomb.gif /core
+AddIcon (SND,/icons/sound2.gif) .ogg
+AddIcon (VID,/icons/movie.gif) .ogm
+
+AddIcon /icons/back.gif ..
+AddIcon /icons/hand.right.gif README
+AddIcon /icons/folder.gif ^^DIRECTORY^^
+AddIcon /icons/blank.gif ^^BLANKICON^^
+
+AddIcon /icons/odf6odt-20x22.png .odt
+AddIcon /icons/odf6ods-20x22.png .ods
+AddIcon /icons/odf6odp-20x22.png .odp
+AddIcon /icons/odf6odg-20x22.png .odg
+AddIcon /icons/odf6odc-20x22.png .odc
+AddIcon /icons/odf6odf-20x22.png .odf
+AddIcon /icons/odf6odb-20x22.png .odb
+AddIcon /icons/odf6odi-20x22.png .odi
+AddIcon /icons/odf6odm-20x22.png .odm
+
+AddIcon /icons/odf6ott-20x22.png .ott
+AddIcon /icons/odf6ots-20x22.png .ots
+AddIcon /icons/odf6otp-20x22.png .otp
+AddIcon /icons/odf6otg-20x22.png .otg
+AddIcon /icons/odf6otc-20x22.png .otc
+AddIcon /icons/odf6otf-20x22.png .otf
+AddIcon /icons/odf6oti-20x22.png .oti
+AddIcon /icons/odf6oth-20x22.png .oth
+
+DefaultIcon /icons/unknown.gif
+ReadmeName README.html
+HeaderName HEADER.html
+
+IndexIgnore .??* *~ *# HEADER* README* RCS CVS *,v *,t
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/autoindex.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'autoindex.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule autoindex_module modules/mod_autoindex.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/autoindex.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'cache.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule cache_module modules/mod_cache.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/cache.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dav.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dav_module modules/mod_dav.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dav.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dav_fs.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'DAVLockDB "/var/lib/dav/lockdb"
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/dav_fs.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'dav_fs.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dav_fs_module modules/mod_dav_fs.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dav_fs.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'deflate.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/x-javascript application/javascript application/ecmascript
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE text/html text/plain text/xml
+
+DeflateFilterNote Input instream
+DeflateFilterNote Output outstream
+DeflateFilterNote Ratio ratio
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/deflate.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'deflate.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule deflate_module modules/mod_deflate.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/deflate.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'dir.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'DirectoryIndex index.html index.html.var index.cgi index.pl index.php index.xhtml
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/dir.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'dir.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule dir_module modules/mod_dir.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/dir.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'env.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule env_module modules/mod_env.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/env.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'expires.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule expires_module modules/mod_expires.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/expires.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'ext_filter.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule ext_filter_module modules/mod_ext_filter.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/ext_filter.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'include.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule include_module modules/mod_include.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/include.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'keystone_wsgi_admin' :
+  ensure  => 'link',
+  group   => 'keystone',
+  mode    => '0644',
+  owner   => 'keystone',
+  path    => '/var/www/cgi-bin/keystone/admin',
+  require => [ File[/var/www/cgi-bin/keystone], Package[keystone] ],
+  target  => '/usr/share/keystone/keystone.wsgi',
+}
+
+file { 'keystone_wsgi_main' :
+  ensure  => 'link',
+  group   => 'keystone',
+  mode    => '0644',
+  owner   => 'keystone',
+  path    => '/var/www/cgi-bin/keystone/main',
+  require => [ File[/var/www/cgi-bin/keystone], Package[keystone] ],
+  target  => '/usr/share/keystone/keystone.wsgi',
+}
+
+file { 'log_config.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule log_config_module modules/mod_log_config.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/log_config.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'logio.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule logio_module modules/mod_logio.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/logio.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'mime.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'TypesConfig /etc/mime.types
+
+AddType application/x-compress .Z
+AddType application/x-gzip .gz .tgz
+AddType application/x-bzip2 .bz2
+
+AddLanguage ca .ca
+AddLanguage cs .cz .cs
+AddLanguage da .dk
+AddLanguage de .de
+AddLanguage el .el
+AddLanguage en .en
+AddLanguage eo .eo
+AddLanguage es .es
+AddLanguage et .et
+AddLanguage fr .fr
+AddLanguage he .he
+AddLanguage hr .hr
+AddLanguage it .it
+AddLanguage ja .ja
+AddLanguage ko .ko
+AddLanguage ltz .ltz
+AddLanguage nl .nl
+AddLanguage nn .nn
+AddLanguage no .no
+AddLanguage pl .po
+AddLanguage pt .pt
+AddLanguage pt-BR .pt-br
+AddLanguage ru .ru
+AddLanguage sv .sv
+AddLanguage zh-CN .zh-cn
+AddLanguage zh-TW .zh-tw
+
+AddHandler type-map var
+AddType text/html .shtml
+AddOutputFilter INCLUDES .shtml
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/mime.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'mime.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule mime_module modules/mod_mime.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/mime.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'mime_magic.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'MIMEMagicFile "/etc/httpd/conf/magic"
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/mime_magic.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'mime_magic.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule mime_magic_module modules/mod_mime_magic.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/mime_magic.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'negotiation.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LanguagePriority en ca cs da de el eo es et fr he hr it ja ko ltz nl nn no pl pt pt-BR ru sv zh-CN zh-TW
+ForceLanguagePriority Prefer Fallback
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/negotiation.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'negotiation.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule negotiation_module modules/mod_negotiation.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/negotiation.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'rewrite.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule rewrite_module modules/mod_rewrite.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/rewrite.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'setenvif.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => '#
+# The following directives modify normal HTTP response behavior to
+# handle known problems with browser implementations.
+#
+BrowserMatch "Mozilla/2" nokeepalive
+BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
+BrowserMatch "RealPlayer 4\.0" force-response-1.0
+BrowserMatch "Java/1\.0" force-response-1.0
+BrowserMatch "JDK/1\.0" force-response-1.0
+
+#
+# The following directive disables redirects on non-GET requests for
+# a directory that does not include the trailing slash.  This fixes a
+# problem with Microsoft WebFolders which does not appropriately handle
+# redirects for folders with DAV methods.
+# Same deal with Apple\'s DAV filesystem and Gnome VFS support for DAV.
+#
+BrowserMatch "Microsoft Data Access Internet Publishing Provider" redirect-carefully
+BrowserMatch "MS FrontPage" redirect-carefully
+BrowserMatch "^WebDrive" redirect-carefully
+BrowserMatch "^WebDAVFS/1.[0123]" redirect-carefully
+BrowserMatch "^gnome-vfs/1.0" redirect-carefully
+BrowserMatch "^gvfs/1" redirect-carefully
+BrowserMatch "^XML Spy" redirect-carefully
+BrowserMatch "^Dreamweaver-WebDAV-SCM1" redirect-carefully
+BrowserMatch " Konqueror/4" redirect-carefully
+
+<IfModule mod_ssl.c>
+  BrowserMatch "MSIE [2-6]" \
+    nokeepalive ssl-unclean-shutdown \
+    downgrade-1.0 force-response-1.0
+  # MSIE 7 and newer should be able to use keepalive
+  BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+</IfModule>
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/setenvif.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'setenvif.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule setenvif_module modules/mod_setenvif.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/setenvif.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'speling.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule speling_module modules/mod_speling.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/speling.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'substitute.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule substitute_module modules/mod_substitute.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/substitute.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'suexec.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule suexec_module modules/mod_suexec.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/suexec.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'usertrack.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule usertrack_module modules/mod_usertrack.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/usertrack.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'version.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule version_module modules/mod_version.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/version.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'vhost_alias.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule vhost_alias_module modules/mod_vhost_alias.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/vhost_alias.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+file { 'wsgi.conf' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => '# The WSGI Apache module configuration file is being
+# managed by Puppet an changes will be overwritten.
+<IfModule mod_wsgi.c>
+  WSGISocketPrefix /var/run/wsgi
+</IfModule>
+',
+  notify  => Class[Apache::Service],
+  path    => '/etc/httpd/conf.d/wsgi.conf',
+  require => Exec[mkdir /etc/httpd/conf.d],
+}
+
+file { 'wsgi.load' :
+  ensure  => 'file',
+  before  => File[/etc/httpd/conf.d],
+  content => 'LoadModule wsgi_module modules/mod_wsgi.so
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Class[Apache::Service],
+  owner   => 'root',
+  path    => '/etc/httpd/conf.d/wsgi.load',
+  require => [ Package[httpd], Exec[mkdir /etc/httpd/conf.d] ],
+}
+
+group { 'apache' :
+  ensure  => 'present',
+  require => Package[httpd],
+}
+
+group { 'keystone' :
+  ensure  => 'present',
+  require => Package[keystone],
+  system  => true,
+}
+
+haproxy_backend_status { 'keystone-admin' :
+  before => [ 'Class[Keystone::Endpoint]', 'Class[Keystone::Roles::Admin]' ],
+  name   => 'keystone-2',
+  url    => 'http://192.168.0.2:10000/;csv',
+}
+
+haproxy_backend_status { 'keystone-public' :
+  before => [ 'Class[Keystone::Endpoint]', 'Class[Keystone::Roles::Admin]' ],
+  name   => 'keystone-1',
+  url    => 'http://192.168.0.2:10000/;csv',
+}
+
+keystone::resource::service_identity { 'keystone' :
+  admin_url             => 'http://192.168.0.2:35357/v2.0',
+  auth_name             => 'keystone',
+  configure_endpoint    => true,
+  configure_service     => true,
+  configure_user        => false,
+  configure_user_role   => false,
+  email                 => 'keystone@localhost',
+  ignore_default_tenant => false,
+  internal_url          => 'http://192.168.0.2:5000/v2.0',
+  password              => false,
+  public_url            => 'https://public.fuel.local:5000/v2.0',
+  region                => 'RegionOne',
+  roles                 => 'admin',
+  service_description   => 'OpenStack Identity Service',
+  service_type          => 'identity',
+  tenant                => 'services',
+}
+
+keystone_config { 'DATABASE/max_overflow' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '20',
+}
+
+keystone_config { 'DATABASE/max_pool_size' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '20',
+}
+
+keystone_config { 'DATABASE/max_retries' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '-1',
+}
+
+keystone_config { 'DEFAULT/admin_bind_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '192.168.0.2',
+}
+
+keystone_config { 'DEFAULT/admin_endpoint' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/admin_port' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '35357',
+}
+
+keystone_config { 'DEFAULT/admin_token' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  secret => true,
+  value  => '0be9G8hj',
+}
+
+keystone_config { 'DEFAULT/compute_port' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/control_exchange' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/debug' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'DEFAULT/default_log_levels' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'amqp=WARN,amqplib=WARN,boto=WARN,iso8601=WARN,keystonemiddleware=WARN,oslo.messaging=INFO,oslo_messaging=INFO,qpid=WARN,requests.packages.urllib3.connectionpool=WARN,requests.packages.urllib3.util.retry=WARN,routes.middleware=WARN,sqlalchemy=WARN,stevedore=WARN,suds=INFO,taskflow=WARN,urllib3.connectionpool=WARN,urllib3.util.retry=WARN,websocket=WARN',
+}
+
+keystone_config { 'DEFAULT/fatal_deprecations' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/instance_format' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/instance_uuid_format' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/log_config_append' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/log_date_format' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/log_dir' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/var/log/keystone',
+}
+
+keystone_config { 'DEFAULT/log_file' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/logging_context_format_string' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/logging_debug_format_suffix' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/logging_default_format_string' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/logging_exception_prefix' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/max_token_size' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/notification_driver' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/notification_format' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/notification_topics' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/public_bind_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '192.168.0.2',
+}
+
+keystone_config { 'DEFAULT/public_endpoint' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/public_port' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '5000',
+}
+
+keystone_config { 'DEFAULT/publish_errors' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'DEFAULT/syslog_log_facility' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'LOG_USER',
+}
+
+keystone_config { 'DEFAULT/use_stderr' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'DEFAULT/use_syslog' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => true,
+}
+
+keystone_config { 'DEFAULT/use_syslog_rfc_format' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => true,
+}
+
+keystone_config { 'DEFAULT/verbose' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => true,
+}
+
+keystone_config { 'app:admin_service/paste.app_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.service:admin_app_factory',
+}
+
+keystone_config { 'app:admin_version_service/paste.app_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.service:admin_version_app_factory',
+}
+
+keystone_config { 'app:public_service/paste.app_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.service:public_app_factory',
+}
+
+keystone_config { 'app:public_version_service/paste.app_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.service:public_version_app_factory',
+}
+
+keystone_config { 'cache/backend' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.cache.memcache_pool',
+}
+
+keystone_config { 'cache/backend_argument' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'cache/debug_cache_backend' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'cache/enabled' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => true,
+}
+
+keystone_config { 'cache/memcache_dead_retry' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '60',
+}
+
+keystone_config { 'cache/memcache_pool_maxsize' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '1000',
+}
+
+keystone_config { 'cache/memcache_pool_unused_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '60',
+}
+
+keystone_config { 'cache/memcache_socket_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '1',
+}
+
+keystone_config { 'catalog/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.catalog.backends.sql.Catalog',
+}
+
+keystone_config { 'catalog/template_file' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/default_catalog.templates',
+}
+
+keystone_config { 'composite:admin//' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'admin_version_api',
+}
+
+keystone_config { 'composite:admin//v2.0' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'admin_api',
+}
+
+keystone_config { 'composite:admin/use' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'egg:Paste#urlmap',
+}
+
+keystone_config { 'composite:main//' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'public_version_api',
+}
+
+keystone_config { 'composite:main//v2.0' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'public_api',
+}
+
+keystone_config { 'composite:main/use' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'egg:Paste#urlmap',
+}
+
+keystone_config { 'database/connection' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  secret => true,
+  value  => 'mysql://keystone:32TWl29R@192.168.0.2/keystone?read_timeout=60',
+}
+
+keystone_config { 'database/idle_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '3600',
+}
+
+keystone_config { 'ec2/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.ec2.backends.sql.Ec2',
+}
+
+keystone_config { 'eventlet_server/admin_workers' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '4',
+}
+
+keystone_config { 'eventlet_server/public_workers' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '4',
+}
+
+keystone_config { 'fernet_tokens/key_repository' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/fernet-keys',
+}
+
+keystone_config { 'fernet_tokens/max_active_keys' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'filter:admin_token_auth/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.middleware:AdminTokenAuthMiddleware.factory',
+}
+
+keystone_config { 'filter:crud_extension/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.admin_crud:CrudExtension.factory',
+}
+
+keystone_config { 'filter:debug/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.common.wsgi:Debug.factory',
+}
+
+keystone_config { 'filter:ec2_extension/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.ec2:Ec2Extension.factory',
+}
+
+keystone_config { 'filter:json_body/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.middleware:JsonBodyMiddleware.factory',
+}
+
+keystone_config { 'filter:s3_extension/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.s3:S3Extension.factory',
+}
+
+keystone_config { 'filter:stats_monitoring/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.stats:StatsMiddleware.factory',
+}
+
+keystone_config { 'filter:stats_reporting/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.stats:StatsExtension.factory',
+}
+
+keystone_config { 'filter:token_auth/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.middleware:TokenAuthMiddleware.factory',
+}
+
+keystone_config { 'filter:url_normalize/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.middleware:NormalizingFilter.factory',
+}
+
+keystone_config { 'filter:user_crud_extension/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.user_crud:CrudExtension.factory',
+}
+
+keystone_config { 'filter:xml_body/paste.filter_factory' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.middleware:XmlBodyMiddleware.factory',
+}
+
+keystone_config { 'identity/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.identity.backends.sql.Identity',
+}
+
+keystone_config { 'memcache/dead_retry' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '60',
+}
+
+keystone_config { 'memcache/pool_maxsize' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '1000',
+}
+
+keystone_config { 'memcache/pool_unused_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '60',
+}
+
+keystone_config { 'memcache/servers' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '192.168.0.2:11211,192.168.0.3:11211,192.168.0.4:11211',
+}
+
+keystone_config { 'memcache/socket_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '1',
+}
+
+keystone_config { 'oslo_messaging_rabbit/heartbeat_rate' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '2',
+}
+
+keystone_config { 'oslo_messaging_rabbit/heartbeat_timeout_threshold' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '0',
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_ca_certs' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_certfile' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_keyfile' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_version' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_ha_queues' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => true,
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_hosts' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '192.168.0.2:5673, 192.168.0.4:5673, 192.168.0.3:5673',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_password' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  secret => true,
+  value  => 'c7fQJeSe',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_use_ssl' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_userid' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'nova',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_virtual_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/',
+}
+
+keystone_config { 'paste_deploy/config_file' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/usr/share/keystone/keystone-dist-paste.ini',
+}
+
+keystone_config { 'pipeline:admin_api/pipeline' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'stats_monitoring url_normalize token_auth admin_token_auth xml_body json_body debug stats_reporting ec2_extension s3_extension crud_extension admin_service',
+}
+
+keystone_config { 'pipeline:admin_version_api/pipeline' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'stats_monitoring url_normalize xml_body admin_version_service',
+}
+
+keystone_config { 'pipeline:public_api/pipeline' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'stats_monitoring url_normalize token_auth admin_token_auth xml_body json_body debug ec2_extension user_crud_extension public_service',
+}
+
+keystone_config { 'pipeline:public_version_api/pipeline' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'stats_monitoring url_normalize xml_body public_version_service',
+}
+
+keystone_config { 'policy/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.policy.backends.sql.Policy',
+}
+
+keystone_config { 'revoke/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.contrib.revoke.backends.sql.Revoke',
+}
+
+keystone_config { 'signing/ca_certs' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/ssl/certs/ca.pem',
+}
+
+keystone_config { 'signing/ca_key' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/ssl/private/cakey.pem',
+}
+
+keystone_config { 'signing/cert_subject' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/C=US/ST=Unset/L=Unset/O=Unset/CN=www.example.com',
+}
+
+keystone_config { 'signing/certfile' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/ssl/certs/signing_cert.pem',
+}
+
+keystone_config { 'signing/key_size' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '2048',
+}
+
+keystone_config { 'signing/keyfile' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '/etc/keystone/ssl/private/signing_key.pem',
+}
+
+keystone_config { 'ssl/enable' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'token/caching' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => false,
+}
+
+keystone_config { 'token/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.token.persistence.backends.memcache_pool.Token',
+}
+
+keystone_config { 'token/expiration' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => '3600',
+}
+
+keystone_config { 'token/provider' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]', 'Service[httpd]' ],
+  value  => 'keystone.token.providers.fernet.Provider',
+}
+
+keystone_endpoint { 'RegionOne/keystone' :
+  ensure       => 'present',
+  admin_url    => 'http://192.168.0.2:35357/v2.0',
+  internal_url => 'http://192.168.0.2:5000/v2.0',
+  public_url   => 'https://public.fuel.local:5000/v2.0',
+}
+
+keystone_role { 'admin' :
+  ensure => 'present',
+}
+
+keystone_service { 'keystone' :
+  ensure      => 'present',
+  description => 'OpenStack Identity Service',
+  type        => 'identity',
+}
+
+keystone_tenant { 'admin' :
+  ensure      => 'present',
+  description => 'admin tenant',
+  enabled     => true,
+}
+
+keystone_tenant { 'services' :
+  ensure      => 'present',
+  description => 'Tenant for the openstack services',
+  enabled     => true,
+}
+
+keystone_user { 'admin' :
+  ensure                => 'present',
+  email                 => 'admin@localhost',
+  enabled               => true,
+  ignore_default_tenant => false,
+  password              => 'admin',
+  tenant                => 'admin',
+}
+
+keystone_user_role { 'admin@admin' :
+  ensure => 'present',
+  roles  => 'admin',
+}
+
+override_resources { 'keystone_config' :
+  data => { 'DEFAULT/crypt_strength' => { 'value' => '6000' }, 'DEFAULT/default_publisher_id' => { 'ensure' => 'absent' }, 'ec2/driver' => { 'value' => 'keystone.contrib.ec2.backends.kvs.Ec2' }, 'policy/driver' => { 'ensure' => 'absent' }, 'trust/allow_redelegation' => { 'value' => true } },
+}
+
+package { 'httpd' :
+  ensure => 'installed',
+  name   => 'httpd',
+  notify => Class[Apache::Service],
+}
+
+package { 'keystone' :
+  ensure => 'present',
+  before => 'Package[httpd]',
+  name   => 'openstack-keystone',
+  notify => [ 'Service[keystone]', 'Service[httpd]' ],
+  tag    => [ 'openstack', 'keystone-package' ],
+}
+
+package { 'mailcap' :
+  ensure => 'installed',
+  before => File[mime.conf],
+}
+
+package { 'mod_wsgi' :
+  ensure  => 'present',
+  before  => [ File[wsgi.load], 'File[wsgi.conf]' ],
+  require => Package[httpd],
+}
+
+package { 'python-keystoneclient' :
+  ensure => 'present',
+  tag    => 'openstack',
+}
+
+package { 'python-memcache' :
+  ensure => 'present',
+  name   => 'python-memcached',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'MySQL-python',
+}
+
+package { 'python-openstackclient' :
+  ensure => 'present',
+  tag    => 'openstack',
+}
+
+service { 'httpd' :
+  ensure     => 'running',
+  before     => [ 'Keystone_endpoint[RegionOne/keystone]', 'Keystone_role[admin]', 'Keystone_service[keystone]', 'Keystone_tenant[services]', 'Keystone_tenant[admin]', 'Keystone_user[admin]', 'Keystone_user_role[admin@admin]', 'Haproxy_backend_status[keystone-public]', 'Haproxy_backend_status[keystone-admin]' ],
+  enable     => true,
+  hasrestart => true,
+  name       => 'httpd',
+  restart    => 'sleep 30 && apachectl graceful || apachectl restart',
+}
+
+service { 'keystone' :
+  ensure     => 'stopped',
+  before     => [ 'Haproxy_backend_status[keystone-public]', 'Haproxy_backend_status[keystone-admin]' ],
+  enable     => false,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'openstack-keystone',
+  tag        => 'keystone-service',
+}
+
+stage { 'main' :
+}
+
+user { 'apache' :
+  ensure  => 'present',
+  gid     => 'apache',
+  require => Package[httpd],
+}
+
+user { 'keystone' :
+  ensure  => 'present',
+  gid     => 'keystone',
+  require => Package[keystone],
+  system  => true,
+}
+

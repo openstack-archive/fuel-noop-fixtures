@@ -1,0 +1,45 @@
+exec { 'add_trust' :
+  command     => 'update-ca-certificates',
+  path        => '/bin:/usr/bin:/sbin:/usr/sbin',
+  refreshonly => true,
+}
+
+file_link { 'ceilometer' :
+}
+
+file_link { 'cinder' :
+}
+
+file_link { 'glance' :
+}
+
+file_link { 'heat' :
+}
+
+file_link { 'horizon' :
+}
+
+file_link { 'keystone' :
+}
+
+file_link { 'murano' :
+}
+
+file_link { 'neutron' :
+}
+
+file_link { 'nova' :
+}
+
+file_link { 'radosgw' :
+}
+
+file_link { 'sahara' :
+}
+
+file_link { 'swift' :
+}
+
+stage { 'main' :
+}
+

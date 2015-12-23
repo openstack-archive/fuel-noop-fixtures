@@ -1,0 +1,49 @@
+class { 'Murano::Keystone::Cfapi_auth' :
+  admin_url           => 'https://murano.admin.fuel.local:8083',
+  auth_name           => 'murano-cfapi',
+  configure_endpoint  => true,
+  email               => 'murano@localhost',
+  internal_url        => 'https://murano.internal.fuel.local:8083',
+  password            => 'xP8WtHQw',
+  public_url          => 'https://murano.public.fuel.local:8083',
+  region              => 'RegionOne',
+  service_description => 'Murano Service Broker API',
+  service_type        => 'service_broker',
+  tenant              => 'services',
+}
+
+keystone::resource::service_identity { 'murano-cfapi' :
+  admin_url             => 'https://murano.admin.fuel.local:8083',
+  auth_name             => 'murano-cfapi',
+  configure_endpoint    => true,
+  configure_service     => true,
+  configure_user        => false,
+  configure_user_role   => false,
+  email                 => 'murano@localhost',
+  ignore_default_tenant => false,
+  internal_url          => 'https://murano.internal.fuel.local:8083',
+  password              => 'xP8WtHQw',
+  public_url            => 'https://murano.public.fuel.local:8083',
+  region                => 'RegionOne',
+  roles                 => 'admin',
+  service_description   => 'Murano Service Broker API',
+  service_type          => 'service_broker',
+  tenant                => 'services',
+}
+
+keystone_endpoint { 'RegionOne/murano-cfapi' :
+  ensure       => 'present',
+  admin_url    => 'https://murano.admin.fuel.local:8083',
+  internal_url => 'https://murano.internal.fuel.local:8083',
+  public_url   => 'https://murano.public.fuel.local:8083',
+}
+
+keystone_service { 'murano-cfapi' :
+  ensure      => 'present',
+  description => 'Murano Service Broker API',
+  type        => 'service_broker',
+}
+
+stage { 'main' :
+}
+

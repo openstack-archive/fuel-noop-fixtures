@@ -1,0 +1,205 @@
+class { 'Galera::Client' :
+  before             => 'Class[Osnailyfacter::Mysql_access]',
+  custom_setup_class => 'galera',
+}
+
+class { 'Mysql::Config' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'python-mysqldb',
+}
+
+class { 'Mysql::Server' :
+}
+
+class { 'Osnailyfacter::Mysql_access' :
+  ensure      => 'present',
+  before      => 'Class[Sahara::Db::Mysql]',
+  db_host     => '192.168.0.2',
+  db_password => 'Lz18BpbQ',
+  db_user     => 'root',
+}
+
+class { 'Sahara::Api' :
+}
+
+class { 'Sahara::Db::Mysql' :
+  allowed_hosts => [ 'node-128', 'localhost', '127.0.0.1', '%' ],
+  charset       => 'utf8',
+  collate       => 'utf8_general_ci',
+  dbname        => 'sahara',
+  host          => '127.0.0.1',
+  password      => 'f0jl4v47',
+  user          => 'sahara',
+}
+
+database { 'sahara' :
+  ensure   => 'present',
+  charset  => 'utf8',
+  provider => 'mysql',
+  require  => Class[Mysql::Server],
+}
+
+database_grant { 'sahara@%/sahara' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[sahara@%],
+}
+
+database_grant { 'sahara@127.0.0.1/sahara' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[sahara@127.0.0.1],
+}
+
+database_grant { 'sahara@localhost/sahara' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[sahara@localhost],
+}
+
+database_grant { 'sahara@node-128/sahara' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[sahara@node-128],
+}
+
+database_user { 'sahara@%' :
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  provider      => 'mysql',
+  require       => Database[sahara],
+}
+
+database_user { 'sahara@127.0.0.1' :
+  ensure        => 'present',
+  password_hash => '*E23B25A0B05249B49498D71CFC06EA7453579E1F',
+  provider      => 'mysql',
+  require       => Database[sahara],
+}
+
+database_user { 'sahara@localhost' :
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  provider      => 'mysql',
+  require       => Database[sahara],
+}
+
+database_user { 'sahara@node-128' :
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  provider      => 'mysql',
+  require       => Database[sahara],
+}
+
+file { '192.168.0.2-mysql-access' :
+  ensure  => 'present',
+  content => '
+[mysql]
+user     = \'root\'
+password = \'Lz18BpbQ\'
+host     = \'192.168.0.2\'
+
+[client]
+user     = \'root\'
+password = \'Lz18BpbQ\'
+host     = \'192.168.0.2\'
+
+[mysqldump]
+user     = \'root\'
+password = \'Lz18BpbQ\'
+host     = \'192.168.0.2\'
+
+[mysqladmin]
+user     = \'root\'
+password = \'Lz18BpbQ\'
+host     = \'192.168.0.2\'
+
+[mysqlcheck]
+user     = \'root\'
+password = \'Lz18BpbQ\'
+host     = \'192.168.0.2\'
+
+',
+  group   => 'root',
+  mode    => '0640',
+  owner   => 'root',
+  path    => '/root/.my.192.168.0.2.cnf',
+}
+
+file { 'default-mysql-access-link' :
+  ensure => 'symlink',
+  path   => '/root/.my.cnf',
+  target => '/root/.my.192.168.0.2.cnf',
+}
+
+mysql::db { 'sahara' :
+  charset     => 'utf8',
+  enforce_sql => false,
+  grant       => 'all',
+  host        => '127.0.0.1',
+  password    => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  require     => Class[Mysql::Config],
+  sql         => '',
+  user        => 'sahara',
+}
+
+openstacklib::db::mysql::host_access { 'sahara_%' :
+  database      => 'sahara',
+  mysql_module  => '0.3',
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  privileges    => 'ALL',
+  user          => 'sahara',
+}
+
+openstacklib::db::mysql::host_access { 'sahara_127.0.0.1' :
+  database      => 'sahara',
+  mysql_module  => '0.3',
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  privileges    => 'ALL',
+  user          => 'sahara',
+}
+
+openstacklib::db::mysql::host_access { 'sahara_localhost' :
+  database      => 'sahara',
+  mysql_module  => '0.3',
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  privileges    => 'ALL',
+  user          => 'sahara',
+}
+
+openstacklib::db::mysql::host_access { 'sahara_node-128' :
+  database      => 'sahara',
+  mysql_module  => '0.3',
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  privileges    => 'ALL',
+  user          => 'sahara',
+}
+
+openstacklib::db::mysql { 'sahara' :
+  allowed_hosts => [ 'node-128', 'localhost', '127.0.0.1', '%' ],
+  charset       => 'utf8',
+  collate       => 'utf8_general_ci',
+  dbname        => 'sahara',
+  host          => '127.0.0.1',
+  mysql_module  => '0.3',
+  password_hash => '*574B0AEBFC05252FE7513EFEAE0EBB5C30CF1CCA',
+  privileges    => 'ALL',
+  require       => Class[Mysql::Python],
+  user          => 'sahara',
+}
+
+package { 'mysql-client' :
+  name => 'mysql-client-5.6',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'python-mysqldb',
+}
+
+stage { 'main' :
+}
+

@@ -1,0 +1,67 @@
+class { 'Ironic::Keystone::Auth' :
+  admin_url           => 'http://192.168.0.5:6385',
+  auth_name           => 'ironic',
+  configure_endpoint  => true,
+  configure_user      => true,
+  configure_user_role => true,
+  email               => 'ironic@localhost',
+  internal_url        => 'http://192.168.0.5:6385',
+  password            => 'ironic',
+  public_url          => 'https://public.fuel.local:6385',
+  region              => 'RegionOne',
+  service_description => 'Ironic Bare Metal Provisioning Service',
+  service_name        => 'ironic',
+  service_type        => 'baremetal',
+  tenant              => 'services',
+}
+
+keystone::resource::service_identity { 'ironic' :
+  admin_url             => 'http://192.168.0.5:6385',
+  auth_name             => 'ironic',
+  configure_endpoint    => true,
+  configure_service     => true,
+  configure_user        => true,
+  configure_user_role   => true,
+  email                 => 'ironic@localhost',
+  ignore_default_tenant => false,
+  internal_url          => 'http://192.168.0.5:6385',
+  password              => 'ironic',
+  public_url            => 'https://public.fuel.local:6385',
+  region                => 'RegionOne',
+  roles                 => 'admin',
+  service_description   => 'Ironic Bare Metal Provisioning Service',
+  service_name          => 'ironic',
+  service_type          => 'baremetal',
+  tenant                => 'services',
+}
+
+keystone_endpoint { 'RegionOne/ironic' :
+  ensure       => 'present',
+  admin_url    => 'http://192.168.0.5:6385',
+  internal_url => 'http://192.168.0.5:6385',
+  public_url   => 'https://public.fuel.local:6385',
+}
+
+keystone_service { 'ironic' :
+  ensure      => 'present',
+  description => 'Ironic Bare Metal Provisioning Service',
+  type        => 'baremetal',
+}
+
+keystone_user { 'ironic' :
+  ensure                => 'present',
+  email                 => 'ironic@localhost',
+  enabled               => true,
+  ignore_default_tenant => false,
+  password              => 'ironic',
+  tenant                => 'services',
+}
+
+keystone_user_role { 'ironic@services' :
+  ensure => 'present',
+  roles  => 'admin',
+}
+
+stage { 'main' :
+}
+

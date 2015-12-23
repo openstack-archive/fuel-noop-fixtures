@@ -1,0 +1,37 @@
+class { 'Sysctl::Base' :
+}
+
+file { '/etc/sysctl.conf' :
+  ensure => 'present',
+  group  => '0',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+package { 'cirros-testvm' :
+  ensure => 'installed',
+  name   => 'cirros-testvm',
+}
+
+package { 'python-openstackclient' :
+  ensure => 'installed',
+}
+
+stage { 'main' :
+}
+
+sysctl::value { 'vm.swappiness' :
+  key     => 'vm.swappiness',
+  require => Class[Sysctl::Base],
+  value   => '10',
+}
+
+sysctl { 'vm.swappiness' :
+  before => Sysctl_runtime[vm.swappiness],
+  val    => '10',
+}
+
+sysctl_runtime { 'vm.swappiness' :
+  val => '10',
+}
+

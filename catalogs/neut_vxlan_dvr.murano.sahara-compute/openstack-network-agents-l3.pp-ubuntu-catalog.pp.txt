@@ -1,0 +1,125 @@
+class { 'Neutron::Agents::L3' :
+  agent_mode                       => 'dvr',
+  allow_automatic_l3agent_failover => false,
+  debug                            => false,
+  enable_metadata_proxy            => true,
+  enabled                          => true,
+  external_network_bridge          => ' ',
+  ha_enabled                       => false,
+  ha_vrrp_advert_int               => '3',
+  ha_vrrp_auth_type                => 'PASS',
+  handle_internal_only_routers     => true,
+  interface_driver                 => 'neutron.agent.linux.interface.OVSInterfaceDriver',
+  manage_service                   => true,
+  metadata_port                    => '8775',
+  package_ensure                   => 'present',
+  periodic_fuzzy_delay             => '5',
+  periodic_interval                => '40',
+  router_delete_namespaces         => true,
+  send_arp_for_ha                  => '3',
+}
+
+class { 'Neutron::Params' :
+}
+
+class { 'Neutron' :
+}
+
+neutron_l3_agent_config { 'DEFAULT/agent_mode' :
+  notify => 'Service[neutron-l3]',
+  value  => 'dvr',
+}
+
+neutron_l3_agent_config { 'DEFAULT/debug' :
+  notify => 'Service[neutron-l3]',
+  value  => false,
+}
+
+neutron_l3_agent_config { 'DEFAULT/enable_metadata_proxy' :
+  notify => 'Service[neutron-l3]',
+  value  => true,
+}
+
+neutron_l3_agent_config { 'DEFAULT/external_network_bridge' :
+  notify => 'Service[neutron-l3]',
+  value  => ' ',
+}
+
+neutron_l3_agent_config { 'DEFAULT/gateway_external_network_id' :
+  notify => 'Service[neutron-l3]',
+}
+
+neutron_l3_agent_config { 'DEFAULT/handle_internal_only_routers' :
+  notify => 'Service[neutron-l3]',
+  value  => true,
+}
+
+neutron_l3_agent_config { 'DEFAULT/interface_driver' :
+  notify => 'Service[neutron-l3]',
+  value  => 'neutron.agent.linux.interface.OVSInterfaceDriver',
+}
+
+neutron_l3_agent_config { 'DEFAULT/metadata_port' :
+  notify => 'Service[neutron-l3]',
+  value  => '8775',
+}
+
+neutron_l3_agent_config { 'DEFAULT/network_device_mtu' :
+  ensure => 'absent',
+  notify => 'Service[neutron-l3]',
+}
+
+neutron_l3_agent_config { 'DEFAULT/periodic_fuzzy_delay' :
+  notify => 'Service[neutron-l3]',
+  value  => '5',
+}
+
+neutron_l3_agent_config { 'DEFAULT/periodic_interval' :
+  notify => 'Service[neutron-l3]',
+  value  => '40',
+}
+
+neutron_l3_agent_config { 'DEFAULT/router_delete_namespaces' :
+  notify => 'Service[neutron-l3]',
+  value  => true,
+}
+
+neutron_l3_agent_config { 'DEFAULT/router_id' :
+  notify => 'Service[neutron-l3]',
+}
+
+neutron_l3_agent_config { 'DEFAULT/send_arp_for_ha' :
+  notify => 'Service[neutron-l3]',
+  value  => '3',
+}
+
+override_resources { 'neutron_l3_agent_config' :
+  data => { 'DEFAULT/send_arp_for_ha' => { 'value' => '5' } },
+}
+
+package { 'neutron-l3' :
+  ensure  => 'present',
+  before  => [ 'Neutron_l3_agent_config[DEFAULT/debug]', 'Neutron_l3_agent_config[DEFAULT/external_network_bridge]', 'Neutron_l3_agent_config[DEFAULT/interface_driver]', 'Neutron_l3_agent_config[DEFAULT/router_id]', 'Neutron_l3_agent_config[DEFAULT/gateway_external_network_id]', 'Neutron_l3_agent_config[DEFAULT/handle_internal_only_routers]', 'Neutron_l3_agent_config[DEFAULT/metadata_port]', 'Neutron_l3_agent_config[DEFAULT/send_arp_for_ha]', 'Neutron_l3_agent_config[DEFAULT/periodic_interval]', 'Neutron_l3_agent_config[DEFAULT/periodic_fuzzy_delay]', 'Neutron_l3_agent_config[DEFAULT/enable_metadata_proxy]', 'Neutron_l3_agent_config[DEFAULT/router_delete_namespaces]', 'Neutron_l3_agent_config[DEFAULT/agent_mode]', 'Neutron_l3_agent_config[DEFAULT/network_device_mtu]' ],
+  name    => 'neutron-l3-agent',
+  notify  => 'Service[neutron-l3]',
+  require => Package[neutron],
+  tag     => [ 'openstack', 'neutron-package' ],
+}
+
+package { 'neutron' :
+  ensure => 'installed',
+  name   => 'binutils',
+  notify => 'Service[neutron-l3]',
+}
+
+service { 'neutron-l3' :
+  ensure  => 'running',
+  enable  => true,
+  name    => 'neutron-l3-agent',
+  require => Class[Neutron],
+  tag     => 'neutron-service',
+}
+
+stage { 'main' :
+}
+

@@ -1,0 +1,739 @@
+anchor { 'keystone_started' :
+  require => Service[openstack-keystone],
+}
+
+class { 'Docker::Container' :
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Keystone::Client' :
+  ensure => 'present',
+}
+
+class { 'Keystone::Db::Sync' :
+  notify => 'Service[openstack-keystone]',
+}
+
+class { 'Keystone::Endpoint' :
+  admin_url    => 'http://10.109.0.2:35357/v2.0',
+  internal_url => 'http://10.109.0.2:5000/v2.0',
+  public_url   => 'http://10.109.0.2:5000/v2.0',
+  region       => 'RegionOne',
+  version      => 'v2.0',
+}
+
+class { 'Keystone::Params' :
+}
+
+class { 'Keystone::Service' :
+  ensure         => 'running',
+  admin_endpoint => 'http://localhost:35357/v2.0',
+  delay          => '2',
+  enable         => true,
+  hasrestart     => true,
+  hasstatus      => true,
+  insecure       => false,
+  retries        => '10',
+  service_name   => 'openstack-keystone',
+  validate       => false,
+}
+
+class { 'Keystone' :
+  admin_bind_host                    => '0.0.0.0',
+  admin_endpoint                     => false,
+  admin_port                         => '35357',
+  admin_token                        => 'ZoyxrMO6',
+  admin_workers                      => '4',
+  cache_backend                      => 'keystone.common.cache.noop',
+  cache_dir                          => '/var/cache/keystone',
+  catalog_driver                     => false,
+  catalog_template_file              => '/etc/keystone/default_catalog.templates',
+  catalog_type                       => 'sql',
+  client_package_ensure              => 'present',
+  control_exchange                   => false,
+  database_connection                => 'postgresql://keystone:cpppakUb@10.109.0.2/keystone',
+  database_idle_timeout              => '200',
+  debug                              => false,
+  debug_cache_backend                => false,
+  enable_fernet_setup                => false,
+  enable_pki_setup                   => true,
+  enable_ssl                         => false,
+  enabled                            => true,
+  fernet_key_repository              => '/etc/keystone/fernet-keys',
+  kombu_ssl_version                  => 'TLSv1',
+  log_dir                            => '/var/log/keystone',
+  log_facility                       => 'LOG_USER',
+  log_file                           => false,
+  manage_service                     => true,
+  memcache_servers                   => false,
+  notification_driver                => false,
+  notification_topics                => false,
+  package_ensure                     => 'present',
+  paste_config                       => '/usr/share/keystone/keystone-dist-paste.ini',
+  public_bind_host                   => '0.0.0.0',
+  public_endpoint                    => false,
+  public_port                        => '5000',
+  public_workers                     => '4',
+  rabbit_heartbeat_rate              => '2',
+  rabbit_heartbeat_timeout_threshold => '0',
+  rabbit_host                        => 'localhost',
+  rabbit_hosts                       => false,
+  rabbit_password                    => 'guest',
+  rabbit_port                        => '5672',
+  rabbit_use_ssl                     => false,
+  rabbit_userid                      => 'guest',
+  rabbit_virtual_host                => '/',
+  revoke_driver                      => 'keystone.contrib.revoke.backends.sql.Revoke',
+  service_name                       => 'openstack-keystone',
+  signing_ca_certs                   => '/etc/keystone/ssl/certs/ca.pem',
+  signing_ca_key                     => '/etc/keystone/ssl/private/cakey.pem',
+  signing_cert_subject               => '/C=US/ST=Unset/L=Unset/O=Unset/CN=www.example.com',
+  signing_certfile                   => '/etc/keystone/ssl/certs/signing_cert.pem',
+  signing_key_size                   => '2048',
+  signing_keyfile                    => '/etc/keystone/ssl/private/signing_key.pem',
+  ssl_ca_certs                       => '/etc/keystone/ssl/certs/ca.pem',
+  ssl_ca_key                         => '/etc/keystone/ssl/private/cakey.pem',
+  ssl_cert_subject                   => '/C=US/ST=Unset/L=Unset/O=Unset/CN=localhost',
+  ssl_certfile                       => '/etc/keystone/ssl/certs/keystone.pem',
+  ssl_keyfile                        => '/etc/keystone/ssl/private/keystonekey.pem',
+  sync_db                            => true,
+  token_caching                      => true,
+  token_driver                       => 'keystone.token.persistence.backends.sql.Token',
+  token_expiration                   => '86400',
+  token_provider                     => 'keystone.token.providers.uuid.Provider',
+  use_stderr                         => true,
+  use_syslog                         => false,
+  validate_auth_url                  => false,
+  validate_insecure                  => false,
+  validate_service                   => false,
+  verbose                            => false,
+}
+
+class { 'Nailgun::Auth' :
+  address   => '10.109.0.2',
+  auth_name => 'nailgun',
+  password  => 'MtC5S2TN',
+  port      => '8000',
+  region    => 'RegionOne',
+}
+
+class { 'Nailgun::Ostf::Auth' :
+  address   => '10.109.0.2',
+  auth_name => 'ostf',
+  password  => '7evzsSBv',
+  port      => '8000',
+  region    => 'RegionOne',
+}
+
+class { 'Openstacklib::Openstackclient' :
+  package_ensure => 'present',
+}
+
+cron { 'keystone-flush-token' :
+  ensure      => 'present',
+  command     => 'keystone-manage token_flush',
+  environment => 'PATH=/bin:/usr/bin:/usr/sbin',
+  hour        => '1',
+  require     => Package[crontabs],
+  user        => 'root',
+}
+
+exec { 'keystone-manage db_sync' :
+  command     => 'keystone-manage  db_sync',
+  notify      => 'Service[keystone]',
+  path        => '/usr/bin',
+  refreshonly => false,
+  require     => User[keystone],
+  subscribe   => [ Package[keystone], Keystone_config[database/connection] ],
+  user        => 'keystone',
+}
+
+exec { 'keystone-manage pki_setup' :
+  creates     => '/etc/keystone/ssl/private/signing_key.pem',
+  notify      => Service[openstack-keystone],
+  path        => '/usr/bin',
+  refreshonly => true,
+  require     => User[keystone],
+  subscribe   => Package[keystone],
+  user        => 'keystone',
+}
+
+file { '/etc/keystone/keystone.conf' :
+  ensure  => 'present',
+  group   => 'keystone',
+  mode    => '0600',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/etc/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/var/cache/keystone' :
+  ensure => 'directory',
+}
+
+file { '/var/lib/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file { '/var/log/keystone' :
+  ensure  => 'directory',
+  group   => 'keystone',
+  mode    => '0750',
+  notify  => Service[openstack-keystone],
+  owner   => 'keystone',
+  require => Package[keystone],
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+group { 'keystone' :
+  ensure  => 'present',
+  require => Package[keystone],
+  system  => true,
+}
+
+keystone::resource::service_identity { 'keystone' :
+  admin_url             => 'http://10.109.0.2:35357/v2.0/v2.0',
+  auth_name             => 'keystone',
+  configure_endpoint    => true,
+  configure_service     => true,
+  configure_user        => false,
+  configure_user_role   => false,
+  email                 => 'keystone@localhost',
+  ignore_default_tenant => false,
+  internal_url          => 'http://10.109.0.2:5000/v2.0/v2.0',
+  password              => false,
+  public_url            => 'http://10.109.0.2:5000/v2.0/v2.0',
+  region                => 'RegionOne',
+  roles                 => 'admin',
+  service_description   => 'OpenStack Identity Service',
+  service_type          => 'identity',
+  tenant                => 'services',
+}
+
+keystone_config { 'DEFAULT/admin_bind_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '0.0.0.0',
+}
+
+keystone_config { 'DEFAULT/admin_endpoint' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/admin_port' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '35357',
+}
+
+keystone_config { 'DEFAULT/admin_token' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  secret => true,
+  value  => 'ZoyxrMO6',
+}
+
+keystone_config { 'DEFAULT/compute_port' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/control_exchange' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/debug' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'DEFAULT/log_dir' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/var/log/keystone',
+}
+
+keystone_config { 'DEFAULT/log_file' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/max_token_size' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/notification_driver' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/notification_format' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/notification_topics' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/public_bind_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '0.0.0.0',
+}
+
+keystone_config { 'DEFAULT/public_endpoint' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'DEFAULT/public_port' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '5000',
+}
+
+keystone_config { 'DEFAULT/use_stderr' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => true,
+}
+
+keystone_config { 'DEFAULT/use_syslog' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'DEFAULT/verbose' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'cache/backend' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/backend_argument' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/debug_cache_backend' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/enabled' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/memcache_dead_retry' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/memcache_pool_maxsize' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/memcache_pool_unused_timeout' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'cache/memcache_socket_timeout' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'catalog/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'keystone.catalog.backends.sql.Catalog',
+}
+
+keystone_config { 'catalog/template_file' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/default_catalog.templates',
+}
+
+keystone_config { 'database/connection' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  secret => true,
+  value  => 'postgresql://keystone:cpppakUb@10.109.0.2/keystone',
+}
+
+keystone_config { 'database/idle_timeout' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '200',
+}
+
+keystone_config { 'eventlet_server/admin_workers' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '4',
+}
+
+keystone_config { 'eventlet_server/public_workers' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '4',
+}
+
+keystone_config { 'fernet_tokens/key_repository' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/fernet-keys',
+}
+
+keystone_config { 'fernet_tokens/max_active_keys' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'memcache/dead_retry' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'memcache/pool_maxsize' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'memcache/pool_unused_timeout' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'memcache/servers' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'memcache/socket_timeout' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/heartbeat_rate' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '2',
+}
+
+keystone_config { 'oslo_messaging_rabbit/heartbeat_timeout_threshold' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '0',
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_ca_certs' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_certfile' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_keyfile' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/kombu_ssl_version' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_ha_queues' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'localhost',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_hosts' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'localhost:5672',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_password' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  secret => true,
+  value  => 'guest',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_port' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '5672',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_use_ssl' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_userid' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'guest',
+}
+
+keystone_config { 'oslo_messaging_rabbit/rabbit_virtual_host' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/',
+}
+
+keystone_config { 'paste_deploy/config_file' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/usr/share/keystone/keystone-dist-paste.ini',
+}
+
+keystone_config { 'revoke/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'keystone.contrib.revoke.backends.sql.Revoke',
+}
+
+keystone_config { 'signing/ca_certs' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/ssl/certs/ca.pem',
+}
+
+keystone_config { 'signing/ca_key' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/ssl/private/cakey.pem',
+}
+
+keystone_config { 'signing/cert_subject' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/C=US/ST=Unset/L=Unset/O=Unset/CN=www.example.com',
+}
+
+keystone_config { 'signing/certfile' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/ssl/certs/signing_cert.pem',
+}
+
+keystone_config { 'signing/key_size' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '2048',
+}
+
+keystone_config { 'signing/keyfile' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '/etc/keystone/ssl/private/signing_key.pem',
+}
+
+keystone_config { 'ssl/enable' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => false,
+}
+
+keystone_config { 'token/caching' :
+  ensure => 'absent',
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+}
+
+keystone_config { 'token/driver' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'keystone.token.persistence.backends.sql.Token',
+}
+
+keystone_config { 'token/expiration' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => '86400',
+}
+
+keystone_config { 'token/provider' :
+  notify => [ 'Service[openstack-keystone]', 'Exec[keystone-manage db_sync]', 'Exec[keystone-manage pki_setup]' ],
+  value  => 'keystone.token.providers.uuid.Provider',
+}
+
+keystone_endpoint { 'RegionOne/keystone' :
+  ensure       => 'present',
+  admin_url    => 'http://10.109.0.2:35357/v2.0/v2.0',
+  internal_url => 'http://10.109.0.2:5000/v2.0/v2.0',
+  public_url   => 'http://10.109.0.2:5000/v2.0/v2.0',
+}
+
+keystone_endpoint { 'RegionOne/nailgun' :
+  ensure       => 'present',
+  admin_url    => 'http://10.109.0.2:8000/api',
+  internal_url => 'http://10.109.0.2:8000/api',
+  public_url   => 'http://10.109.0.2:8000/api',
+}
+
+keystone_endpoint { 'RegionOne/ostf' :
+  ensure       => 'present',
+  admin_url    => 'http://10.109.0.2:8000/ostf',
+  internal_url => 'http://10.109.0.2:8000/ostf',
+  public_url   => 'http://10.109.0.2:8000/ostf',
+}
+
+keystone_role { 'admin' :
+  ensure => 'present',
+}
+
+keystone_role { 'monitoring' :
+  ensure => 'present',
+}
+
+keystone_service { 'keystone' :
+  ensure      => 'present',
+  description => 'OpenStack Identity Service',
+  type        => 'identity',
+}
+
+keystone_service { 'nailgun' :
+  ensure      => 'present',
+  description => 'Nailgun API',
+  type        => 'fuel',
+}
+
+keystone_service { 'ostf' :
+  ensure      => 'present',
+  description => 'OSTF',
+  type        => 'ostf',
+}
+
+keystone_tenant { 'admin' :
+  ensure  => 'present',
+  enabled => 'True',
+}
+
+keystone_tenant { 'services' :
+  ensure      => 'present',
+  description => 'fuel services tenant',
+  enabled     => 'True',
+}
+
+keystone_user { 'admin' :
+  ensure           => 'present',
+  enabled          => 'True',
+  password         => 'admin',
+  replace_password => false,
+  tenant           => 'admin',
+}
+
+keystone_user { 'monitord' :
+  ensure   => 'present',
+  email    => 'monitord@localhost',
+  enabled  => 'True',
+  password => '9IR0gsgd',
+  tenant   => 'services',
+}
+
+keystone_user { 'nailgun' :
+  ensure   => 'present',
+  enabled  => 'True',
+  password => 'MtC5S2TN',
+  tenant   => 'services',
+}
+
+keystone_user { 'ostf' :
+  ensure   => 'present',
+  enabled  => 'True',
+  password => '7evzsSBv',
+  tenant   => 'services',
+}
+
+keystone_user_role { 'admin@admin' :
+  ensure => 'present',
+  roles  => 'admin',
+}
+
+keystone_user_role { 'monitord@services' :
+  ensure => 'present',
+  roles  => 'monitoring',
+}
+
+keystone_user_role { 'nailgun@services' :
+  ensure => 'present',
+  roles  => 'admin',
+}
+
+keystone_user_role { 'ostf@services' :
+  ensure => 'present',
+  roles  => 'admin',
+}
+
+package { 'crontabs' :
+  ensure => 'latest',
+}
+
+package { 'keystone' :
+  ensure => 'present',
+  name   => 'openstack-keystone',
+  tag    => [ 'openstack', 'keystone-package' ],
+}
+
+package { 'python-keystoneclient' :
+  ensure => 'present',
+  tag    => 'openstack',
+}
+
+package { 'python-openstackclient' :
+  ensure => 'present',
+  tag    => 'openstack',
+}
+
+package { 'python-psycopg2' :
+  ensure => 'installed',
+}
+
+service { 'crond' :
+  ensure => 'running',
+  enable => true,
+}
+
+service { 'keystone' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'openstack-keystone',
+  tag        => 'keystone-service',
+}
+
+stage { 'main' :
+}
+
+user { 'keystone' :
+  ensure  => 'present',
+  gid     => 'keystone',
+  require => Package[keystone],
+  system  => true,
+}
+

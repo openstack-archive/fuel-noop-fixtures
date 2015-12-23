@@ -1,0 +1,1203 @@
+anchor { 'postgresql::server::end' :
+}
+
+anchor { 'postgresql::server::service::begin' :
+}
+
+anchor { 'postgresql::server::service::end' :
+}
+
+anchor { 'postgresql::server::start' :
+  before => 'Class[Postgresql::Server::Install]',
+}
+
+augeas { 'override PGPORT in /etc/sysconfig/pgsql/postgresql' :
+  before  => Class[Postgresql::Server::Reload],
+  changes => 'set PGPORT 5432',
+  context => '/files/etc/sysconfig/pgsql/postgresql',
+  incl    => '/etc/sysconfig/pgsql/*',
+  lens    => 'Shellvars.lns',
+  notify  => Class[Postgresql::Server::Service],
+  require => File[/etc/sysconfig/pgsql/postgresql],
+}
+
+class { 'Concat::Setup' :
+}
+
+class { 'Docker::Container' :
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Nailgun::Database' :
+  dbname   => 'nailgun',
+  password => 'CYoU6RS6',
+  user     => 'nailgun',
+}
+
+class { 'Postgresql::Client' :
+  file_ensure    => 'file',
+  package_ensure => 'present',
+  package_name   => 'postgresql',
+}
+
+class { 'Postgresql::Globals' :
+  bindir              => '/usr/pgsql-9.3/bin',
+  client_package_name => 'postgresql',
+  encoding            => 'UTF8',
+  server_package_name => 'postgresql-server',
+  version             => '9.3',
+}
+
+class { 'Postgresql::Params' :
+}
+
+class { 'Postgresql::Server::Config' :
+  before => 'Class[Postgresql::Server::Service]',
+}
+
+class { 'Postgresql::Server::Initdb' :
+  before => 'Class[Postgresql::Server::Config]',
+}
+
+class { 'Postgresql::Server::Install' :
+  before => 'Class[Postgresql::Server::Initdb]',
+}
+
+class { 'Postgresql::Server::Passwd' :
+  before => 'Anchor[postgresql::server::end]',
+}
+
+class { 'Postgresql::Server::Reload' :
+  require => Class[Postgresql::Server::Install],
+}
+
+class { 'Postgresql::Server::Service' :
+  before => 'Class[Postgresql::Server::Passwd]',
+}
+
+class { 'Postgresql::Server' :
+  before                     => [ 'Postgres_config[log_directory]', 'Postgres_config[log_filename]', 'Postgres_config[log_rotation_age]' ],
+  client_package_name        => 'postgresql',
+  createdb_path              => '/usr/pgsql-9.3/bin/createdb',
+  datadir                    => '/var/lib/pgsql/9.3/data',
+  default_database           => 'postgres',
+  encoding                   => 'UTF8',
+  group                      => 'postgres',
+  initdb_path                => '/usr/pgsql-9.3/bin/initdb',
+  ip_mask_allow_all_users    => '0.0.0.0/0',
+  ip_mask_deny_postgres_user => '0.0.0.0/0',
+  ipv4acls                   => [  ],
+  ipv6acls                   => [  ],
+  listen_addresses           => '0.0.0.0',
+  manage_pg_hba_conf         => true,
+  manage_pg_ident_conf       => true,
+  needs_initdb               => true,
+  package_ensure             => 'present',
+  package_name               => 'postgresql-server',
+  pg_hba_conf_defaults       => true,
+  pg_hba_conf_path           => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  pg_ident_conf_path         => '/var/lib/pgsql/9.3/data/pg_ident.conf',
+  plperl_package_name        => 'postgresql93-plperl',
+  port                       => '5432',
+  postgresql_conf_path       => '/var/lib/pgsql/9.3/data/postgresql.conf',
+  psql_path                  => '/usr/pgsql-9.3/bin/psql',
+  service_enable             => true,
+  service_ensure             => 'running',
+  service_name               => 'postgresql-9.3',
+  user                       => 'postgres',
+}
+
+concat::fragment { 'pg_hba_rule_allow access to all users' :
+  content => '
+# Rule Name: allow access to all users
+# Description: none
+# Order: 100
+host	all	all	0.0.0.0/0	md5
+',
+  order   => '100',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat::fragment { 'pg_hba_rule_allow access to ipv6 localhost' :
+  content => '
+# Rule Name: allow access to ipv6 localhost
+# Description: none
+# Order: 101
+host	all	all	::1/128	md5
+',
+  order   => '101',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat::fragment { 'pg_hba_rule_allow localhost TCP access to postgresql user' :
+  content => '
+# Rule Name: allow localhost TCP access to postgresql user
+# Description: none
+# Order: 003
+host	all	postgres	127.0.0.1/32	md5
+',
+  order   => '003',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat::fragment { 'pg_hba_rule_deny access to postgresql user' :
+  content => '
+# Rule Name: deny access to postgresql user
+# Description: none
+# Order: 004
+host	all	postgres	0.0.0.0/0	reject
+',
+  order   => '004',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat::fragment { 'pg_hba_rule_local access as postgres user' :
+  content => '
+# Rule Name: local access as postgres user
+# Description: none
+# Order: 001
+local	all	postgres		ident
+',
+  order   => '001',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat::fragment { 'pg_hba_rule_local access to database with same name' :
+  content => '
+# Rule Name: local access to database with same name
+# Description: none
+# Order: 002
+local	all	all		ident
+',
+  order   => '002',
+  target  => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+}
+
+concat { '/var/lib/pgsql/9.3/data/pg_hba.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => 'postgres',
+  mode           => '0640',
+  notify         => Class[Postgresql::Server::Reload],
+  order          => 'alpha',
+  owner          => 'postgres',
+  path           => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  replace        => true,
+  warn           => true,
+}
+
+concat { '/var/lib/pgsql/9.3/data/pg_ident.conf' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => true,
+  group          => 'postgres',
+  mode           => '0640',
+  notify         => Class[Postgresql::Server::Reload],
+  order          => 'alpha',
+  owner          => 'postgres',
+  path           => '/var/lib/pgsql/9.3/data/pg_ident.conf',
+  replace        => true,
+  warn           => true,
+}
+
+exec { '/usr/pgsql-9.3/bin/createdb --port='5432' --owner='postgres' --template=template0 --encoding 'UTF8'  'keystone'' :
+  before      => 'Postgresql_psql[UPDATE pg_database SET datistemplate = false WHERE datname = \'keystone\']',
+  logoutput   => 'on_failure',
+  notify      => 'Postgresql_psql[REVOKE CONNECT ON DATABASE "keystone" FROM public]',
+  refreshonly => true,
+  user        => 'postgres',
+}
+
+exec { '/usr/pgsql-9.3/bin/createdb --port='5432' --owner='postgres' --template=template0 --encoding 'UTF8'  'nailgun'' :
+  before      => 'Postgresql_psql[UPDATE pg_database SET datistemplate = false WHERE datname = \'nailgun\']',
+  logoutput   => 'on_failure',
+  notify      => 'Postgresql_psql[REVOKE CONNECT ON DATABASE "nailgun" FROM public]',
+  refreshonly => true,
+  user        => 'postgres',
+}
+
+exec { '/usr/pgsql-9.3/bin/createdb --port='5432' --owner='postgres' --template=template0 --encoding 'UTF8'  'ostf'' :
+  before      => 'Postgresql_psql[UPDATE pg_database SET datistemplate = false WHERE datname = \'ostf\']',
+  logoutput   => 'on_failure',
+  notify      => 'Postgresql_psql[REVOKE CONNECT ON DATABASE "ostf" FROM public]',
+  refreshonly => true,
+  user        => 'postgres',
+}
+
+exec { 'concat_/var/lib/pgsql/9.3/data/pg_hba.conf' :
+  alias     => 'concat_/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat.out" -d "/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf" -w \'# This file is managed by Puppet. DO NOT EDIT.\'',
+  notify    => File[/var/lib/pgsql/9.3/data/pg_hba.conf],
+  require   => [ File[/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf], File[/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments], File[/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat] ],
+  subscribe => File[/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat.out" -d "/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf" -w \'# This file is managed by Puppet. DO NOT EDIT.\' -t',
+}
+
+exec { 'concat_/var/lib/pgsql/9.3/data/pg_ident.conf' :
+  alias     => 'concat_/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat.out" -d "/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf" -w \'# This file is managed by Puppet. DO NOT EDIT.\' -f',
+  notify    => File[/var/lib/pgsql/9.3/data/pg_ident.conf],
+  require   => [ File[/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf], File[/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments], File[/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat] ],
+  subscribe => File[/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat.out" -d "/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf" -w \'# This file is managed by Puppet. DO NOT EDIT.\' -f -t',
+}
+
+exec { 'postgresql_initdb' :
+  command   => '/usr/pgsql-9.3/bin/initdb --encoding \'UTF8\' --pgdata \'/var/lib/pgsql/9.3/data\'',
+  creates   => '/var/lib/pgsql/9.3/data/PG_VERSION',
+  group     => 'postgres',
+  logoutput => 'on_failure',
+  require   => File[/var/lib/pgsql/9.3/data],
+  user      => 'postgres',
+}
+
+exec { 'postgresql_reload' :
+  command     => 'service postgresql-9.3 reload',
+  path        => '/usr/bin:/usr/sbin:/bin:/sbin',
+  refreshonly => true,
+  require     => Class[Postgresql::Server::Service],
+}
+
+exec { 'postgresql_stop' :
+  before    => 'Augeas[override PGPORT in /etc/sysconfig/pgsql/postgresql]',
+  command   => 'service postgresql-9.3 stop',
+  logoutput => 'on_failure',
+  onlyif    => 'service postgresql-9.3 status',
+  path      => '/sbin:/bin:/usr/bin:/usr/local/bin',
+  require   => File[/etc/sysconfig/pgsql/postgresql],
+  unless    => 'grep \'PGPORT=5432\' /etc/sysconfig/pgsql/postgresql',
+}
+
+exec { 'validate postgres connection for /postgres' :
+  command   => 'echo \'Unable to connect to defined database using: /usr/pgsql-9.3/bin/psql --tuples-only --quiet -p 5432 --dbname postgres \' && false',
+  cwd       => '/tmp',
+  logoutput => 'on_failure',
+  path      => '/bin:/usr/bin:/usr/local/bin',
+  require   => Package[postgresql-client],
+  timeout   => '180',
+  unless    => '/usr/local/bin/validate_postgresql_connection.sh 1 60 \'/usr/pgsql-9.3/bin/psql --tuples-only --quiet -p 5432 --dbname postgres \'',
+  user      => 'postgres',
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/sysconfig/pgsql/postgresql' :
+  ensure  => 'present',
+  replace => false,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/001_pg_hba_rule_local access as postgres user' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_local access as postgres user',
+  backup  => 'puppet',
+  content => '
+# Rule Name: local access as postgres user
+# Description: none
+# Order: 001
+local	all	postgres		ident
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/002_pg_hba_rule_local access to database with same name' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_local access to database with same name',
+  backup  => 'puppet',
+  content => '
+# Rule Name: local access to database with same name
+# Description: none
+# Order: 002
+local	all	all		ident
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/003_pg_hba_rule_allow localhost TCP access to postgresql user' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_allow localhost TCP access to postgresql user',
+  backup  => 'puppet',
+  content => '
+# Rule Name: allow localhost TCP access to postgresql user
+# Description: none
+# Order: 003
+host	all	postgres	127.0.0.1/32	md5
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/004_pg_hba_rule_deny access to postgresql user' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_deny access to postgresql user',
+  backup  => 'puppet',
+  content => '
+# Rule Name: deny access to postgresql user
+# Description: none
+# Order: 004
+host	all	postgres	0.0.0.0/0	reject
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/100_pg_hba_rule_allow access to all users' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_allow access to all users',
+  backup  => 'puppet',
+  content => '
+# Rule Name: allow access to all users
+# Description: none
+# Order: 100
+host	all	all	0.0.0.0/0	md5
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments/101_pg_hba_rule_allow access to ipv6 localhost' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_pg_hba_rule_allow access to ipv6 localhost',
+  backup  => 'puppet',
+  content => '
+# Rule Name: allow access to ipv6 localhost
+# Description: none
+# Order: 101
+host	all	all	::1/128	md5
+',
+  mode    => '0640',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  replace => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_hba.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/var/lib/pgsql/9.3/data/pg_ident.conf],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/usr/local/bin/validate_postgresql_connection.sh' :
+  ensure => 'file',
+  group  => '0',
+  mode   => '0755',
+  owner  => '0',
+  source => 'puppet:///modules/postgresql/validate_postgresql_connection.sh',
+}
+
+file { '/var/lib/pgsql/9.3/data/pg_hba.conf' :
+  ensure  => 'present',
+  alias   => 'concat_/var/lib/pgsql/9.3/data/pg_hba.conf',
+  backup  => 'puppet',
+  group   => 'postgres',
+  mode    => '0640',
+  owner   => 'postgres',
+  path    => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  replace => true,
+  source  => '/tmp//_var_lib_pgsql_9.3_data_pg_hba.conf/fragments.concat.out',
+}
+
+file { '/var/lib/pgsql/9.3/data/pg_ident.conf' :
+  ensure  => 'present',
+  alias   => 'concat_/var/lib/pgsql/9.3/data/pg_ident.conf',
+  backup  => 'puppet',
+  group   => 'postgres',
+  mode    => '0640',
+  owner   => 'postgres',
+  path    => '/var/lib/pgsql/9.3/data/pg_ident.conf',
+  replace => true,
+  source  => '/tmp//_var_lib_pgsql_9.3_data_pg_ident.conf/fragments.concat.out',
+}
+
+file { '/var/lib/pgsql/9.3/data' :
+  ensure => 'directory',
+  group  => 'postgres',
+  mode   => '0700',
+  owner  => 'postgres',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+package { 'postgresql-client' :
+  ensure => 'present',
+  name   => 'postgresql',
+  tag    => 'postgresql',
+}
+
+package { 'postgresql-server' :
+  ensure => 'present',
+  name   => 'postgresql-server',
+  tag    => 'postgresql',
+}
+
+postgres_config { 'log_directory' :
+  ensure => 'present',
+  value  => '\'/var/log/\'',
+}
+
+postgres_config { 'log_filename' :
+  ensure => 'present',
+  value  => '\'pgsql\'',
+}
+
+postgres_config { 'log_rotation_age' :
+  ensure => 'present',
+  value  => '7d',
+}
+
+postgresql::server::config_entry { 'listen_addresses' :
+  ensure => 'present',
+  path   => false,
+  value  => '0.0.0.0',
+}
+
+postgresql::server::config_entry { 'port' :
+  ensure => 'present',
+  path   => false,
+  value  => '5432',
+}
+
+postgresql::server::database { 'keystone' :
+  before     => 'Postgresql_psql[GRANT ALL ON DATABASE "keystone" TO "keystone"]',
+  dbname     => 'keystone',
+  encoding   => 'UTF8',
+  istemplate => false,
+  owner      => 'postgres',
+  template   => 'template0',
+}
+
+postgresql::server::database { 'nailgun' :
+  before     => 'Postgresql_psql[GRANT ALL ON DATABASE "nailgun" TO "nailgun"]',
+  dbname     => 'nailgun',
+  encoding   => 'UTF8',
+  istemplate => false,
+  owner      => 'postgres',
+  template   => 'template0',
+}
+
+postgresql::server::database { 'ostf' :
+  before     => 'Postgresql_psql[GRANT ALL ON DATABASE "ostf" TO "ostf"]',
+  dbname     => 'ostf',
+  encoding   => 'UTF8',
+  istemplate => false,
+  owner      => 'postgres',
+  template   => 'template0',
+}
+
+postgresql::server::database_grant { 'GRANT keystone - all - keystone' :
+  db        => 'keystone',
+  privilege => 'all',
+  role      => 'keystone',
+}
+
+postgresql::server::database_grant { 'GRANT nailgun - all - nailgun' :
+  db        => 'nailgun',
+  privilege => 'all',
+  role      => 'nailgun',
+}
+
+postgresql::server::database_grant { 'GRANT ostf - all - ostf' :
+  db        => 'ostf',
+  privilege => 'all',
+  role      => 'ostf',
+}
+
+postgresql::server::db { 'keystone' :
+  dbname     => 'keystone',
+  encoding   => 'UTF8',
+  grant      => 'all',
+  istemplate => false,
+  password   => 'cpppakUb',
+  require    => Class[Postgresql::Server],
+  template   => 'template0',
+  user       => 'keystone',
+}
+
+postgresql::server::db { 'nailgun' :
+  dbname     => 'nailgun',
+  encoding   => 'UTF8',
+  grant      => 'all',
+  istemplate => false,
+  password   => 'CYoU6RS6',
+  require    => Class[Postgresql::Server],
+  template   => 'template0',
+  user       => 'nailgun',
+}
+
+postgresql::server::db { 'ostf' :
+  dbname     => 'ostf',
+  encoding   => 'UTF8',
+  grant      => 'all',
+  istemplate => false,
+  password   => 'TwfzylM7',
+  require    => Class[Postgresql::Server],
+  template   => 'template0',
+  user       => 'ostf',
+}
+
+postgresql::server::grant { 'database:GRANT keystone - all - keystone' :
+  db          => 'keystone',
+  object_name => 'keystone',
+  object_type => 'DATABASE',
+  port        => '5432',
+  privilege   => 'all',
+  psql_db     => 'postgres',
+  psql_user   => 'postgres',
+  role        => 'keystone',
+}
+
+postgresql::server::grant { 'database:GRANT nailgun - all - nailgun' :
+  db          => 'nailgun',
+  object_name => 'nailgun',
+  object_type => 'DATABASE',
+  port        => '5432',
+  privilege   => 'all',
+  psql_db     => 'postgres',
+  psql_user   => 'postgres',
+  role        => 'nailgun',
+}
+
+postgresql::server::grant { 'database:GRANT ostf - all - ostf' :
+  db          => 'ostf',
+  object_name => 'ostf',
+  object_type => 'DATABASE',
+  port        => '5432',
+  privilege   => 'all',
+  psql_db     => 'postgres',
+  psql_user   => 'postgres',
+  role        => 'ostf',
+}
+
+postgresql::server::pg_hba_rule { 'allow access to all users' :
+  address     => '0.0.0.0/0',
+  auth_method => 'md5',
+  database    => 'all',
+  description => 'none',
+  order       => '100',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'host',
+  user        => 'all',
+}
+
+postgresql::server::pg_hba_rule { 'allow access to ipv6 localhost' :
+  address     => '::1/128',
+  auth_method => 'md5',
+  database    => 'all',
+  description => 'none',
+  order       => '101',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'host',
+  user        => 'all',
+}
+
+postgresql::server::pg_hba_rule { 'allow localhost TCP access to postgresql user' :
+  address     => '127.0.0.1/32',
+  auth_method => 'md5',
+  database    => 'all',
+  description => 'none',
+  order       => '003',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'host',
+  user        => 'postgres',
+}
+
+postgresql::server::pg_hba_rule { 'deny access to postgresql user' :
+  address     => '0.0.0.0/0',
+  auth_method => 'reject',
+  database    => 'all',
+  description => 'none',
+  order       => '004',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'host',
+  user        => 'postgres',
+}
+
+postgresql::server::pg_hba_rule { 'local access as postgres user' :
+  auth_method => 'ident',
+  database    => 'all',
+  description => 'none',
+  order       => '001',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'local',
+  user        => 'postgres',
+}
+
+postgresql::server::pg_hba_rule { 'local access to database with same name' :
+  auth_method => 'ident',
+  database    => 'all',
+  description => 'none',
+  order       => '002',
+  target      => '/var/lib/pgsql/9.3/data/pg_hba.conf',
+  type        => 'local',
+  user        => 'all',
+}
+
+postgresql::server::role { 'keystone' :
+  before           => 'Postgresql_psql[GRANT ALL ON DATABASE "keystone" TO "keystone"]',
+  connection_limit => '-1',
+  createdb         => false,
+  createrole       => false,
+  db               => 'postgres',
+  inherit          => true,
+  login            => true,
+  password_hash    => 'cpppakUb',
+  port             => '5432',
+  replication      => false,
+  superuser        => false,
+  username         => 'keystone',
+}
+
+postgresql::server::role { 'nailgun' :
+  before           => 'Postgresql_psql[GRANT ALL ON DATABASE "nailgun" TO "nailgun"]',
+  connection_limit => '-1',
+  createdb         => false,
+  createrole       => false,
+  db               => 'postgres',
+  inherit          => true,
+  login            => true,
+  password_hash    => 'CYoU6RS6',
+  port             => '5432',
+  replication      => false,
+  superuser        => false,
+  username         => 'nailgun',
+}
+
+postgresql::server::role { 'ostf' :
+  before           => 'Postgresql_psql[GRANT ALL ON DATABASE "ostf" TO "ostf"]',
+  connection_limit => '-1',
+  createdb         => false,
+  createrole       => false,
+  db               => 'postgres',
+  inherit          => true,
+  login            => true,
+  password_hash    => 'TwfzylM7',
+  port             => '5432',
+  replication      => false,
+  superuser        => false,
+  username         => 'ostf',
+}
+
+postgresql::validate_db_connection { 'validate_service_is_running' :
+  before          => Anchor[postgresql::server::service::end],
+  create_db_first => false,
+  database_name   => 'postgres',
+  database_port   => '5432',
+  require         => [ Service[postgresqld], Class[Postgresql::Client] ],
+  run_as          => 'postgres',
+  sleep           => '1',
+  tries           => '60',
+}
+
+postgresql_conf { 'listen_addresses' :
+  ensure  => 'present',
+  before  => Class[Postgresql::Server::Reload],
+  notify  => Class[Postgresql::Server::Service],
+  require => Class[Postgresql::Server::Initdb],
+  target  => '/var/lib/pgsql/9.3/data/postgresql.conf',
+  value   => '0.0.0.0',
+}
+
+postgresql_conf { 'port' :
+  ensure  => 'present',
+  before  => Class[Postgresql::Server::Reload],
+  notify  => Class[Postgresql::Server::Service],
+  require => Class[Postgresql::Server::Initdb],
+  target  => '/var/lib/pgsql/9.3/data/postgresql.conf',
+  value   => '5432',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolconnlimit=-1',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT usename FROM pg_shadow WHERE usename=\'keystone\' and passwd=\'md5c934d3ebdb43990202b43e88b1ac1af0\'',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" INHERIT' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolinherit=true',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" LOGIN' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolcanlogin=true',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" NOCREATEDB' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolcreatedb=false',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" NOCREATEROLE' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolcreaterole=false',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" NOREPLICATION' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolreplication=false',
+}
+
+postgresql_psql { 'ALTER ROLE "keystone" NOSUPERUSER' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\' and rolsuper=false',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolconnlimit=-1',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT usename FROM pg_shadow WHERE usename=\'nailgun\' and passwd=\'md58dd820efba0fcecfb5a65e75f11e32e6\'',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" INHERIT' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolinherit=true',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" LOGIN' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolcanlogin=true',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" NOCREATEDB' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolcreatedb=false',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" NOCREATEROLE' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolcreaterole=false',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" NOREPLICATION' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolreplication=false',
+}
+
+postgresql_psql { 'ALTER ROLE "nailgun" NOSUPERUSER' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\' and rolsuper=false',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolconnlimit=-1',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT usename FROM pg_shadow WHERE usename=\'ostf\' and passwd=\'md59c0a887eba0e425418a89ea1ba1b9b53\'',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" INHERIT' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolinherit=true',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" LOGIN' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolcanlogin=true',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" NOCREATEDB' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolcreatedb=false',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" NOCREATEROLE' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolcreaterole=false',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" NOREPLICATION' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolreplication=false',
+}
+
+postgresql_psql { 'ALTER ROLE "ostf" NOSUPERUSER' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => [ Postgresql_psql[CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1], Class[Postgresql::Server] ],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\' and rolsuper=false',
+}
+
+postgresql_psql { 'CREATE ROLE "keystone" ENCRYPTED PASSWORD 'cpppakUb' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'keystone\'',
+}
+
+postgresql_psql { 'CREATE ROLE "nailgun" ENCRYPTED PASSWORD 'CYoU6RS6' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'nailgun\'',
+}
+
+postgresql_psql { 'CREATE ROLE "ostf" ENCRYPTED PASSWORD 'TwfzylM7' LOGIN NOCREATEROLE NOCREATEDB NOSUPERUSER  CONNECTION LIMIT -1' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT rolname FROM pg_roles WHERE rolname=\'ostf\'',
+}
+
+postgresql_psql { 'Check for existence of db 'keystone'' :
+  command    => 'SELECT 1',
+  db         => 'postgres',
+  notify     => 'Exec[/usr/pgsql-9.3/bin/createdb --port=\'5432\' --owner=\'postgres\' --template=template0 --encoding \'UTF8\'  \'keystone\']',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server::Service],
+  unless     => 'SELECT datname FROM pg_database WHERE datname=\'keystone\'',
+}
+
+postgresql_psql { 'Check for existence of db 'nailgun'' :
+  command    => 'SELECT 1',
+  db         => 'postgres',
+  notify     => 'Exec[/usr/pgsql-9.3/bin/createdb --port=\'5432\' --owner=\'postgres\' --template=template0 --encoding \'UTF8\'  \'nailgun\']',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server::Service],
+  unless     => 'SELECT datname FROM pg_database WHERE datname=\'nailgun\'',
+}
+
+postgresql_psql { 'Check for existence of db 'ostf'' :
+  command    => 'SELECT 1',
+  db         => 'postgres',
+  notify     => 'Exec[/usr/pgsql-9.3/bin/createdb --port=\'5432\' --owner=\'postgres\' --template=template0 --encoding \'UTF8\'  \'ostf\']',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server::Service],
+  unless     => 'SELECT datname FROM pg_database WHERE datname=\'ostf\'',
+}
+
+postgresql_psql { 'GRANT ALL ON DATABASE "keystone" TO "keystone"' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT 1 WHERE has_database_privilege(\'keystone\', \'keystone\', \'CREATE\')',
+}
+
+postgresql_psql { 'GRANT ALL ON DATABASE "nailgun" TO "nailgun"' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT 1 WHERE has_database_privilege(\'nailgun\', \'nailgun\', \'CREATE\')',
+}
+
+postgresql_psql { 'GRANT ALL ON DATABASE "ostf" TO "ostf"' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  require    => Class[Postgresql::Server],
+  unless     => 'SELECT 1 WHERE has_database_privilege(\'ostf\', \'ostf\', \'CREATE\')',
+}
+
+postgresql_psql { 'REVOKE CONNECT ON DATABASE "keystone" FROM public' :
+  db          => 'postgres',
+  port        => '5432',
+  psql_group  => 'postgres',
+  psql_path   => '/usr/pgsql-9.3/bin/psql',
+  psql_user   => 'postgres',
+  refreshonly => true,
+}
+
+postgresql_psql { 'REVOKE CONNECT ON DATABASE "nailgun" FROM public' :
+  db          => 'postgres',
+  port        => '5432',
+  psql_group  => 'postgres',
+  psql_path   => '/usr/pgsql-9.3/bin/psql',
+  psql_user   => 'postgres',
+  refreshonly => true,
+}
+
+postgresql_psql { 'REVOKE CONNECT ON DATABASE "ostf" FROM public' :
+  db          => 'postgres',
+  port        => '5432',
+  psql_group  => 'postgres',
+  psql_path   => '/usr/pgsql-9.3/bin/psql',
+  psql_user   => 'postgres',
+  refreshonly => true,
+}
+
+postgresql_psql { 'UPDATE pg_database SET datistemplate = false WHERE datname = 'keystone'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  unless     => 'SELECT datname FROM pg_database WHERE datname = \'keystone\' AND datistemplate = false',
+}
+
+postgresql_psql { 'UPDATE pg_database SET datistemplate = false WHERE datname = 'nailgun'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  unless     => 'SELECT datname FROM pg_database WHERE datname = \'nailgun\' AND datistemplate = false',
+}
+
+postgresql_psql { 'UPDATE pg_database SET datistemplate = false WHERE datname = 'ostf'' :
+  db         => 'postgres',
+  port       => '5432',
+  psql_group => 'postgres',
+  psql_path  => '/usr/pgsql-9.3/bin/psql',
+  psql_user  => 'postgres',
+  unless     => 'SELECT datname FROM pg_database WHERE datname = \'ostf\' AND datistemplate = false',
+}
+
+service { 'postgresqld' :
+  ensure    => 'running',
+  enable    => true,
+  hasstatus => true,
+  name      => 'postgresql-9.3',
+}
+
+stage { 'main' :
+}
+

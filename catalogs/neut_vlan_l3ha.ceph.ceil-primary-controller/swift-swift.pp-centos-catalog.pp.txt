@@ -1,0 +1,9 @@
+class { 'Ceilometer' :
+}
+
+class { 'Memcached' :
+}
+
+stage { 'main' :
+}
+

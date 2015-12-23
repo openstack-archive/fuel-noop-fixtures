@@ -1,0 +1,1018 @@
+class { 'Glance::Api' :
+  auth_admin_prefix        => false,
+  auth_host                => '192.168.0.2',
+  auth_port                => '35357',
+  auth_protocol            => 'http',
+  auth_type                => 'keystone',
+  auth_uri                 => false,
+  auth_url                 => 'http://192.168.0.2:5000/',
+  backlog                  => '4096',
+  before                   => 'Class[Glance::Cache::Pruner]',
+  bind_host                => '192.168.0.3',
+  bind_port                => '9292',
+  ca_file                  => false,
+  cert_file                => false,
+  database_connection      => 'mysql://glance:0UYCFNfc@192.168.0.2/glance?read_timeout=60',
+  database_idle_timeout    => '3600',
+  debug                    => false,
+  enabled                  => true,
+  identity_uri             => false,
+  image_cache_dir          => '/var/lib/glance/image-cache',
+  key_file                 => false,
+  keystone_password        => '94lWbeNn',
+  keystone_tenant          => 'services',
+  keystone_user            => 'glance',
+  known_stores             => [ 'glance.store.swift.Store', 'glance.store.http.Store' ],
+  log_dir                  => '/var/log/glance',
+  log_facility             => 'LOG_LOCAL2',
+  log_file                 => '/var/log/glance/api.log',
+  manage_service           => true,
+  os_region_name           => 'RegionOne',
+  package_ensure           => 'present',
+  pipeline                 => 'keystone',
+  purge_config             => false,
+  registry_client_protocol => 'http',
+  registry_host            => '192.168.0.2',
+  registry_port            => '9191',
+  require                  => [ Class[Keystone::Python], Class[Mysql::Bindings], Class[Mysql::Bindings::Python] ],
+  show_image_direct_url    => false,
+  use_stderr               => false,
+  use_syslog               => true,
+  validate                 => false,
+  validation_options       => {  },
+  verbose                  => true,
+  workers                  => '4',
+}
+
+class { 'Glance::Backend::Swift' :
+  default_swift_reference             => 'ref1',
+  swift_store_auth_address            => 'http://192.168.0.2:5000/v2.0/',
+  swift_store_auth_version            => '2',
+  swift_store_container               => 'glance',
+  swift_store_create_container_on_put => 'True',
+  swift_store_endpoint_type           => 'internalURL',
+  swift_store_key                     => '94lWbeNn',
+  swift_store_large_object_size       => '5120',
+  swift_store_region                  => 'RegionOne',
+  swift_store_user                    => 'services:glance',
+}
+
+class { 'Glance::Cache::Cleaner' :
+  command_options => '',
+  hour            => '0',
+  minute          => '1',
+  month           => '*',
+  monthday        => '*',
+  weekday         => '*',
+}
+
+class { 'Glance::Cache::Pruner' :
+  before          => 'Class[Glance::Cache::Cleaner]',
+  command_options => '',
+  hour            => '*',
+  minute          => '*/30',
+  month           => '*',
+  monthday        => '*',
+  weekday         => '*',
+}
+
+class { 'Glance::Notify::Rabbitmq' :
+  amqp_durable_queues                => false,
+  kombu_ssl_version                  => 'TLSv1',
+  notification_driver                => 'noop',
+  rabbit_durable_queues              => false,
+  rabbit_heartbeat_rate              => '2',
+  rabbit_heartbeat_timeout_threshold => '0',
+  rabbit_host                        => 'localhost',
+  rabbit_hosts                       => [ '192.168.0.3:5673', ' 192.168.0.2:5673', ' 192.168.0.4:5673' ],
+  rabbit_notification_exchange       => 'glance',
+  rabbit_notification_topic          => 'notifications',
+  rabbit_password                    => 'c7fQJeSe',
+  rabbit_port                        => '5672',
+  rabbit_use_ssl                     => false,
+  rabbit_userid                      => 'nova',
+  rabbit_virtual_host                => '/',
+}
+
+class { 'Glance::Params' :
+}
+
+class { 'Glance::Policy' :
+  notify      => 'Service[glance-api]',
+  policies    => {  },
+  policy_path => '/etc/glance/policy.json',
+}
+
+class { 'Glance::Registry' :
+  auth_admin_prefix     => false,
+  auth_host             => '192.168.0.2',
+  auth_port             => '35357',
+  auth_protocol         => 'http',
+  auth_type             => 'keystone',
+  auth_uri              => false,
+  bind_host             => '192.168.0.3',
+  bind_port             => '9191',
+  ca_file               => false,
+  cert_file             => false,
+  database_connection   => 'mysql://glance:0UYCFNfc@192.168.0.2/glance?read_timeout=60',
+  database_idle_timeout => '3600',
+  debug                 => false,
+  enabled               => true,
+  identity_uri          => false,
+  key_file              => false,
+  keystone_password     => '94lWbeNn',
+  keystone_tenant       => 'services',
+  keystone_user         => 'glance',
+  log_dir               => '/var/log/glance',
+  log_facility          => 'LOG_LOCAL2',
+  log_file              => '/var/log/glance/registry.log',
+  manage_service        => true,
+  package_ensure        => 'present',
+  pipeline              => 'keystone',
+  purge_config          => false,
+  require               => [ Class[Keystone::Python], Class[Mysql::Bindings], Class[Mysql::Bindings::Python] ],
+  sync_db               => false,
+  use_stderr            => false,
+  use_syslog            => true,
+  verbose               => true,
+  workers               => '4',
+}
+
+class { 'Glance' :
+  package_ensure => 'present',
+}
+
+class { 'Keystone::Params' :
+}
+
+class { 'Keystone::Python' :
+  ensure              => 'present',
+  client_package_name => 'python-keystone',
+}
+
+class { 'Mysql::Bindings::Python' :
+}
+
+class { 'Mysql::Bindings' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'python-mysqldb',
+}
+
+class { 'Openstack::Glance' :
+  amqp_durable_queues            => false,
+  auth_uri                       => 'http://192.168.0.2:5000/',
+  bind_host                      => '192.168.0.3',
+  ceilometer                     => false,
+  db_host                        => '192.168.0.2',
+  db_type                        => 'mysql',
+  debug                          => false,
+  default_log_levels             => { 'amqp' => 'WARN', 'amqplib' => 'WARN', 'boto' => 'WARN', 'iso8601' => 'WARN', 'keystonemiddleware' => 'WARN', 'oslo.messaging' => 'INFO', 'oslo_messaging' => 'INFO', 'qpid' => 'WARN', 'requests.packages.urllib3.connectionpool' => 'WARN', 'requests.packages.urllib3.util.retry' => 'WARN', 'routes.middleware' => 'WARN', 'sqlalchemy' => 'WARN', 'stevedore' => 'WARN', 'suds' => 'INFO', 'taskflow' => 'WARN', 'urllib3.connectionpool' => 'WARN', 'urllib3.util.retry' => 'WARN', 'websocket' => 'WARN' },
+  enabled                        => true,
+  glance_backend                 => 'swift',
+  glance_db_dbname               => 'glance',
+  glance_db_password             => '0UYCFNfc',
+  glance_db_user                 => 'glance',
+  glance_image_cache_max_size    => '13868466176',
+  glance_protocol                => 'http',
+  glance_tenant                  => 'services',
+  glance_user                    => 'glance',
+  glance_user_password           => '94lWbeNn',
+  glance_vcenter_api_retry_count => '20',
+  idle_timeout                   => '3600',
+  internal_ssl                   => false,
+  keystone_host                  => '192.168.0.2',
+  known_stores                   => [ 'glance.store.swift.Store', 'glance.store.http.Store' ],
+  max_overflow                   => '20',
+  max_pool_size                  => '20',
+  max_retries                    => '-1',
+  pipeline                       => 'keystone',
+  primary_controller             => false,
+  rabbit_host                    => 'localhost',
+  rabbit_hosts                   => [ '192.168.0.3:5673', ' 192.168.0.2:5673', ' 192.168.0.4:5673' ],
+  rabbit_notification_exchange   => 'glance',
+  rabbit_notification_topic      => 'notifications',
+  rabbit_password                => 'c7fQJeSe',
+  rabbit_port                    => '5672',
+  rabbit_use_ssl                 => false,
+  rabbit_userid                  => 'nova',
+  rabbit_virtual_host            => '/',
+  rados_connect_timeout          => '30',
+  rbd_store_pool                 => 'images',
+  rbd_store_user                 => 'images',
+  region                         => 'RegionOne',
+  registry_host                  => '192.168.0.2',
+  service_workers                => '4',
+  show_image_direct_url          => false,
+  swift_store_large_object_size  => '5120',
+  syslog_log_facility            => 'LOG_LOCAL2',
+  use_stderr                     => false,
+  use_syslog                     => true,
+  verbose                        => true,
+}
+
+class { 'Swift::Params' :
+}
+
+cron { 'glance-cache-cleaner' :
+  command     => 'glance-cache-cleaner',
+  environment => 'PATH=/bin:/usr/bin:/usr/sbin',
+  hour        => '0',
+  minute      => '1',
+  month       => '*',
+  monthday    => '*',
+  require     => Package[glance-api],
+  user        => 'glance',
+  weekday     => '*',
+}
+
+cron { 'glance-cache-pruner' :
+  command     => 'glance-cache-pruner',
+  environment => 'PATH=/bin:/usr/bin:/usr/sbin',
+  hour        => '*',
+  minute      => '*/30',
+  month       => '*',
+  monthday    => '*',
+  require     => Package[glance-api],
+  user        => 'glance',
+  weekday     => '*',
+}
+
+exec { 'remove_glance-api_override' :
+  before  => [ 'Service[glance-api]', 'Service[glance-api]' ],
+  command => 'rm -f /etc/init/glance-api.override',
+  onlyif  => 'test -f /etc/init/glance-api.override',
+  path    => [ '/sbin', '/bin', '/usr/bin', '/usr/sbin' ],
+}
+
+exec { 'remove_glance-registry_override' :
+  before  => [ 'Service[glance-registry]', 'Service[glance-registry]' ],
+  command => 'rm -f /etc/init/glance-registry.override',
+  onlyif  => 'test -f /etc/init/glance-registry.override',
+  path    => [ '/sbin', '/bin', '/usr/bin', '/usr/sbin' ],
+}
+
+file { '/etc/glance/' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0770',
+  owner  => 'glance',
+}
+
+file { '/etc/glance/glance-api-paste.ini' :
+  ensure  => 'present',
+  group   => 'glance',
+  mode    => '0640',
+  notify  => Service[glance-api],
+  owner   => 'glance',
+  require => Class[Glance],
+}
+
+file { '/etc/glance/glance-api.conf' :
+  ensure  => 'present',
+  group   => 'glance',
+  mode    => '0640',
+  notify  => Service[glance-api],
+  owner   => 'glance',
+  require => Class[Glance],
+}
+
+file { '/etc/glance/glance-cache.conf' :
+  ensure  => 'present',
+  group   => 'glance',
+  mode    => '0640',
+  notify  => Service[glance-api],
+  owner   => 'glance',
+  require => Class[Glance],
+}
+
+file { '/etc/glance/glance-registry-paste.ini' :
+  ensure  => 'present',
+  group   => 'glance',
+  mode    => '0640',
+  notify  => Service[glance-registry],
+  owner   => 'glance',
+  require => Class[Glance],
+}
+
+file { '/etc/glance/glance-registry.conf' :
+  ensure  => 'present',
+  group   => 'glance',
+  mode    => '0640',
+  notify  => Service[glance-registry],
+  owner   => 'glance',
+  require => Class[Glance],
+}
+
+file { 'create_glance-api_override' :
+  ensure  => 'present',
+  before  => [ 'Package[glance-api]', 'Exec[remove_glance-api_override]' ],
+  content => 'manual',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/init/glance-api.override',
+}
+
+file { 'create_glance-registry_override' :
+  ensure  => 'present',
+  before  => [ 'Package[glance-registry]', 'Exec[remove_glance-registry_override]' ],
+  content => 'manual',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/init/glance-registry.override',
+}
+
+glance_api_config { 'DEFAULT/amqp_durable_queues' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_api_config { 'DEFAULT/auth_region' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_api_config { 'DEFAULT/backlog' :
+  notify => 'Service[glance-api]',
+  value  => '4096',
+}
+
+glance_api_config { 'DEFAULT/bind_host' :
+  notify => 'Service[glance-api]',
+  value  => '192.168.0.3',
+}
+
+glance_api_config { 'DEFAULT/bind_port' :
+  notify => 'Service[glance-api]',
+  value  => '9292',
+}
+
+glance_api_config { 'DEFAULT/ca_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'DEFAULT/cert_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'DEFAULT/debug' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_api_config { 'DEFAULT/default_log_levels' :
+  notify => 'Service[glance-api]',
+  value  => 'amqp=WARN,amqplib=WARN,boto=WARN,iso8601=WARN,keystonemiddleware=WARN,oslo.messaging=INFO,oslo_messaging=INFO,qpid=WARN,requests.packages.urllib3.connectionpool=WARN,requests.packages.urllib3.util.retry=WARN,routes.middleware=WARN,sqlalchemy=WARN,stevedore=WARN,suds=INFO,taskflow=WARN,urllib3.connectionpool=WARN,urllib3.util.retry=WARN,websocket=WARN',
+}
+
+glance_api_config { 'DEFAULT/delayed_delete' :
+  notify => 'Service[glance-api]',
+  value  => 'False',
+}
+
+glance_api_config { 'DEFAULT/image_cache_dir' :
+  notify => 'Service[glance-api]',
+  value  => '/var/lib/glance/image-cache',
+}
+
+glance_api_config { 'DEFAULT/key_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'DEFAULT/log_dir' :
+  notify => 'Service[glance-api]',
+  value  => '/var/log/glance',
+}
+
+glance_api_config { 'DEFAULT/log_file' :
+  notify => 'Service[glance-api]',
+  value  => '/var/log/glance/api.log',
+}
+
+glance_api_config { 'DEFAULT/notification_driver' :
+  notify => 'Service[glance-api]',
+  value  => 'noop',
+}
+
+glance_api_config { 'DEFAULT/os_region_name' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_api_config { 'DEFAULT/registry_client_protocol' :
+  notify => 'Service[glance-api]',
+  value  => 'http',
+}
+
+glance_api_config { 'DEFAULT/registry_host' :
+  notify => 'Service[glance-api]',
+  value  => '192.168.0.2',
+}
+
+glance_api_config { 'DEFAULT/registry_port' :
+  notify => 'Service[glance-api]',
+  value  => '9191',
+}
+
+glance_api_config { 'DEFAULT/scrub_time' :
+  notify => 'Service[glance-api]',
+  value  => '43200',
+}
+
+glance_api_config { 'DEFAULT/scrubber_datadir' :
+  notify => 'Service[glance-api]',
+  value  => '/var/lib/glance/scrubber',
+}
+
+glance_api_config { 'DEFAULT/show_image_direct_url' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_api_config { 'DEFAULT/swift_store_config_file' :
+  notify => 'Service[glance-api]',
+  value  => '/etc/glance/glance-api.conf',
+}
+
+glance_api_config { 'DEFAULT/syslog_log_facility' :
+  notify => 'Service[glance-api]',
+  value  => 'LOG_LOCAL2',
+}
+
+glance_api_config { 'DEFAULT/use_stderr' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_api_config { 'DEFAULT/use_syslog' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_api_config { 'DEFAULT/use_syslog_rfc_format' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_api_config { 'DEFAULT/verbose' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_api_config { 'DEFAULT/workers' :
+  notify => 'Service[glance-api]',
+  value  => '4',
+}
+
+glance_api_config { 'database/connection' :
+  notify => 'Service[glance-api]',
+  secret => true,
+  value  => 'mysql://glance:0UYCFNfc@192.168.0.2/glance?read_timeout=60',
+}
+
+glance_api_config { 'database/idle_timeout' :
+  notify => 'Service[glance-api]',
+  value  => '3600',
+}
+
+glance_api_config { 'database/max_overflow' :
+  notify => 'Service[glance-api]',
+  value  => '20',
+}
+
+glance_api_config { 'database/max_pool_size' :
+  notify => 'Service[glance-api]',
+  value  => '20',
+}
+
+glance_api_config { 'database/max_retries' :
+  notify => 'Service[glance-api]',
+  value  => '-1',
+}
+
+glance_api_config { 'glance_store/default_store' :
+  notify => 'Service[glance-api]',
+  value  => 'swift',
+}
+
+glance_api_config { 'glance_store/default_swift_reference' :
+  notify => 'Service[glance-api]',
+  value  => 'ref1',
+}
+
+glance_api_config { 'glance_store/os_region_name' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_api_config { 'glance_store/stores' :
+  notify => 'Service[glance-api]',
+  value  => 'glance.store.swift.Store,glance.store.http.Store',
+}
+
+glance_api_config { 'glance_store/swift_store_container' :
+  notify => 'Service[glance-api]',
+  value  => 'glance',
+}
+
+glance_api_config { 'glance_store/swift_store_create_container_on_put' :
+  notify => 'Service[glance-api]',
+  value  => 'True',
+}
+
+glance_api_config { 'glance_store/swift_store_endpoint_type' :
+  notify => 'Service[glance-api]',
+  value  => 'internalURL',
+}
+
+glance_api_config { 'glance_store/swift_store_large_object_size' :
+  notify => 'Service[glance-api]',
+  value  => '5120',
+}
+
+glance_api_config { 'glance_store/swift_store_region' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_api_config { 'keystone_authtoken/admin_password' :
+  notify => 'Service[glance-api]',
+  secret => true,
+  value  => '94lWbeNn',
+}
+
+glance_api_config { 'keystone_authtoken/admin_tenant_name' :
+  notify => 'Service[glance-api]',
+  value  => 'services',
+}
+
+glance_api_config { 'keystone_authtoken/admin_user' :
+  notify => 'Service[glance-api]',
+  value  => 'glance',
+}
+
+glance_api_config { 'keystone_authtoken/auth_admin_prefix' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'keystone_authtoken/auth_host' :
+  notify => 'Service[glance-api]',
+  value  => '192.168.0.2',
+}
+
+glance_api_config { 'keystone_authtoken/auth_port' :
+  notify => 'Service[glance-api]',
+  value  => '35357',
+}
+
+glance_api_config { 'keystone_authtoken/auth_protocol' :
+  notify => 'Service[glance-api]',
+  value  => 'http',
+}
+
+glance_api_config { 'keystone_authtoken/auth_uri' :
+  notify => 'Service[glance-api]',
+  value  => 'http://192.168.0.2:5000/',
+}
+
+glance_api_config { 'keystone_authtoken/identity_uri' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'keystone_authtoken/signing_dir' :
+  notify => 'Service[glance-api]',
+  value  => '/tmp/keystone-signing-glance',
+}
+
+glance_api_config { 'keystone_authtoken/token_cache_time' :
+  notify => 'Service[glance-api]',
+  value  => '-1',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/heartbeat_rate' :
+  notify => 'Service[glance-api]',
+  value  => '2',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/heartbeat_timeout_threshold' :
+  notify => 'Service[glance-api]',
+  value  => '0',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/kombu_ssl_ca_certs' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/kombu_ssl_certfile' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/kombu_ssl_keyfile' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/kombu_ssl_version' :
+  ensure => 'absent',
+  notify => 'Service[glance-api]',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_ha_queues' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_hosts' :
+  notify => 'Service[glance-api]',
+  value  => '192.168.0.3:5673, 192.168.0.2:5673, 192.168.0.4:5673',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_notification_exchange' :
+  notify => 'Service[glance-api]',
+  value  => 'glance',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_notification_topic' :
+  notify => 'Service[glance-api]',
+  value  => 'notifications',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_password' :
+  notify => 'Service[glance-api]',
+  secret => true,
+  value  => 'c7fQJeSe',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_use_ssl' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_userid' :
+  notify => 'Service[glance-api]',
+  value  => 'nova',
+}
+
+glance_api_config { 'oslo_messaging_rabbit/rabbit_virtual_host' :
+  notify => 'Service[glance-api]',
+  value  => '/',
+}
+
+glance_api_config { 'paste_deploy/flavor' :
+  ensure => 'present',
+  notify => 'Service[glance-api]',
+  value  => 'keystone',
+}
+
+glance_api_config { 'ref1/auth_address' :
+  notify => 'Service[glance-api]',
+  value  => 'http://192.168.0.2:5000/v2.0/',
+}
+
+glance_api_config { 'ref1/auth_version' :
+  notify => 'Service[glance-api]',
+  value  => '2',
+}
+
+glance_api_config { 'ref1/key' :
+  notify => 'Service[glance-api]',
+  value  => '94lWbeNn',
+}
+
+glance_api_config { 'ref1/user' :
+  notify => 'Service[glance-api]',
+  value  => 'services:glance',
+}
+
+glance_cache_config { 'DEFAULT/admin_password' :
+  notify => 'Service[glance-api]',
+  secret => true,
+  value  => '94lWbeNn',
+}
+
+glance_cache_config { 'DEFAULT/admin_tenant_name' :
+  notify => 'Service[glance-api]',
+  value  => 'services',
+}
+
+glance_cache_config { 'DEFAULT/admin_user' :
+  notify => 'Service[glance-api]',
+  value  => 'glance',
+}
+
+glance_cache_config { 'DEFAULT/auth_url' :
+  notify => 'Service[glance-api]',
+  value  => 'http://192.168.0.2:5000/',
+}
+
+glance_cache_config { 'DEFAULT/debug' :
+  notify => 'Service[glance-api]',
+  value  => false,
+}
+
+glance_cache_config { 'DEFAULT/image_cache_dir' :
+  notify => 'Service[glance-api]',
+  value  => '/var/lib/glance/image-cache/',
+}
+
+glance_cache_config { 'DEFAULT/image_cache_max_size' :
+  notify => 'Service[glance-api]',
+  value  => '13868466176',
+}
+
+glance_cache_config { 'DEFAULT/image_cache_stall_time' :
+  notify => 'Service[glance-api]',
+  value  => '86400',
+}
+
+glance_cache_config { 'DEFAULT/log_file' :
+  notify => 'Service[glance-api]',
+  value  => '/var/log/glance/image-cache.log',
+}
+
+glance_cache_config { 'DEFAULT/os_region_name' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_cache_config { 'DEFAULT/registry_host' :
+  notify => 'Service[glance-api]',
+  value  => '192.168.0.2',
+}
+
+glance_cache_config { 'DEFAULT/registry_port' :
+  notify => 'Service[glance-api]',
+  value  => '9191',
+}
+
+glance_cache_config { 'DEFAULT/use_syslog' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_cache_config { 'DEFAULT/use_syslog_rfc_format' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_cache_config { 'DEFAULT/verbose' :
+  notify => 'Service[glance-api]',
+  value  => true,
+}
+
+glance_cache_config { 'glance_store/os_region_name' :
+  notify => 'Service[glance-api]',
+  value  => 'RegionOne',
+}
+
+glance_registry_config { 'DEFAULT/bind_host' :
+  notify => 'Service[glance-registry]',
+  value  => '192.168.0.3',
+}
+
+glance_registry_config { 'DEFAULT/bind_port' :
+  notify => 'Service[glance-registry]',
+  value  => '9191',
+}
+
+glance_registry_config { 'DEFAULT/ca_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-registry]',
+}
+
+glance_registry_config { 'DEFAULT/cert_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-registry]',
+}
+
+glance_registry_config { 'DEFAULT/debug' :
+  notify => 'Service[glance-registry]',
+  value  => false,
+}
+
+glance_registry_config { 'DEFAULT/default_log_levels' :
+  notify => 'Service[glance-registry]',
+  value  => 'amqp=WARN,amqplib=WARN,boto=WARN,iso8601=WARN,keystonemiddleware=WARN,oslo.messaging=INFO,oslo_messaging=INFO,qpid=WARN,requests.packages.urllib3.connectionpool=WARN,requests.packages.urllib3.util.retry=WARN,routes.middleware=WARN,sqlalchemy=WARN,stevedore=WARN,suds=INFO,taskflow=WARN,urllib3.connectionpool=WARN,urllib3.util.retry=WARN,websocket=WARN',
+}
+
+glance_registry_config { 'DEFAULT/key_file' :
+  ensure => 'absent',
+  notify => 'Service[glance-registry]',
+}
+
+glance_registry_config { 'DEFAULT/log_dir' :
+  notify => 'Service[glance-registry]',
+  value  => '/var/log/glance',
+}
+
+glance_registry_config { 'DEFAULT/log_file' :
+  notify => 'Service[glance-registry]',
+  value  => '/var/log/glance/registry.log',
+}
+
+glance_registry_config { 'DEFAULT/syslog_log_facility' :
+  notify => 'Service[glance-registry]',
+  value  => 'LOG_LOCAL2',
+}
+
+glance_registry_config { 'DEFAULT/use_stderr' :
+  notify => 'Service[glance-registry]',
+  value  => false,
+}
+
+glance_registry_config { 'DEFAULT/use_syslog' :
+  notify => 'Service[glance-registry]',
+  value  => true,
+}
+
+glance_registry_config { 'DEFAULT/use_syslog_rfc_format' :
+  notify => 'Service[glance-registry]',
+  value  => true,
+}
+
+glance_registry_config { 'DEFAULT/verbose' :
+  notify => 'Service[glance-registry]',
+  value  => true,
+}
+
+glance_registry_config { 'DEFAULT/workers' :
+  notify => 'Service[glance-registry]',
+  value  => '4',
+}
+
+glance_registry_config { 'database/connection' :
+  notify => 'Service[glance-registry]',
+  secret => true,
+  value  => 'mysql://glance:0UYCFNfc@192.168.0.2/glance?read_timeout=60',
+}
+
+glance_registry_config { 'database/idle_timeout' :
+  notify => 'Service[glance-registry]',
+  value  => '3600',
+}
+
+glance_registry_config { 'database/max_overflow' :
+  notify => 'Service[glance-registry]',
+  value  => '20',
+}
+
+glance_registry_config { 'database/max_pool_size' :
+  notify => 'Service[glance-registry]',
+  value  => '20',
+}
+
+glance_registry_config { 'database/max_retries' :
+  notify => 'Service[glance-registry]',
+  value  => '-1',
+}
+
+glance_registry_config { 'glance_store/os_region_name' :
+  notify => 'Service[glance-registry]',
+  value  => 'RegionOne',
+}
+
+glance_registry_config { 'keystone_authtoken/admin_password' :
+  notify => 'Service[glance-registry]',
+  secret => true,
+  value  => '94lWbeNn',
+}
+
+glance_registry_config { 'keystone_authtoken/admin_tenant_name' :
+  notify => 'Service[glance-registry]',
+  value  => 'services',
+}
+
+glance_registry_config { 'keystone_authtoken/admin_user' :
+  notify => 'Service[glance-registry]',
+  value  => 'glance',
+}
+
+glance_registry_config { 'keystone_authtoken/auth_admin_prefix' :
+  ensure => 'absent',
+  notify => 'Service[glance-registry]',
+}
+
+glance_registry_config { 'keystone_authtoken/auth_host' :
+  notify => 'Service[glance-registry]',
+  value  => '192.168.0.2',
+}
+
+glance_registry_config { 'keystone_authtoken/auth_port' :
+  notify => 'Service[glance-registry]',
+  value  => '35357',
+}
+
+glance_registry_config { 'keystone_authtoken/auth_protocol' :
+  notify => 'Service[glance-registry]',
+  value  => 'http',
+}
+
+glance_registry_config { 'keystone_authtoken/auth_uri' :
+  notify => 'Service[glance-registry]',
+  value  => 'http://192.168.0.2:5000/',
+}
+
+glance_registry_config { 'keystone_authtoken/identity_uri' :
+  ensure => 'absent',
+  notify => 'Service[glance-registry]',
+}
+
+glance_registry_config { 'keystone_authtoken/signing_dir' :
+  notify => 'Service[glance-registry]',
+  value  => '/tmp/keystone-signing-glance',
+}
+
+glance_registry_config { 'paste_deploy/flavor' :
+  ensure => 'present',
+  notify => 'Service[glance-registry]',
+  value  => 'keystone',
+}
+
+package { 'glance-api' :
+  ensure => 'present',
+  before => [ 'File[/etc/glance/]', 'Class[Glance::Policy]', 'Exec[remove_glance-api_override]' ],
+  tag    => [ 'openstack', 'glance-package' ],
+}
+
+package { 'glance-registry' :
+  ensure => 'present',
+  before => [ 'File[/etc/glance/]', 'Exec[remove_glance-registry_override]' ],
+  tag    => [ 'openstack', 'glance-package' ],
+}
+
+package { 'python-keystone' :
+  ensure => 'present',
+  name   => 'python-keystone',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'python-mysqldb',
+}
+
+package { 'python-openstackclient' :
+  ensure => 'present',
+  tag    => 'openstack',
+}
+
+package { 'swift' :
+  ensure => 'present',
+  name   => 'swift',
+  notify => [ 'Service[glance-api]', 'Service[glance-api]' ],
+}
+
+resources { 'glance_api_config' :
+  purge => false,
+}
+
+resources { 'glance_registry_config' :
+  purge => false,
+}
+
+service { 'glance-api' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'glance-api',
+  tag        => 'glance-service',
+}
+
+service { 'glance-registry' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'glance-registry',
+  require    => Class[Glance],
+  subscribe  => File[/etc/glance/glance-registry.conf],
+  tag        => 'glance-service',
+}
+
+stage { 'main' :
+}
+
+tweaks::ubuntu_service_override { 'glance-api' :
+  package_name => 'glance-api',
+  service_name => 'glance-api',
+}
+
+tweaks::ubuntu_service_override { 'glance-registry' :
+  package_name => 'glance-registry',
+  service_name => 'glance-registry',
+}
+

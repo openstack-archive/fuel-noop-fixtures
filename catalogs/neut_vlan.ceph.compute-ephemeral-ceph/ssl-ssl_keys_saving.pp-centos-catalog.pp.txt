@@ -1,0 +1,47 @@
+file { '/etc/pki/tls/certs/public_haproxy.pem' :
+  ensure  => 'present',
+  content => 'somedataboutyourkeypair',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/etc/pki/tls/certs' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/etc/pki/tls' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/etc/pki' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/var/lib/astute/haproxy/public_haproxy.pem' :
+  ensure  => 'present',
+  content => 'somedataboutyourkeypair',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/var/lib/astute/haproxy' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+stage { 'main' :
+}
+

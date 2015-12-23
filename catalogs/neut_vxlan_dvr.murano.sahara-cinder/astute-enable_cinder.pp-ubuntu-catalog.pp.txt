@@ -1,0 +1,13 @@
+class { 'Cinder::Params' :
+}
+
+service { 'cinder-volume' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+}
+
+stage { 'main' :
+}
+

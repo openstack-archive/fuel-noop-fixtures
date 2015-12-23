@@ -1,0 +1,22 @@
+exec { 'add_trust' :
+  command     => 'update-ca-certificates',
+  path        => '/bin:/usr/bin:/sbin:/usr/sbin',
+  refreshonly => true,
+}
+
+exec { 'enable_trust' :
+  command     => 'update-ca-trust force-enable',
+  notify      => Exec[add_trust],
+  path        => '/bin:/usr/bin:/sbin:/usr/sbin',
+  refreshonly => true,
+}
+
+file { '/etc/pki/ca-trust/source/anchors/public_haproxy.pem' :
+  ensure => 'file',
+  notify => 'Exec[enable_trust]',
+  source => '/etc/pki/tls/certs/public_haproxy.pem',
+}
+
+stage { 'main' :
+}
+

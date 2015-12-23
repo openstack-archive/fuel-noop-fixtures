@@ -1,0 +1,109 @@
+class { 'Nova::Network::Flatdhcp' :
+  dhcp_domain         => 'novalocal',
+  dhcpbridge          => '/usr/bin/nova-dhcpbridge',
+  dhcpbridge_flagfile => '/etc/nova/nova.conf',
+  fixed_range         => '10.0.0.0/16',
+  flat_injected       => false,
+  flat_interface      => 'eth0.103',
+  flat_network_bridge => 'br100',
+  force_dhcp_release  => true,
+  public_interface    => '',
+}
+
+class { 'Nova::Network' :
+  config_overrides  => {  },
+  create_networks   => false,
+  dns1              => '8.8.4.4',
+  dns2              => '8.8.8.8',
+  enabled           => false,
+  ensure_package    => 'installed',
+  fixed_range       => '10.0.0.0/16',
+  floating_range    => false,
+  install_service   => false,
+  network_manager   => 'nova.network.manager.FlatDHCPManager',
+  network_size      => '65536',
+  num_networks      => '1',
+  private_interface => 'eth0.103',
+  public_interface  => '',
+}
+
+class { 'Nova::Params' :
+}
+
+class { 'Sysctl::Base' :
+}
+
+exec { 'create_private_nova_network' :
+  command => 'nova-manage network create novanetwork 10.0.0.0/16 1 65536 --dns1 8.8.4.4 --dns2 8.8.8.8',
+  path    => '/usr/bin',
+}
+
+file { '/etc/nova/nova.conf' :
+  ensure => 'present',
+}
+
+file { '/etc/sysctl.conf' :
+  ensure => 'present',
+  group  => '0',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+nova_config { 'DEFAULT/dhcp_domain' :
+  value => 'novalocal',
+}
+
+nova_config { 'DEFAULT/dhcpbridge' :
+  value => '/usr/bin/nova-dhcpbridge',
+}
+
+nova_config { 'DEFAULT/dhcpbridge_flagfile' :
+  value => '/etc/nova/nova.conf',
+}
+
+nova_config { 'DEFAULT/fixed_range' :
+  value => '10.0.0.0/16',
+}
+
+nova_config { 'DEFAULT/flat_injected' :
+  value => false,
+}
+
+nova_config { 'DEFAULT/flat_interface' :
+  value => 'eth0.103',
+}
+
+nova_config { 'DEFAULT/flat_network_bridge' :
+  value => 'br100',
+}
+
+nova_config { 'DEFAULT/force_dhcp_release' :
+  value => true,
+}
+
+nova_config { 'DEFAULT/force_snat_range' :
+  value => '0.0.0.0/0',
+}
+
+nova_config { 'DEFAULT/network_manager' :
+  value => 'nova.network.manager.FlatDHCPManager',
+}
+
+stage { 'main' :
+}
+
+sysctl::value { 'net.ipv4.ip_forward' :
+  key     => 'net.ipv4.ip_forward',
+  require => Class[Sysctl::Base],
+  value   => '1',
+}
+
+sysctl { 'net.ipv4.ip_forward' :
+  before => Sysctl_runtime[net.ipv4.ip_forward],
+  val    => '1',
+}
+
+sysctl_runtime { 'net.ipv4.ip_forward' :
+  val => '1',
+}
+

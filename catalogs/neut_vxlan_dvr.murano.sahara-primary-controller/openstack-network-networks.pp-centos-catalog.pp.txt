@@ -1,0 +1,42 @@
+neutron_network { 'net04custom' :
+  ensure                    => 'present',
+  provider_network_type     => 'vxlan',
+  provider_physical_network => false,
+  provider_segmentation_id  => '2',
+  router_external           => false,
+  shared                    => false,
+  tenant_name               => 'admin',
+}
+
+neutron_network { 'net04custom_ext' :
+  ensure                    => 'present',
+  provider_network_type     => 'flat',
+  provider_physical_network => 'physnet1',
+  router_external           => true,
+  shared                    => false,
+  tenant_name               => 'admin',
+}
+
+neutron_subnet { 'net04custom__subnet' :
+  ensure          => 'present',
+  cidr            => '192.168.111.0/24',
+  dns_nameservers => [ '8.8.4.4', '8.8.8.8' ],
+  enable_dhcp     => true,
+  gateway_ip      => '192.168.111.1',
+  network_name    => 'net04custom',
+  tenant_name     => 'admin',
+}
+
+neutron_subnet { 'net04custom_ext__subnet' :
+  ensure           => 'present',
+  allocation_pools => 'start=172.16.0.130,end=172.16.0.254',
+  cidr             => '172.16.0.0/24',
+  enable_dhcp      => false,
+  gateway_ip       => '172.16.0.1',
+  network_name     => 'net04custom_ext',
+  tenant_name      => 'admin',
+}
+
+stage { 'main' :
+}
+

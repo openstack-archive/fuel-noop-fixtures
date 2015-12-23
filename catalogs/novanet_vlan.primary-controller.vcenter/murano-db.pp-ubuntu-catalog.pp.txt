@@ -1,0 +1,12 @@
+class { 'Murano::Api' :
+}
+
+class { 'Mysql::Config' :
+}
+
+class { 'Mysql::Server' :
+}
+
+stage { 'main' :
+}
+

@@ -1,0 +1,38 @@
+host { 'node-3.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-3',
+  ip           => '172.16.1.5',
+  target       => '/etc/hosts',
+}
+
+host { 'node-4.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-4',
+  ip           => '172.16.1.7',
+  target       => '/etc/hosts',
+}
+
+host { 'node-5.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-5',
+  ip           => '172.16.1.6',
+  target       => '/etc/hosts',
+}
+
+host { 'node-6.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-6',
+  ip           => '172.16.1.3',
+  target       => '/etc/hosts',
+}
+
+host { 'node-7.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-7',
+  ip           => '172.16.1.4',
+  target       => '/etc/hosts',
+}
+
+stage { 'main' :
+}
+

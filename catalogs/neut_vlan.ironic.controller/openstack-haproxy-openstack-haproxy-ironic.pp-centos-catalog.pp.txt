@@ -1,0 +1,371 @@
+class { 'Concat::Setup' :
+}
+
+class { 'Openstack::Ha::Haproxy_restart' :
+}
+
+class { 'Openstack::Ha::Ironic' :
+  baremetal_virtual_ip => '192.168.3.1',
+  internal_virtual_ip  => '192.168.0.2',
+  ipaddresses          => '192.168.0.3',
+  public_ssl           => true,
+  public_ssl_path      => '/var/lib/astute/haproxy/public_haproxy.pem',
+  public_virtual_ip    => '172.16.51.116',
+  server_names         => 'node-1',
+}
+
+concat::fragment { 'ironic-baremetal_balancermember_ironic-baremetal' :
+  ensure  => 'present',
+  content => '  server node-1 192.168.0.3:6385  check
+',
+  order   => '01-ironic-baremetal',
+  target  => '/etc/haproxy/conf.d/185-ironic-baremetal.cfg',
+}
+
+concat::fragment { 'ironic-baremetal_listen_block' :
+  content => '
+listen ironic-baremetal
+  bind 192.168.3.1:6385
+  http-request  set-header X-Forwarded-Proto https if { ssl_fc }
+  option  httpchk GET /
+  option  httplog
+  option  httpclose
+',
+  order   => '00',
+  target  => '/etc/haproxy/conf.d/185-ironic-baremetal.cfg',
+}
+
+concat::fragment { 'ironic_balancermember_ironic' :
+  ensure  => 'present',
+  content => '  server node-1 192.168.0.3:6385  check
+',
+  order   => '01-ironic',
+  target  => '/etc/haproxy/conf.d/180-ironic.cfg',
+}
+
+concat::fragment { 'ironic_listen_block' :
+  content => '
+listen ironic
+  bind 172.16.51.116:6385 ssl crt /var/lib/astute/haproxy/public_haproxy.pem
+  bind 192.168.0.2:6385
+  http-request  set-header X-Forwarded-Proto https if { ssl_fc }
+  option  httpchk GET /
+  option  httplog
+  option  httpclose
+',
+  order   => '00',
+  target  => '/etc/haproxy/conf.d/180-ironic.cfg',
+}
+
+concat { '/etc/haproxy/conf.d/180-ironic.cfg' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => '0',
+  mode           => '0644',
+  order          => 'alpha',
+  owner          => '0',
+  path           => '/etc/haproxy/conf.d/180-ironic.cfg',
+  replace        => true,
+  warn           => false,
+}
+
+concat { '/etc/haproxy/conf.d/185-ironic-baremetal.cfg' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => '0',
+  mode           => '0644',
+  order          => 'alpha',
+  owner          => '0',
+  path           => '/etc/haproxy/conf.d/185-ironic-baremetal.cfg',
+  replace        => true,
+  warn           => false,
+}
+
+exec { 'concat_/etc/haproxy/conf.d/180-ironic.cfg' :
+  alias     => 'concat_/tmp//_etc_haproxy_conf.d_180-ironic.cfg',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat.out" -d "/tmp//_etc_haproxy_conf.d_180-ironic.cfg"',
+  notify    => File[/etc/haproxy/conf.d/180-ironic.cfg],
+  require   => [ File[/tmp//_etc_haproxy_conf.d_180-ironic.cfg], File[/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments], File[/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat] ],
+  subscribe => File[/tmp//_etc_haproxy_conf.d_180-ironic.cfg],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat.out" -d "/tmp//_etc_haproxy_conf.d_180-ironic.cfg" -t',
+}
+
+exec { 'concat_/etc/haproxy/conf.d/185-ironic-baremetal.cfg' :
+  alias     => 'concat_/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat.out" -d "/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg"',
+  notify    => File[/etc/haproxy/conf.d/185-ironic-baremetal.cfg],
+  require   => [ File[/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg], File[/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments], File[/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat] ],
+  subscribe => File[/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat.out" -d "/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg" -t',
+}
+
+exec { 'haproxy-restart' :
+  command     => '/usr/lib/ocf/resource.d/fuel/ns_haproxy reload',
+  environment => 'OCF_ROOT=/usr/lib/ocf',
+  logoutput   => true,
+  path        => '/usr/bin:/usr/sbin:/bin:/sbin',
+  provider    => 'shell',
+  refreshonly => true,
+  returns     => [ '0', '' ],
+  tries       => '10',
+  try_sleep   => '10',
+}
+
+file { '/etc/haproxy/conf.d/180-ironic.cfg' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/haproxy/conf.d/180-ironic.cfg',
+  backup  => 'puppet',
+  group   => '0',
+  mode    => '0644',
+  owner   => '0',
+  path    => '/etc/haproxy/conf.d/180-ironic.cfg',
+  replace => true,
+  source  => '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat.out',
+}
+
+file { '/etc/haproxy/conf.d/185-ironic-baremetal.cfg' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/haproxy/conf.d/185-ironic-baremetal.cfg',
+  backup  => 'puppet',
+  group   => '0',
+  mode    => '0644',
+  owner   => '0',
+  path    => '/etc/haproxy/conf.d/185-ironic-baremetal.cfg',
+  replace => true,
+  source  => '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat.out',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments/00_ironic_listen_block' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_ironic_listen_block',
+  backup  => 'puppet',
+  content => '
+listen ironic
+  bind 172.16.51.116:6385 ssl crt /var/lib/astute/haproxy/public_haproxy.pem
+  bind 192.168.0.2:6385
+  http-request  set-header X-Forwarded-Proto https if { ssl_fc }
+  option  httpchk GET /
+  option  httplog
+  option  httpclose
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/haproxy/conf.d/180-ironic.cfg],
+  replace => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments/01-ironic_ironic_balancermember_ironic' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_ironic_balancermember_ironic',
+  backup  => 'puppet',
+  content => '  server node-1 192.168.0.3:6385  check
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/haproxy/conf.d/180-ironic.cfg],
+  replace => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/haproxy/conf.d/180-ironic.cfg],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_180-ironic.cfg' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments/00_ironic-baremetal_listen_block' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_ironic-baremetal_listen_block',
+  backup  => 'puppet',
+  content => '
+listen ironic-baremetal
+  bind 192.168.3.1:6385
+  http-request  set-header X-Forwarded-Proto https if { ssl_fc }
+  option  httpchk GET /
+  option  httplog
+  option  httpclose
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/haproxy/conf.d/185-ironic-baremetal.cfg],
+  replace => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments/01-ironic-baremetal_ironic-baremetal_balancermember_ironic-baremetal' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_ironic-baremetal_balancermember_ironic-baremetal',
+  backup  => 'puppet',
+  content => '  server node-1 192.168.0.3:6385  check
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/haproxy/conf.d/185-ironic-baremetal.cfg],
+  replace => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/haproxy/conf.d/185-ironic-baremetal.cfg],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_haproxy_conf.d_185-ironic-baremetal.cfg' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+haproxy::balancermember::collect_exported { 'ironic-baremetal' :
+}
+
+haproxy::balancermember::collect_exported { 'ironic' :
+}
+
+haproxy::balancermember { 'ironic-baremetal' :
+  ensure            => 'present',
+  define_backups    => false,
+  define_cookies    => false,
+  ipaddresses       => '192.168.0.3',
+  listening_service => 'ironic-baremetal',
+  notify            => Exec[haproxy-restart],
+  options           => 'check',
+  order             => '185',
+  ports             => '6385',
+  server_names      => 'node-1',
+  use_include       => true,
+}
+
+haproxy::balancermember { 'ironic' :
+  ensure            => 'present',
+  define_backups    => false,
+  define_cookies    => false,
+  ipaddresses       => '192.168.0.3',
+  listening_service => 'ironic',
+  notify            => Exec[haproxy-restart],
+  options           => 'check',
+  order             => '180',
+  ports             => '6385',
+  server_names      => 'node-1',
+  use_include       => true,
+}
+
+haproxy::listen { 'ironic-baremetal' :
+  bind             => { '192.168.3.1:6385' => '' },
+  bind_options     => '',
+  collect_exported => true,
+  notify           => Exec[haproxy-restart],
+  options          => { 'http-request' => 'set-header X-Forwarded-Proto https if { ssl_fc }', 'option' => [ 'httpchk GET /', 'httplog', 'httpclose' ] },
+  order            => '185',
+  use_include      => true,
+}
+
+haproxy::listen { 'ironic' :
+  bind             => { '172.16.51.116:6385' => [ 'ssl', 'crt', '/var/lib/astute/haproxy/public_haproxy.pem' ], '192.168.0.2:6385' => '' },
+  bind_options     => '',
+  collect_exported => true,
+  notify           => Exec[haproxy-restart],
+  options          => { 'http-request' => 'set-header X-Forwarded-Proto https if { ssl_fc }', 'option' => [ 'httpchk GET /', 'httplog', 'httpclose' ] },
+  order            => '180',
+  use_include      => true,
+}
+
+openstack::ha::haproxy_service { 'ironic-baremetal' :
+  balancermember_options => 'check',
+  balancermember_port    => '6385',
+  before_start           => false,
+  define_backups         => false,
+  define_cookies         => false,
+  haproxy_config_options => { 'http-request' => 'set-header X-Forwarded-Proto https if { ssl_fc }', 'option' => [ 'httpchk GET /', 'httplog', 'httpclose' ] },
+  internal               => true,
+  internal_ssl           => false,
+  internal_virtual_ip    => '192.168.3.1',
+  ipaddresses            => '192.168.0.3',
+  listen_port            => '6385',
+  order                  => '185',
+  public                 => false,
+  public_ssl             => false,
+  public_virtual_ip      => false,
+  server_names           => 'node-1',
+}
+
+openstack::ha::haproxy_service { 'ironic' :
+  balancermember_options => 'check',
+  balancermember_port    => '6385',
+  before_start           => false,
+  define_backups         => false,
+  define_cookies         => false,
+  haproxy_config_options => { 'http-request' => 'set-header X-Forwarded-Proto https if { ssl_fc }', 'option' => [ 'httpchk GET /', 'httplog', 'httpclose' ] },
+  internal               => true,
+  internal_ssl           => false,
+  internal_virtual_ip    => '192.168.0.2',
+  ipaddresses            => '192.168.0.3',
+  listen_port            => '6385',
+  order                  => '180',
+  public                 => true,
+  public_ssl             => true,
+  public_ssl_path        => '/var/lib/astute/haproxy/public_haproxy.pem',
+  public_virtual_ip      => '172.16.51.116',
+  server_names           => 'node-1',
+}
+
+stage { 'main' :
+}
+

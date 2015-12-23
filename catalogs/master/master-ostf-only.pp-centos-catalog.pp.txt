@@ -1,0 +1,301 @@
+class { 'Docker::Container' :
+  before       => 'Class[Nailgun::Packages]',
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Nailgun::Ostf' :
+  auth_enable        => 'True',
+  dbengine           => 'postgresql+psycopg2',
+  dbhost             => '10.109.0.2',
+  dbname             => 'ostf',
+  dbpass             => 'TwfzylM7',
+  dbport             => '5432',
+  dbuser             => 'ostf',
+  host               => '0.0.0.0',
+  keystone_host      => '10.109.0.2',
+  keystone_ostf_pass => '7evzsSBv',
+  keystone_ostf_user => 'ostf',
+  keystone_port      => '35357',
+  logfile            => '/var/log/ostf.log',
+  nailgun_host       => '10.109.0.2',
+  nailgun_port       => '8000',
+  pip_opts           => ' ',
+  port               => '8777',
+  production         => 'docker',
+  use_systemd        => false,
+  venv               => '/opt/fuel_plugins/ostf',
+}
+
+class { 'Nailgun::Packages' :
+  before     => 'Class[Nailgun::Ostf]',
+  gem_source => 'http://rubygems.org/',
+}
+
+class { 'Nailgun::Supervisor' :
+  conf_file       => 'nailgun/supervisord.conf.base.erb',
+  nailgun_env     => '/opt/nailgun',
+  ostf_env        => '/opt/nailgun',
+  require         => Class[Nailgun::Ostf],
+  restart_service => true,
+  service_enabled => true,
+}
+
+exec { 'ostf-init' :
+  command   => '/usr/bin/ostf-server           --after-initialization-environment-hook',
+  path      => '/usr/bin:/bin:/usr/sbin:/sbin',
+  tries     => '50',
+  try_sleep => '5',
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/ostf/' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0750',
+  owner  => 'root',
+}
+
+file { '/etc/ostf/ostf.conf' :
+  before  => 'Exec[ostf-init]',
+  content => '[adapter]
+server_host = 0.0.0.0
+server_port = 8777
+dbpath = postgresql+psycopg2://ostf:TwfzylM7@10.109.0.2/ostf
+lock_dir = /var/lock
+nailgun_host = 10.109.0.2
+nailgun_port = 8000
+log_file = /var/log/ostf.log
+after_init_hook = False
+auth_enable = True
+
+[keystone_authtoken]
+auth_protocol=http
+auth_port=35357
+auth_host=10.109.0.2
+auth_version=v2.0
+admin_user=ostf
+admin_password=7evzsSBv
+admin_tenant_name=services
+',
+  group   => 'root',
+  owner   => 'root',
+}
+
+file { '/etc/rc.d/init.d/supervisord' :
+  group   => 'root',
+  mode    => '0755',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  require => [ Package[supervisor], File[/etc/sysconfig/supervisord] ],
+  source  => 'puppet:///modules/nailgun/supervisor-init',
+}
+
+file { '/etc/supervisord.conf' :
+  content => '[rpcinterface:supervisor]
+; required for supervisorctl
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file=/var/run/supervisor.sock
+
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log
+loglevel=debug
+pidfile=/var/run/supervisord.pid
+childlogdir=/var/log/supervisor
+
+[supervisorctl]
+serverurl=unix:///var/run/supervisor.sock
+
+[include]
+files = /etc/supervisord.d/*.conf /etc/supervisord.d/current/*.conf
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  require => Package[supervisor],
+}
+
+file { '/etc/supervisord.d/ostf.conf' :
+  content => '[program:ostf]
+command=/usr/bin/ostf-server
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0,2
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/ostf-stdout.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+stderr_logfile=/var/log/ostf-stderr.log
+stderr_logfile_maxbytes=50MB
+stderr_logfile_backups=10
+stderr_capture_maxbytes=0
+stderr_events_enabled=false
+serverurl=AUTO
+',
+  group   => 'root',
+  owner   => 'root',
+  require => Package[supervisor],
+}
+
+file { '/etc/sysconfig/supervisord' :
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+  source => 'puppet:///modules/nailgun/supervisor-sysconfig',
+}
+
+file { '/var/log/ostf' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+nailgun::packages::nailgun_safe_package { 'acpid' :
+}
+
+nailgun::packages::nailgun_safe_package { 'cronie-anacron' :
+}
+
+nailgun::packages::nailgun_safe_package { 'crontabs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fence-agents' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fuel-migrate' :
+}
+
+nailgun::packages::nailgun_safe_package { 'iptables' :
+}
+
+nailgun::packages::nailgun_safe_package { 'nginx' :
+}
+
+nailgun::packages::nailgun_safe_package { 'postgresql-libs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'python-fuelclient' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsync' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsyslog' :
+}
+
+nailgun::packages::nailgun_safe_package { 'screen' :
+}
+
+nailgun::packages::nailgun_safe_package { 'supervisor' :
+}
+
+node { 'default' :
+}
+
+package { 'acpid' :
+  ensure => 'latest',
+}
+
+package { 'cronie-anacron' :
+  ensure => 'latest',
+}
+
+package { 'crontabs' :
+  ensure => 'latest',
+}
+
+package { 'fence-agents' :
+  ensure => 'latest',
+}
+
+package { 'fuel-migrate' :
+  ensure => 'latest',
+}
+
+package { 'fuel-ostf' :
+  before => 'Exec[ostf-init]',
+}
+
+package { 'iptables' :
+  ensure => 'latest',
+}
+
+package { 'libevent-devel' :
+}
+
+package { 'nginx' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+package { 'openssl-devel' :
+}
+
+package { 'postgresql-libs' :
+  ensure => 'latest',
+}
+
+package { 'python-fuelclient' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+package { 'rsync' :
+  ensure => 'latest',
+}
+
+package { 'rsyslog' :
+  ensure => 'latest',
+}
+
+package { 'screen' :
+  ensure => 'latest',
+}
+
+package { 'supervisor' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+service { 'supervisord' :
+  ensure     => true,
+  enable     => true,
+  hasrestart => true,
+  require    => Package[supervisor],
+  restart    => '/usr/bin/supervisorctl stop all; /etc/init.d/supervisord restart',
+}
+
+stage { 'main' :
+}
+

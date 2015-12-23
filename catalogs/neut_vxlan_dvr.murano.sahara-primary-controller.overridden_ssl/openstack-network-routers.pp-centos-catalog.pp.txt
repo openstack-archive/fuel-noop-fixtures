@@ -1,0 +1,15 @@
+neutron_router { 'router04custom' :
+  ensure               => 'present',
+  before               => 'Neutron_router_interface[router04custom:net04custom__subnet]',
+  gateway_network_name => 'net04custom_ext',
+  name                 => 'router04custom',
+  tenant_name          => 'admin',
+}
+
+neutron_router_interface { 'router04custom:net04custom__subnet' :
+  ensure => 'present',
+}
+
+stage { 'main' :
+}
+

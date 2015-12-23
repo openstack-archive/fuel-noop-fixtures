@@ -1,0 +1,14 @@
+class { 'Osnailyfacter::Resolvconf' :
+  management_vip => '10.108.2.3',
+}
+
+file { '/etc/resolv.conf' :
+  ensure  => 'file',
+  content => 'search pp
+nameserver 10.108.2.3
+',
+}
+
+stage { 'main' :
+}
+

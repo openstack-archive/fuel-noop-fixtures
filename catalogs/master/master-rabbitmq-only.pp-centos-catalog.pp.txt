@@ -1,0 +1,446 @@
+anchor { 'nailgun::rabbitmq end' :
+}
+
+anchor { 'nailgun::rabbitmq start' :
+  before => 'Class[Rabbitmq]',
+}
+
+anchor { 'rabbitmq::begin' :
+  before => 'Class[Rabbitmq::Install]',
+}
+
+anchor { 'rabbitmq::end' :
+}
+
+class { 'Docker::Container' :
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Nailgun::Rabbitmq' :
+  astute_password => 'SwLCUx2H',
+  astute_user     => 'naily',
+  bind_ip         => '10.109.0.2',
+  env_config      => { 'ERL_EPMD_ADDRESS' => '10.109.0.2', 'NODENAME' => 'rabbit@fuel', 'RABBITMQ_SERVER_ERL_ARGS' => '+K true +A48 +P 1048576' },
+  management_port => '15672',
+  mco_password    => 'PPMi1XT2',
+  mco_user        => 'mcollective',
+  mco_vhost       => 'mcollective',
+  production      => 'docker',
+  stomp           => false,
+  stompport       => '61613',
+}
+
+class { 'Rabbitmq::Config' :
+  notify => 'Class[Rabbitmq::Service]',
+}
+
+class { 'Rabbitmq::Install::Rabbitmqadmin' :
+}
+
+class { 'Rabbitmq::Install' :
+  before => [ 'Class[Rabbitmq::Config]', 'Exec[epmd_daemon]' ],
+}
+
+class { 'Rabbitmq::Management' :
+  before => 'Anchor[rabbitmq::end]',
+}
+
+class { 'Rabbitmq::Params' :
+}
+
+class { 'Rabbitmq::Repo::Rhel' :
+}
+
+class { 'Rabbitmq::Service' :
+  before         => [ 'Class[Rabbitmq::Install::Rabbitmqadmin]', 'Class[Rabbitmq::Management]' ],
+  service_ensure => 'running',
+  service_manage => true,
+  service_name   => 'rabbitmq-server',
+}
+
+class { 'Rabbitmq' :
+  admin_enable                         => true,
+  before                               => 'Anchor[nailgun::rabbitmq end]',
+  cluster_node_type                    => 'disc',
+  cluster_nodes                        => [  ],
+  cluster_partition_handling           => 'ignore',
+  config                               => 'rabbitmq/rabbitmq.config.erb',
+  config_cluster                       => false,
+  config_kernel_variables              => { 'inet_default_connect_options' => '[{nodelay,true}]', 'inet_dist_listen_max' => '41055', 'inet_dist_listen_min' => '41055' },
+  config_path                          => '/etc/rabbitmq/rabbitmq.config',
+  config_rabbitmq_management_variables => { 'listener' => '[{port, 15672}, {ip, "10.109.0.2"}]' },
+  config_stomp                         => true,
+  config_variables                     => { 'default_permissions' => '[<<".*">>, <<".*">>, <<".*">>]', 'default_vhost' => '<<"">>', 'log_levels' => '[{connection,debug,info,error}]', 'tcp_listen_options' => '[
+      binary,
+      {packet, raw},
+      {reuseaddr, true},
+      {backlog, 128},
+      {nodelay, true},
+      {exit_on_close, false},
+      {keepalive, true}
+    ]' },
+  default_pass                         => 'guest',
+  default_user                         => 'guest',
+  delete_guest_user                    => true,
+  env_config                           => 'rabbitmq/rabbitmq-env.conf.erb',
+  env_config_path                      => '/etc/rabbitmq/rabbitmq-env.conf',
+  environment_variables                => { 'ERL_EPMD_ADDRESS' => '10.109.0.2', 'NODENAME' => 'rabbit@fuel', 'RABBITMQ_SERVER_ERL_ARGS' => '+K true +A48 +P 1048576' },
+  ldap_auth                            => false,
+  ldap_log                             => false,
+  ldap_port                            => '389',
+  ldap_server                          => 'ldap',
+  ldap_use_ssl                         => false,
+  ldap_user_dn_pattern                 => 'cn=username,ou=People,dc=example,dc=com',
+  management_port                      => '15672',
+  node_ip_address                      => '10.109.0.2',
+  package_apt_pin                      => '',
+  package_ensure                       => 'installed',
+  package_gpg_key                      => 'http://www.rabbitmq.com/rabbitmq-signing-key-public.asc',
+  package_name                         => 'rabbitmq-server',
+  package_provider                     => 'yum',
+  plugin_dir                           => '/usr/lib/rabbitmq/lib/rabbitmq_server-3.1.5-1/plugins',
+  port                                 => '5672',
+  repos_ensure                         => false,
+  service_ensure                       => 'running',
+  service_manage                       => true,
+  service_name                         => 'rabbitmq-server',
+  ssl                                  => false,
+  ssl_cacert                           => 'UNSET',
+  ssl_cert                             => 'UNSET',
+  ssl_fail_if_no_peer_cert             => false,
+  ssl_key                              => 'UNSET',
+  ssl_management_port                  => '15671',
+  ssl_only                             => false,
+  ssl_port                             => '5671',
+  ssl_stomp_port                       => '6164',
+  ssl_verify                           => 'verify_none',
+  stomp_ensure                         => false,
+  stomp_port                           => '61613',
+  tcp_keepalive                        => false,
+  version                              => '3.1.5-1',
+  wipe_db_on_cookie_change             => false,
+}
+
+class { 'Staging::Params' :
+}
+
+class { 'Staging' :
+  exec_path => '/usr/local/bin:/usr/bin:/bin',
+  group     => '0',
+  mode      => '0755',
+  owner     => '0',
+  path      => '/opt/staging',
+}
+
+class { 'Stdlib::Stages' :
+}
+
+class { 'Stdlib' :
+}
+
+exec { '/var/lib/rabbitmq/rabbitmqadmin' :
+  command   => 'curl -k --noproxy localhost --retry 30 --retry-delay 6 -f -L -o /var/lib/rabbitmq/rabbitmqadmin http://guest:guest@localhost:15672/cli/rabbitmqadmin',
+  creates   => '/var/lib/rabbitmq/rabbitmqadmin',
+  cwd       => '/var/lib/rabbitmq',
+  logoutput => 'on_failure',
+  path      => '/usr/local/bin:/usr/bin:/bin',
+  timeout   => '180',
+  tries     => '30',
+  try_sleep => '6',
+}
+
+exec { 'create-mcollective-broadcast-exchange' :
+  command   => 'curl -L -i -u mcollective:PPMi1XT2 -H "content-type:application/json" -XPUT       -d\'{"type":"topic","durable":true}\'      http://10.109.0.2:15672/api/exchanges/mcollective/mcollective_broadcast',
+  logoutput => true,
+  path      => '/bin:/usr/bin:/sbin:/usr/sbin',
+  require   => [ Service[rabbitmq-server], Rabbitmq_user_permissions[mcollective@mcollective] ],
+  tries     => '10',
+  try_sleep => '3',
+}
+
+exec { 'create-mcollective-directed-exchange' :
+  command   => 'curl -L -i -u mcollective:PPMi1XT2 -H   "content-type:application/json" -XPUT       -d\'{"type":"direct","durable":true}\'      http://10.109.0.2:15672/api/exchanges/mcollective/mcollective_directed',
+  logoutput => true,
+  path      => '/bin:/usr/bin:/sbin:/usr/sbin',
+  require   => [ Service[rabbitmq-server], Rabbitmq_user_permissions[mcollective@mcollective] ],
+  tries     => '10',
+  try_sleep => '3',
+}
+
+exec { 'epmd_daemon' :
+  before  => 'Rabbitmq_plugin[rabbitmq_management]',
+  command => 'epmd -daemon',
+  group   => 'rabbitmq',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  unless  => 'pgrep epmd',
+  user    => 'rabbitmq',
+}
+
+file { '/etc/default/rabbitmq-server' :
+  ensure  => 'absent',
+  before  => Service[rabbitmq-server],
+  require => Package[rabbitmq-server],
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/rabbitmq/enabled_plugins' :
+  content => '[amqp_client,rabbitmq_stomp,rabbitmq_management].',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[rabbitmq-server],
+  owner   => 'root',
+  require => Package[rabbitmq-server],
+}
+
+file { '/etc/rabbitmq/ssl' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0644',
+  owner  => '0',
+}
+
+file { '/etc/rabbitmq' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0644',
+  owner  => '0',
+}
+
+file { '/opt/staging' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0755',
+  owner  => '0',
+}
+
+file { '/usr/local/bin/rabbitmqadmin' :
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+  require => Staging::File[rabbitmqadmin],
+  source  => '/var/lib/rabbitmq/rabbitmqadmin',
+}
+
+file { '/var/log/rabbitmq' :
+  ensure  => 'directory',
+  before  => Service[rabbitmq-server],
+  group   => 'rabbitmq',
+  mode    => '0755',
+  owner   => 'rabbitmq',
+  require => User[rabbitmq],
+}
+
+file { 'rabbitmq-env.config' :
+  ensure  => 'file',
+  content => 'ERL_EPMD_ADDRESS=10.109.0.2
+NODENAME=rabbit@fuel
+NODE_IP_ADDRESS=10.109.0.2
+NODE_PORT=5672
+RABBITMQ_SERVER_ERL_ARGS=+K true +A48 +P 1048576
+',
+  group   => '0',
+  mode    => '0644',
+  notify  => Class[Rabbitmq::Service],
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmq-env.conf',
+}
+
+file { 'rabbitmq.config' :
+  ensure  => 'file',
+  content => '% This file managed by Puppet
+% Template Path: rabbitmq/templates/rabbitmq.config
+[
+  {rabbit, [
+    {default_permissions, [<<".*">>, <<".*">>, <<".*">>]},
+    {default_vhost, <<"">>},
+    {log_levels, [{connection,debug,info,error}]},
+    {tcp_listen_options, [
+      binary,
+      {packet, raw},
+      {reuseaddr, true},
+      {backlog, 128},
+      {nodelay, true},
+      {exit_on_close, false},
+      {keepalive, true}
+    ]},
+    {default_user, <<"guest">>},
+    {default_pass, <<"guest">>}
+  ]},
+  {kernel, [
+    {inet_default_connect_options, [{nodelay,true}]},
+    {inet_dist_listen_max, 41055},
+    {inet_dist_listen_min, 41055}
+  ]}
+,
+  {rabbitmq_management, [
+    {listener, [{port, 15672}, {ip, "10.109.0.2"}]}
+  ]}
+,
+  {rabbitmq_management, [
+    {listener, [
+      {port, 15672}
+    ]}
+  ]}
+,
+% Configure the Stomp Plugin listening port
+  {rabbitmq_stomp, [
+    {tcp_listeners, [61613]}
+  ]}
+].
+% EOF
+',
+  group   => '0',
+  mode    => '0644',
+  notify  => Class[Rabbitmq::Service],
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmq.config',
+}
+
+file { 'rabbitmqadmin.conf' :
+  ensure  => 'file',
+  content => '[default]
+ssl = False
+port = 15672
+',
+  group   => '0',
+  mode    => '0644',
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmqadmin.conf',
+  require => File[/etc/rabbitmq],
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+package { 'rabbitmq-server' :
+  ensure   => 'installed',
+  name     => 'rabbitmq-server',
+  notify   => Class[Rabbitmq::Service],
+  provider => 'yum',
+}
+
+rabbitmq_plugin { 'rabbitmq_management' :
+  ensure   => 'present',
+  notify   => Class[Rabbitmq::Service],
+  provider => 'rabbitmqplugins',
+  require  => Class[Rabbitmq::Install],
+}
+
+rabbitmq_user { 'guest' :
+  ensure   => 'absent',
+  provider => 'rabbitmqctl',
+}
+
+rabbitmq_user { 'mcollective' :
+  admin    => true,
+  password => 'PPMi1XT2',
+  provider => 'rabbitmqctl',
+  require  => Class[Rabbitmq],
+}
+
+rabbitmq_user { 'naily' :
+  admin    => true,
+  password => 'SwLCUx2H',
+  provider => 'rabbitmqctl',
+  require  => Class[Rabbitmq],
+}
+
+rabbitmq_user_permissions { 'mcollective@mcollective' :
+  configure_permission => '.*',
+  provider             => 'rabbitmqctl',
+  read_permission      => '.*',
+  require              => Class[Rabbitmq],
+  write_permission     => '.*',
+}
+
+rabbitmq_user_permissions { 'naily@/' :
+  configure_permission => '.*',
+  provider             => 'rabbitmqctl',
+  read_permission      => '.*',
+  require              => [ Class[Rabbitmq], Rabbitmq_vhost[/] ],
+  write_permission     => '.*',
+}
+
+rabbitmq_vhost { '/' :
+  require => Class[Rabbitmq],
+}
+
+rabbitmq_vhost { 'mcollective' :
+}
+
+service { 'rabbitmq-server' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'rabbitmq-server',
+}
+
+stage { 'deploy' :
+}
+
+stage { 'deploy_app' :
+  before => 'Stage[deploy]',
+}
+
+stage { 'deploy_infra' :
+  before => 'Stage[setup_app]',
+}
+
+stage { 'main' :
+}
+
+stage { 'runtime' :
+  before  => 'Stage[setup_infra]',
+  require => Stage[main],
+}
+
+stage { 'setup' :
+  before => Stage[main],
+}
+
+stage { 'setup_app' :
+  before => 'Stage[deploy_app]',
+}
+
+stage { 'setup_infra' :
+  before => 'Stage[deploy_infra]',
+}
+
+staging::file { 'rabbitmqadmin' :
+  curl_option => '-k --noproxy localhost --retry 30 --retry-delay 6',
+  require     => [ Class[Rabbitmq::Service], Rabbitmq_plugin[rabbitmq_management] ],
+  source      => 'http://guest:guest@localhost:15672/cli/rabbitmqadmin',
+  subdir      => 'rabbitmq',
+  target      => '/var/lib/rabbitmq/rabbitmqadmin',
+  timeout     => '180',
+  tries       => '30',
+  try_sleep   => '6',
+  wget_option => '--no-proxy',
+}
+
+user { 'rabbitmq' :
+  ensure     => 'present',
+  comment    => 'RabbitMQ messaging server',
+  home       => '/var/lib/rabbitmq',
+  managehome => true,
+  shell      => '/bin/bash',
+  uid        => '495',
+}
+

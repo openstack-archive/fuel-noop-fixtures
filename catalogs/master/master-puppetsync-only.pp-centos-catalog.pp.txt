@@ -1,0 +1,72 @@
+class { 'Nailgun::Puppetsync' :
+  puppet_folder => '/etc/puppet',
+  rsync_config  => '/etc/rsyncd.conf',
+  xinetd_config => '/etc/xinetd.d/rsync',
+}
+
+file { 'rsync_conf' :
+  ensure  => 'present',
+  content => '[puppet]
+path            = /etc/puppet
+read only       = true
+uid             = 0
+gid             = 0
+use chroot      = no
+
+[plugins]
+path            = /var/www/nailgun/plugins
+read only       = true
+uid             = 0
+gid             = 0
+use chroot      = no',
+  group   => 'root',
+  mode    => '0644',
+  notify  => 'Service[xinetd]',
+  owner   => 'root',
+  path    => '/etc/rsyncd.conf',
+}
+
+file { 'rsync_xinetd' :
+  ensure  => 'present',
+  content => 'service rsync
+{
+    disable         = no
+    socket_type     = stream
+    wait            = no
+    user            = root
+    server          = /usr/bin/rsync
+    server_args     = --daemon --log-file=/var/log/rsync.log
+    cps = 512 10
+    flags = IPv4
+    per_source = UNLIMITED
+    log_on_failure  += USERID
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => 'Service[xinetd]',
+  owner   => 'root',
+  path    => '/etc/xinetd.d/rsync',
+}
+
+node { 'default' :
+}
+
+package { 'rsync' :
+  ensure => 'installed',
+  before => [ 'File[rsync_conf]', 'File[rsync_xinetd]' ],
+}
+
+package { 'xinetd' :
+  ensure => 'installed',
+}
+
+service { 'xinetd' :
+  ensure  => 'running',
+  enable  => true,
+  require => Package[xinetd],
+}
+
+stage { 'main' :
+}
+

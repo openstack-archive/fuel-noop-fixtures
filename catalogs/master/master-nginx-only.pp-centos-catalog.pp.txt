@@ -1,0 +1,369 @@
+anchor { 'nginx-begin' :
+  before => 'Class[Nailgun::Nginx-repo]',
+}
+
+anchor { 'nginx-end' :
+}
+
+class { 'Docker::Container' :
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Nailgun::Nginx-nailgun' :
+  before        => 'Anchor[nginx-end]',
+  keystone_host => '10.109.0.2',
+  logdumpdir    => '/var/www/nailgun/dump',
+  nailgun_host  => '10.109.0.2',
+  notify        => Service[nginx],
+  ostf_host     => '10.109.0.2',
+  ssl_enabled   => true,
+  staticdir     => '/usr/share/nailgun/static',
+}
+
+class { 'Nailgun::Nginx-repo' :
+  before    => 'Class[Nailgun::Nginx-nailgun]',
+  notify    => Service[nginx],
+  repo_root => '/var/www/nailgun',
+}
+
+class { 'Nailgun::Nginx-service' :
+  service_enabled => false,
+}
+
+class { 'Nailgun::Nginx' :
+  keystone_host   => '10.109.0.2',
+  logdumpdir      => '/var/www/nailgun/dump',
+  nailgun_host    => '10.109.0.2',
+  ostf_host       => '10.109.0.2',
+  production      => 'docker',
+  repo_root       => '/var/www/nailgun',
+  service_enabled => false,
+  ssl_enabled     => true,
+  staticdir       => '/usr/share/nailgun/static',
+  templatedir     => '/usr/share/nailgun/static',
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/nginx/conf.d/default.conf' :
+  ensure => 'absent',
+  before => [ Class[Nailgun::Nginx-repo], Class[Nailgun::Nginx-nailgun] ],
+  notify => Service[nginx],
+}
+
+file { '/etc/nginx/conf.d/nailgun.conf' :
+  content => 'server {
+    listen   8000;
+        listen   8443 ssl;
+    ssl_certificate /var/lib/fuel/keys/master/nginx/nginx.crt;
+    ssl_certificate_key /var/lib/fuel/keys/master/nginx/nginx.key;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    server_name localhost;
+
+    access_log /var/log/nginx/access_nailgun.log;
+    error_log /var/log/nginx/error_nailgun.log debug;
+
+    charset utf-8;
+    client_max_body_size 10M;
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_types text/plain text/css application/json application/javascript application/x-javascript;
+
+    location /static {
+        autoindex on;
+        alias /usr/share/nailgun/static;
+    }
+
+    location /dump {
+        internal;
+        alias /var/www/nailgun/dump;
+    }
+
+    location ~ ^/ostf/(.*) {
+        proxy_pass http://10.109.0.2:8777/v1/$1;
+        proxy_buffering off;
+    }
+
+    location ~ ^/keystone/(.*) {
+        proxy_pass http://10.109.0.2:5000/$1;
+        proxy_buffering off;
+    }
+
+    location / {
+        expires -1;
+        root /usr/share/nailgun/static;
+    }
+
+    location /api {
+        include uwsgi_params;
+        uwsgi_pass 10.109.0.2:8001;
+        client_max_body_size 100m;
+    }
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[nginx],
+  owner   => 'root',
+  require => Package[nginx],
+}
+
+file { '/etc/nginx/conf.d/repo.conf' :
+  content => 'server {
+    listen   8080;
+
+    server_name localhost;
+
+    access_log /var/log/nginx/access_repo.log;
+    error_log /var/log/nginx/error_repo.log debug;
+
+    charset utf-8;
+    client_max_body_size 2M;
+
+    location / {
+        autoindex on;
+        root /var/www/nailgun;
+    }
+
+    location ~ /\.ht {
+        deny  all;
+    }
+
+    location  /dump/ {
+        deny  all;
+    }
+
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[nginx],
+  owner   => 'root',
+  require => Package[nginx],
+}
+
+file { '/etc/nginx/conf.d/ssl.conf' :
+  ensure => 'absent',
+  before => [ Class[Nailgun::Nginx-repo], Class[Nailgun::Nginx-nailgun] ],
+  notify => Service[nginx],
+}
+
+file { '/etc/nginx/conf.d/virtual.conf' :
+  ensure => 'absent',
+  before => [ Class[Nailgun::Nginx-repo], Class[Nailgun::Nginx-nailgun] ],
+  notify => Service[nginx],
+}
+
+file { '/etc/nginx/nginx.conf' :
+  ensure  => 'present',
+  content => 'user              nginx;
+worker_processes  2;
+
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+    use epoll;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  \'$remote_addr - $remote_user [$time_local] "$request" \'
+                      \'$status $body_bytes_sent "$http_referer" \'
+                      \'"$http_user_agent" "$http_x_forwarded_for"\';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    tcp_nopush      on;
+
+    # don\'t buffer data-sends (disable Nagle algorithm).
+    # Good for sending frequent small bursts of data in real time.
+    tcp_nodelay on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    server_tokens off;
+    #gzip  on;
+
+    #prefer server ciphers over client ones
+    ssl_prefer_server_ciphers on;
+
+    #prevent from clickjacking attacks
+    add_header X-Frame-Options SAMEORIGIN;
+
+    # Load config files from the /etc/nginx/conf.d directory
+    # The default server is in conf.d/default.conf
+    include /etc/nginx/conf.d/*.conf;
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[nginx],
+  owner   => 'root',
+  require => Package[nginx],
+}
+
+file { '/var/lib/fuel/keys/master/nginx//nginx.cnf' :
+  ensure  => 'present',
+  content => '# file managed by puppet
+#
+# SSLeay example configuration file.
+#
+
+# This definition stops the following lines choking if HOME isn\'t
+# defined.
+HOME                    = .
+RANDFILE                = $ENV::HOME/.rnd
+
+[ req ]
+default_bits            = 2048
+default_md              = sha256
+default_keyfile         = privkey.pem
+distinguished_name      = req_distinguished_name
+prompt                  = no
+req_extensions          = req_ext
+
+[ req_distinguished_name ]
+countryName                     = US
+stateOrProvinceName             = California
+organizationName                = Fuel
+organizationalUnitName          = Fuel Deployment Team
+commonName                      = fuel.master.local
+emailAddress                    = root@fuel.master.local
+
+[ req_ext ]
+subjectAltName = "DNS: 10.109.0.2"
+
+
+',
+  group   => 'root',
+  owner   => 'root',
+}
+
+file { '/var/lib/fuel/keys/master/nginx//nginx.crt' :
+  ensure  => 'present',
+  group   => 'root',
+  owner   => 'root',
+  require => X509_cert[/var/lib/fuel/keys/master/nginx//nginx.crt],
+}
+
+file { '/var/lib/fuel/keys/master/nginx//nginx.csr' :
+  ensure  => 'present',
+  group   => 'root',
+  owner   => 'root',
+  require => X509_request[/var/lib/fuel/keys/master/nginx//nginx.csr],
+}
+
+file { '/var/lib/fuel/keys/master/nginx//nginx.key' :
+  ensure  => 'present',
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+  require => Ssl_pkey[/var/lib/fuel/keys/master/nginx//nginx.key],
+}
+
+file { '/var/lib/fuel/keys/master/nginx' :
+  ensure => 'directory',
+}
+
+file { '/var/lib/fuel/keys/master' :
+  ensure => 'directory',
+}
+
+file { '/var/lib/fuel/keys' :
+  ensure => 'directory',
+}
+
+file { '/var/lib/fuel' :
+  ensure => 'directory',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+node { 'default' :
+}
+
+openssl::certificate::x509 { 'nginx' :
+  ensure       => 'present',
+  altnames     => 'DNS: 10.109.0.2',
+  base_dir     => '/var/lib/fuel/keys/master/nginx/',
+  cnf_tpl      => 'openssl/cert.cnf.erb',
+  commonname   => 'fuel.master.local',
+  country      => 'US',
+  days         => '3650',
+  email        => 'root@fuel.master.local',
+  force        => false,
+  group        => 'root',
+  key_mode     => '0600',
+  organization => 'Fuel',
+  owner        => 'root',
+  require      => File[/var/lib/fuel/keys/master/nginx],
+  state        => 'California',
+  unit         => 'Fuel Deployment Team',
+}
+
+package { 'nginx' :
+  ensure => 'latest',
+  notify => 'Service[nginx]',
+}
+
+service { 'nginx' :
+  ensure  => false,
+  enable  => false,
+  require => File[/etc/nginx/nginx.conf],
+}
+
+ssl_pkey { '/var/lib/fuel/keys/master/nginx//nginx.key' :
+  ensure => 'present',
+}
+
+stage { 'main' :
+}
+
+x509_cert { '/var/lib/fuel/keys/master/nginx//nginx.crt' :
+  ensure      => 'present',
+  days        => '3650',
+  force       => false,
+  private_key => '/var/lib/fuel/keys/master/nginx//nginx.key',
+  req_ext     => true,
+  require     => File[/var/lib/fuel/keys/master/nginx//nginx.cnf],
+  template    => '/var/lib/fuel/keys/master/nginx//nginx.cnf',
+}
+
+x509_request { '/var/lib/fuel/keys/master/nginx//nginx.csr' :
+  ensure      => 'present',
+  force       => false,
+  private_key => '/var/lib/fuel/keys/master/nginx//nginx.key',
+  require     => File[/var/lib/fuel/keys/master/nginx//nginx.cnf],
+  template    => '/var/lib/fuel/keys/master/nginx//nginx.cnf',
+}
+

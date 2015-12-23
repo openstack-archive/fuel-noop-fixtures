@@ -1,0 +1,132 @@
+class { 'Neutron::Agents::Metadata' :
+  auth_insecure             => false,
+  auth_password             => 'oT56DSZF',
+  auth_region               => 'RegionOne',
+  auth_tenant               => 'services',
+  auth_url                  => 'http://192.168.0.2:35357/v2.0',
+  auth_user                 => 'neutron',
+  debug                     => false,
+  enabled                   => true,
+  manage_service            => true,
+  metadata_backlog          => '4096',
+  metadata_ip               => '192.168.0.2',
+  metadata_memory_cache_ttl => '5',
+  metadata_port             => '8775',
+  metadata_protocol         => 'http',
+  metadata_workers          => '4',
+  package_ensure            => 'present',
+  shared_secret             => 'fp618p5V',
+}
+
+class { 'Neutron::Params' :
+}
+
+class { 'Neutron' :
+}
+
+neutron_metadata_agent_config { 'DEFAULT/admin_password' :
+  notify => 'Service[neutron-metadata]',
+  secret => true,
+  value  => 'oT56DSZF',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/admin_tenant_name' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'services',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/admin_user' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'neutron',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/auth_ca_cert' :
+  ensure => 'absent',
+  notify => 'Service[neutron-metadata]',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/auth_insecure' :
+  notify => 'Service[neutron-metadata]',
+  value  => false,
+}
+
+neutron_metadata_agent_config { 'DEFAULT/auth_region' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'RegionOne',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/auth_url' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'http://192.168.0.2:35357/v2.0',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/cache_url' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'memory://?default_ttl=5',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/debug' :
+  notify => 'Service[neutron-metadata]',
+  value  => false,
+}
+
+neutron_metadata_agent_config { 'DEFAULT/metadata_backlog' :
+  notify => 'Service[neutron-metadata]',
+  value  => '4096',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/metadata_proxy_shared_secret' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'fp618p5V',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/metadata_workers' :
+  notify => 'Service[neutron-metadata]',
+  value  => '4',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/nova_metadata_ip' :
+  notify => 'Service[neutron-metadata]',
+  value  => '192.168.0.2',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/nova_metadata_port' :
+  notify => 'Service[neutron-metadata]',
+  value  => '8775',
+}
+
+neutron_metadata_agent_config { 'DEFAULT/nova_metadata_protocol' :
+  notify => 'Service[neutron-metadata]',
+  value  => 'http',
+}
+
+override_resources { 'neutron_metadata_agent_config' :
+  data => { 'DEFAULT/debug' => { 'value' => true } },
+}
+
+package { 'neutron-metadata' :
+  ensure  => 'present',
+  before  => 'Service[neutron-metadata]',
+  name    => 'neutron-metadata-agent',
+  notify  => 'Service[neutron-metadata]',
+  require => Package[neutron],
+  tag     => [ 'openstack', 'neutron-package' ],
+}
+
+package { 'neutron' :
+  ensure => 'installed',
+  name   => 'binutils',
+  notify => 'Service[neutron-metadata]',
+}
+
+service { 'neutron-metadata' :
+  ensure  => 'running',
+  enable  => true,
+  name    => 'neutron-metadata-agent',
+  require => Class[Neutron],
+  tag     => 'neutron-service',
+}
+
+stage { 'main' :
+}
+

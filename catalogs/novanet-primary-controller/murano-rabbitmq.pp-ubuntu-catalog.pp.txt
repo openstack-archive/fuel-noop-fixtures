@@ -1,0 +1,12 @@
+rabbitmq_user_permissions { 'nova@/murano' :
+  configure_permission => '.*',
+  read_permission      => '.*',
+  write_permission     => '.*',
+}
+
+rabbitmq_vhost { '/murano' :
+}
+
+stage { 'main' :
+}
+

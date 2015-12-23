@@ -1,0 +1,29 @@
+class { 'Ceph::Params' :
+}
+
+file { '/etc/sudoers.d/ceph' :
+  content => '# This is required for ceph-deploy
+Defaults !requiretty
+',
+}
+
+package { 'ceph-deploy' :
+  ensure => 'installed',
+}
+
+package { 'ceph' :
+  ensure => 'installed',
+}
+
+package { 'redhat-lsb-core' :
+  ensure => 'installed',
+}
+
+service { 'ceph-radosgw' :
+  ensure => 'running',
+  enable => true,
+}
+
+stage { 'main' :
+}
+

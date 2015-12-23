@@ -1,0 +1,549 @@
+anchor { 'rabbitmq::begin' :
+  before => 'Class[Rabbitmq::Install]',
+}
+
+anchor { 'rabbitmq::end' :
+}
+
+class { 'Cluster::Rabbitmq_fence' :
+  enabled => true,
+  require => Class[Rabbitmq],
+}
+
+class { 'Nova::Rabbitmq' :
+  cluster_disk_nodes => false,
+  enabled            => true,
+  password           => 'U7sRLche',
+  port               => '5672',
+  require            => Class[Rabbitmq],
+  userid             => 'nova',
+  virtual_host       => '/',
+}
+
+class { 'Pacemaker_wrappers::Rabbitmq' :
+  admin_pass              => 'U7sRLche',
+  admin_user              => 'nova',
+  before                  => Class[Nova::Rabbitmq],
+  command_timeout         => '\'-s KILL\'',
+  debug                   => true,
+  enable_notifications_ha => 'true',
+  enable_rpc_ha           => 'true',
+  erlang_cookie           => 'EOKOWXQREETZSHFNTPEY',
+  host_ip                 => '10.108.2.4',
+  ocf_script_file         => 'cluster/ocf/rabbitmq',
+  port                    => '5673',
+  primitive_type          => 'rabbitmq-server',
+  service_name            => 'rabbitmq-server',
+}
+
+class { 'Rabbitmq::Config' :
+  notify => 'Class[Rabbitmq::Service]',
+}
+
+class { 'Rabbitmq::Install::Rabbitmqadmin' :
+}
+
+class { 'Rabbitmq::Install' :
+  before => [ 'Class[Rabbitmq::Config]', 'Exec[epmd_daemon]' ],
+}
+
+class { 'Rabbitmq::Management' :
+  before => 'Anchor[rabbitmq::end]',
+}
+
+class { 'Rabbitmq::Params' :
+}
+
+class { 'Rabbitmq::Repo::Rhel' :
+}
+
+class { 'Rabbitmq::Service' :
+  before         => [ 'Class[Rabbitmq::Install::Rabbitmqadmin]', 'Class[Rabbitmq::Management]' ],
+  service_ensure => 'running',
+  service_manage => true,
+  service_name   => 'rabbitmq-server',
+}
+
+class { 'Rabbitmq' :
+  admin_enable                         => true,
+  cluster_node_type                    => 'disc',
+  cluster_nodes                        => [  ],
+  cluster_partition_handling           => 'ignore',
+  config                               => 'rabbitmq/rabbitmq.config.erb',
+  config_cluster                       => false,
+  config_kernel_variables              => { 'inet_default_connect_options' => '[{nodelay,true}]', 'inet_dist_listen_max' => '41055', 'inet_dist_listen_min' => '41055', 'net_ticktime' => '10' },
+  config_path                          => '/etc/rabbitmq/rabbitmq.config',
+  config_rabbitmq_management_variables => { 'listener' => '[{port, 15672}, {ip,"127.0.0.1"}]', 'rates_mode' => 'none' },
+  config_stomp                         => false,
+  config_variables                     => { 'cluster_partition_handling' => 'autoheal', 'collect_statistics_interval' => '30000', 'default_permissions' => '[<<".*">>, <<".*">>, <<".*">>]', 'default_vhost' => '<<"/">>', 'disk_free_limit' => '5000000', 'log_levels' => '[{connection,info}]', 'mnesia_table_loading_timeout' => '10000', 'tcp_listen_options' => '[
+      binary,
+      {packet, raw},
+      {reuseaddr, true},
+      {backlog, 128},
+      {nodelay, true},
+      {exit_on_close, false},
+      {keepalive, true}
+    ]' },
+  default_pass                         => 'U7sRLche',
+  default_user                         => 'nova',
+  delete_guest_user                    => true,
+  env_config                           => 'rabbitmq/rabbitmq-env.conf.erb',
+  env_config_path                      => '/etc/rabbitmq/rabbitmq-env.conf',
+  environment_variables                => { 'ERL_EPMD_ADDRESS' => '10.108.2.4', 'PID_FILE' => '/var/run/rabbitmq/p_pid', 'SERVER_ERL_ARGS' => '"+K true +A48 +P 1048576"' },
+  ldap_auth                            => false,
+  ldap_log                             => false,
+  ldap_port                            => '389',
+  ldap_server                          => 'ldap',
+  ldap_use_ssl                         => false,
+  ldap_user_dn_pattern                 => 'cn=username,ou=People,dc=example,dc=com',
+  management_port                      => '15672',
+  node_ip_address                      => '10.108.2.4',
+  package_apt_pin                      => '',
+  package_ensure                       => 'installed',
+  package_gpg_key                      => 'http://www.rabbitmq.com/rabbitmq-signing-key-public.asc',
+  package_name                         => 'rabbitmq-server',
+  package_provider                     => 'yum',
+  plugin_dir                           => '/usr/lib/rabbitmq/lib/rabbitmq_server-3.1.5-1/plugins',
+  port                                 => '5673',
+  repos_ensure                         => false,
+  service_ensure                       => 'running',
+  service_manage                       => true,
+  service_name                         => 'rabbitmq-server',
+  ssl                                  => false,
+  ssl_cacert                           => 'UNSET',
+  ssl_cert                             => 'UNSET',
+  ssl_fail_if_no_peer_cert             => false,
+  ssl_key                              => 'UNSET',
+  ssl_management_port                  => '15671',
+  ssl_only                             => false,
+  ssl_port                             => '5671',
+  ssl_stomp_port                       => '6164',
+  ssl_verify                           => 'verify_none',
+  stomp_ensure                         => false,
+  stomp_port                           => '6163',
+  tcp_keepalive                        => false,
+  version                              => '3.3.5',
+  wipe_db_on_cookie_change             => false,
+}
+
+class { 'Staging::Params' :
+}
+
+class { 'Staging' :
+  exec_path => '/usr/local/bin:/usr/bin:/bin',
+  group     => '0',
+  mode      => '0755',
+  owner     => '0',
+  path      => '/opt/staging',
+}
+
+cs_resource { 'p_rabbitmq-server' :
+  ensure          => 'present',
+  before          => 'Service[rabbitmq-server]',
+  complex_type    => 'master',
+  metadata        => { 'failure-timeout' => '30s', 'migration-threshold' => '10', 'resource-stickiness' => '100' },
+  ms_metadata     => { 'interleave' => 'true', 'master-max' => '1', 'master-node-max' => '1', 'notify' => 'true', 'ordered' => 'false', 'target-role' => 'Master' },
+  operations      => { 'demote' => { 'timeout' => '120' }, 'monitor' => { 'interval' => '30', 'timeout' => '180' }, 'monitor:Master' => { 'interval' => '27', 'role' => 'Master', 'timeout' => '180' }, 'monitor:Slave' => { 'OCF_CHECK_LEVEL' => '30', 'interval' => '103', 'role' => 'Slave', 'timeout' => '180' }, 'notify' => { 'timeout' => '180' }, 'promote' => { 'timeout' => '120' }, 'start' => { 'timeout' => '360' }, 'stop' => { 'timeout' => '120' } },
+  parameters      => { 'admin_password' => 'U7sRLche', 'admin_user' => 'nova', 'command_timeout' => '\'-s KILL\'', 'debug' => true, 'enable_notifications_ha' => 'true', 'enable_rpc_ha' => 'true', 'erlang_cookie' => 'EOKOWXQREETZSHFNTPEY', 'host_ip' => '10.108.2.4', 'node_port' => '5673' },
+  primitive_class => 'ocf',
+  primitive_type  => 'rabbitmq-server',
+  provided_by     => 'fuel',
+}
+
+exec { '/var/lib/rabbitmq/rabbitmqadmin' :
+  command   => 'curl -k --noproxy localhost --retry 30 --retry-delay 6 -f -L -o /var/lib/rabbitmq/rabbitmqadmin http://nova:U7sRLche@localhost:15672/cli/rabbitmqadmin',
+  creates   => '/var/lib/rabbitmq/rabbitmqadmin',
+  cwd       => '/var/lib/rabbitmq',
+  logoutput => 'on_failure',
+  path      => '/usr/local/bin:/usr/bin:/bin',
+  timeout   => '180',
+  tries     => '30',
+  try_sleep => '6',
+}
+
+exec { 'epmd_daemon' :
+  before  => 'Rabbitmq_plugin[rabbitmq_management]',
+  command => 'epmd -daemon',
+  group   => 'rabbitmq',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  unless  => 'pgrep epmd',
+  user    => 'rabbitmq',
+}
+
+file { '/etc/rabbitmq/ssl' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0644',
+  owner  => '0',
+}
+
+file { '/etc/rabbitmq' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0644',
+  owner  => '0',
+}
+
+file { '/opt/staging' :
+  ensure => 'directory',
+  group  => '0',
+  mode   => '0755',
+  owner  => '0',
+}
+
+file { '/usr/local/bin/rabbitmqadmin' :
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+  require => Staging::File[rabbitmqadmin],
+  source  => '/var/lib/rabbitmq/rabbitmqadmin',
+}
+
+file { 'ocf_handler_rabbitmq-server' :
+  ensure  => 'present',
+  before  => 'Service[rabbitmq-server]',
+  content => '#!/bin/bash
+export PATH=\'/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\'
+export OCF_ROOT=\'/usr/lib/ocf\'
+export OCF_RA_VERSION_MAJOR=\'1\'
+export OCF_RA_VERSION_MINOR=\'0\'
+export OCF_RESOURCE_INSTANCE=\'p_rabbitmq-server\'
+
+# OCF Parameters
+                                    export OCF_RESKEY_host_ip=\'10.108.2.4\'
+                                    export OCF_RESKEY_node_port=\'5673\'
+                                    export OCF_RESKEY_debug=\'true\'
+                                    export OCF_RESKEY_command_timeout=\'-s KILL\'
+                                    export OCF_RESKEY_erlang_cookie=\'EOKOWXQREETZSHFNTPEY\'
+                                    export OCF_RESKEY_admin_user=\'nova\'
+                                    export OCF_RESKEY_admin_password=\'U7sRLche\'
+                                    export OCF_RESKEY_enable_rpc_ha=\'true\'
+                                    export OCF_RESKEY_enable_notifications_ha=\'true\'
+
+help() {
+cat<<EOF
+OCF wrapper for rabbitmq-server Pacemaker primitive
+
+Usage: ocf_handler_rabbitmq-server [-dh] (action)
+
+Options:
+-d - Use set -x to debug the shell script
+-h - Show this help
+
+Main actions:
+* start
+* stop
+* monitor
+* meta-data
+* validate-all
+
+Multistate:
+* promote
+* demote
+* notify
+
+Migration:
+* migrate_to
+* migrate_from
+
+Optional and unused:
+* usage
+* help
+* status
+* reload
+* restart
+* recover
+EOF
+}
+
+red() {
+  echo -e "\033[31m${1}\033[0m"
+}
+
+green() {
+  echo -e "\033[32m${1}\033[0m"
+}
+
+blue() {
+  echo -e "\033[34m${1}\033[0m"
+}
+
+ec2error() {
+  case "${1}" in
+    0) green \'Success\' ;;
+    1) red \'Error: Generic\' ;;
+    2) red \'Error: Arguments\' ;;
+    3) red \'Error: Unimplemented\' ;;
+    4) red \'Error: Permissions\' ;;
+    5) red \'Error: Installation\' ;;
+    6) red \'Error: Configuration\' ;;
+    7) blue \'Not Running\' ;;
+    8) green \'Master Running\' ;;
+    9) red \'Master Failed\' ;;
+    *) red "Unknown" ;;
+  esac
+}
+
+DEBUG=\'0\'
+while getopts \':dh\' opt; do
+  case $opt in
+    d)
+      DEBUG=\'1\'
+      ;;
+    h)
+      help
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option: -${OPTARG}" >&2
+      help
+      exit 1
+      ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+ACTION="${1}"
+
+# set default action to monitor
+if [ "${ACTION}" = \'\' ]; then
+  ACTION=\'monitor\'
+fi
+
+# alias status to monitor
+if [ "${ACTION}" = \'status\' ]; then
+  ACTION=\'monitor\'
+fi
+
+# view defined OCF parameters
+if [ "${ACTION}" = \'params\' ]; then
+  env | grep \'OCF_\'
+  exit 0
+fi
+
+if [ "${DEBUG}" = \'1\' ]; then
+  bash -x /usr/lib/ocf/resource.d/fuel/rabbitmq-server "${ACTION}"
+else
+  /usr/lib/ocf/resource.d/fuel/rabbitmq-server "${ACTION}"
+fi
+ec="${?}"
+
+message="$(ec2error ${ec})"
+echo "Exit status: ${message} (${ec})"
+exit "${ec}"
+',
+  group   => 'root',
+  mode    => '0700',
+  owner   => 'root',
+  path    => '/usr/local/bin/ocf_handler_rabbitmq-server',
+}
+
+file { 'rabbitmq-env.config' :
+  ensure  => 'file',
+  content => 'ERL_EPMD_ADDRESS=10.108.2.4
+NODE_IP_ADDRESS=10.108.2.4
+NODE_PORT=5673
+PID_FILE=/var/run/rabbitmq/p_pid
+SERVER_ERL_ARGS="+K true +A48 +P 1048576"
+',
+  group   => '0',
+  mode    => '0644',
+  notify  => Class[Rabbitmq::Service],
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmq-env.conf',
+}
+
+file { 'rabbitmq.config' :
+  ensure  => 'file',
+  content => '% This file managed by Puppet
+% Template Path: rabbitmq/templates/rabbitmq.config
+[
+  {rabbit, [
+    {cluster_partition_handling, autoheal},
+    {collect_statistics_interval, 30000},
+    {default_permissions, [<<".*">>, <<".*">>, <<".*">>]},
+    {default_vhost, <<"/">>},
+    {disk_free_limit, 5000000},
+    {log_levels, [{connection,info}]},
+    {mnesia_table_loading_timeout, 10000},
+    {tcp_listen_options, [
+      binary,
+      {packet, raw},
+      {reuseaddr, true},
+      {backlog, 128},
+      {nodelay, true},
+      {exit_on_close, false},
+      {keepalive, true}
+    ]},
+    {default_user, <<"nova">>},
+    {default_pass, <<"U7sRLche">>}
+  ]},
+  {kernel, [
+    {inet_default_connect_options, [{nodelay,true}]},
+    {inet_dist_listen_max, 41055},
+    {inet_dist_listen_min, 41055},
+    {net_ticktime, 10}
+  ]}
+,
+  {rabbitmq_management, [
+    {listener, [{port, 15672}, {ip,"127.0.0.1"}]},
+    {rates_mode, none}
+  ]}
+,
+  {rabbitmq_management, [
+    {listener, [
+      {port, 15672}
+    ]}
+  ]}
+].
+% EOF
+',
+  group   => '0',
+  mode    => '0644',
+  notify  => Class[Rabbitmq::Service],
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmq.config',
+}
+
+file { 'rabbitmqadmin.conf' :
+  ensure  => 'file',
+  content => '[default]
+ssl = False
+port = 15672
+',
+  group   => '0',
+  mode    => '0644',
+  owner   => '0',
+  path    => '/etc/rabbitmq/rabbitmqadmin.conf',
+  require => File[/etc/rabbitmq],
+}
+
+pacemaker_wrappers::service { 'rabbitmq-server' :
+  ensure             => 'present',
+  complex_type       => 'master',
+  create_primitive   => true,
+  handler_root_path  => '/usr/local/bin',
+  metadata           => { 'failure-timeout' => '30s', 'migration-threshold' => '10', 'resource-stickiness' => '100' },
+  ms_metadata        => { 'interleave' => 'true', 'master-max' => '1', 'master-node-max' => '1', 'notify' => 'true', 'ordered' => 'false', 'target-role' => 'Master' },
+  ocf_root_path      => '/usr/lib/ocf',
+  operations         => { 'demote' => { 'timeout' => '120' }, 'monitor' => { 'interval' => '30', 'timeout' => '180' }, 'monitor:Master' => { 'interval' => '27', 'role' => 'Master', 'timeout' => '180' }, 'monitor:Slave' => { 'OCF_CHECK_LEVEL' => '30', 'interval' => '103', 'role' => 'Slave', 'timeout' => '180' }, 'notify' => { 'timeout' => '180' }, 'promote' => { 'timeout' => '120' }, 'start' => { 'timeout' => '360' }, 'stop' => { 'timeout' => '120' } },
+  parameters         => { 'admin_password' => 'U7sRLche', 'admin_user' => 'nova', 'command_timeout' => '\'-s KILL\'', 'debug' => true, 'enable_notifications_ha' => 'true', 'enable_rpc_ha' => 'true', 'erlang_cookie' => 'EOKOWXQREETZSHFNTPEY', 'host_ip' => '10.108.2.4', 'node_port' => '5673' },
+  prefix             => true,
+  primitive_class    => 'ocf',
+  primitive_provider => 'fuel',
+  primitive_type     => 'rabbitmq-server',
+  use_handler        => true,
+}
+
+package { 'dbus-python' :
+  before => 'Service[messagebus]',
+}
+
+package { 'dbus' :
+  before => 'Service[messagebus]',
+}
+
+package { 'fuel-rabbit-fence' :
+  before => 'Service[rabbit-fence]',
+}
+
+package { 'pygobject2' :
+  before => 'Service[messagebus]',
+}
+
+package { 'python-daemon' :
+  before => 'Service[messagebus]',
+}
+
+package { 'rabbitmq-server' :
+  ensure   => 'installed',
+  name     => 'rabbitmq-server',
+  notify   => Class[Rabbitmq::Service],
+  provider => 'yum',
+}
+
+rabbitmq_plugin { 'rabbitmq_management' :
+  ensure   => 'present',
+  notify   => Class[Rabbitmq::Service],
+  provider => 'rabbitmqplugins',
+  require  => Class[Rabbitmq::Install],
+}
+
+rabbitmq_user { 'guest' :
+  ensure   => 'absent',
+  provider => 'rabbitmqctl',
+}
+
+rabbitmq_user { 'nova' :
+  admin    => true,
+  password => 'U7sRLche',
+  provider => 'rabbitmqctl',
+}
+
+rabbitmq_user_permissions { 'nova@/' :
+  configure_permission => '.*',
+  provider             => 'rabbitmqctl',
+  read_permission      => '.*',
+  write_permission     => '.*',
+}
+
+rabbitmq_vhost { '/' :
+  provider => 'rabbitmqctl',
+}
+
+service { 'corosync-notifyd' :
+  ensure     => 'running',
+  before     => 'Package[fuel-rabbit-fence]',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+}
+
+service { 'messagebus' :
+  ensure     => 'running',
+  before     => 'Service[corosync-notifyd]',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+}
+
+service { 'rabbit-fence' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'rabbit-fence',
+  require    => Package[rabbitmq-server],
+}
+
+service { 'rabbitmq-server' :
+  ensure     => 'running',
+  before     => [ 'Rabbitmq_user[guest]', 'Rabbitmq_user[nova]' ],
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'rabbitmq-server',
+  provider   => 'pacemaker',
+}
+
+stage { 'main' :
+}
+
+staging::file { 'rabbitmqadmin' :
+  curl_option => '-k --noproxy localhost --retry 30 --retry-delay 6',
+  require     => [ Class[Rabbitmq::Service], Rabbitmq_plugin[rabbitmq_management] ],
+  source      => 'http://nova:U7sRLche@localhost:15672/cli/rabbitmqadmin',
+  subdir      => 'rabbitmq',
+  target      => '/var/lib/rabbitmq/rabbitmqadmin',
+  timeout     => '180',
+  tries       => '30',
+  try_sleep   => '6',
+  wget_option => '--no-proxy',
+}
+
+tweaks::ubuntu_service_override { 'rabbitmq-server' :
+  package_name => 'rabbitmq-server',
+  service_name => 'rabbitmq-server',
+}
+

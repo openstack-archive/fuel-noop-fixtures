@@ -1,0 +1,96 @@
+class { 'Murano::Cfapi' :
+  auth_url       => 'https://public.fuel.local:5000/v2.0/',
+  bind_host      => '192.168.0.2',
+  bind_port      => '8083',
+  enabled        => true,
+  manage_service => true,
+  package_ensure => 'present',
+  tenant         => 'admin',
+}
+
+class { 'Murano::Params' :
+}
+
+class { 'Murano::Policy' :
+  before      => 'Service[murano-cfapi]',
+  policies    => {  },
+  policy_path => '/etc/murano/policy.json',
+}
+
+class { 'Openstack::Firewall' :
+}
+
+exec { 'remove_murano-cfapi_override' :
+  before  => [ 'Service[murano-cfapi]', 'Service[murano-cfapi]' ],
+  command => 'rm -f /etc/init/murano-cfapi.override',
+  onlyif  => 'test -f /etc/init/murano-cfapi.override',
+  path    => [ '/sbin', '/bin', '/usr/bin', '/usr/sbin' ],
+}
+
+file { 'create_murano-cfapi_override' :
+  ensure  => 'present',
+  before  => [ 'Package[murano-cfapi]', 'Package[murano-cfapi]', 'Exec[remove_murano-cfapi_override]' ],
+  content => 'manual',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/init/murano-cfapi.override',
+}
+
+firewall { '203 murano-cfapi' :
+  action => 'accept',
+  before => 'Class[Murano::Cfapi]',
+  dport  => '8083',
+  proto  => 'tcp',
+}
+
+haproxy_backend_status { 'murano-cfapi' :
+  name => 'murano-cfapi',
+  url  => 'http://192.168.0.2:10000/;csv',
+}
+
+murano_config { 'cfapi/auth_url' :
+  notify => 'Service[murano-cfapi]',
+  value  => 'https://public.fuel.local:5000/v2.0/',
+}
+
+murano_config { 'cfapi/bind_host' :
+  notify => 'Service[murano-cfapi]',
+  value  => '192.168.0.2',
+}
+
+murano_config { 'cfapi/bind_port' :
+  notify => 'Service[murano-cfapi]',
+  value  => '8083',
+}
+
+murano_config { 'cfapi/tenant' :
+  notify => 'Service[murano-cfapi]',
+  value  => 'admin',
+}
+
+package { 'murano-cfapi' :
+  ensure => 'present',
+  before => [ 'Exec[remove_murano-cfapi_override]', 'Exec[remove_murano-cfapi_override]' ],
+  name   => 'murano-cfapi',
+  notify => 'Service[murano-cfapi]',
+  tag    => [ 'openstack', 'murano-package' ],
+}
+
+service { 'murano-cfapi' :
+  ensure  => 'running',
+  before  => 'Haproxy_backend_status[murano-cfapi]',
+  enable  => true,
+  name    => 'murano-cfapi',
+  require => Package[murano-cfapi],
+  tag     => 'murano-service',
+}
+
+stage { 'main' :
+}
+
+tweaks::ubuntu_service_override { 'murano-cfapi' :
+  package_name => 'murano-cfapi',
+  service_name => 'murano-cfapi',
+}
+

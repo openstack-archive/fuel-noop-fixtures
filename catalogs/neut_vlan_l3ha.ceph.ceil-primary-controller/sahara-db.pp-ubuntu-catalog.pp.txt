@@ -1,0 +1,12 @@
+class { 'Mysql::Config' :
+}
+
+class { 'Mysql::Server' :
+}
+
+class { 'Sahara::Api' :
+}
+
+stage { 'main' :
+}
+

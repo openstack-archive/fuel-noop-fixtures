@@ -1,0 +1,17 @@
+ceilometer_radosgw_user { 'ceilometer' :
+  caps   => { 'buckets' => 'read', 'usage' => 'read' },
+  notify => 'Service[openstack-ceilometer-central]',
+}
+
+class { 'Ceilometer::Params' :
+}
+
+service { 'openstack-ceilometer-central' :
+  ensure   => 'running',
+  enable   => true,
+  provider => 'pacemaker',
+}
+
+stage { 'main' :
+}
+

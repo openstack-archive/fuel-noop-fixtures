@@ -1,0 +1,28 @@
+exec { 'rabbitmq-dump-clean' :
+  command => 'rabbitmq-dump-clean.py < /etc/rabbitmq/definitions.full > /etc/rabbitmq/definitions',
+  path    => [ '/usr/bin', '/usr/sbin', '/sbin', '/bin' ],
+}
+
+exec { 'rabbitmq-dump-definitions' :
+  before  => 'Exec[rabbitmq-dump-clean]',
+  command => 'curl -u nova:XrExAeLy http://localhost:15672/api/definitions -o /etc/rabbitmq/definitions.full',
+  path    => [ '/usr/bin', '/usr/sbin', '/sbin', '/bin' ],
+}
+
+file { '/etc/rabbitmq/definitions.full' :
+  ensure => 'file',
+  group  => 'root',
+  mode   => '0600',
+  owner  => 'root',
+}
+
+file { '/etc/rabbitmq/definitions' :
+  ensure => 'file',
+  group  => 'root',
+  mode   => '0600',
+  owner  => 'root',
+}
+
+stage { 'main' :
+}
+

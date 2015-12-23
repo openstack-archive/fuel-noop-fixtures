@@ -1,0 +1,17 @@
+host { 'node-1.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-1',
+  ip           => '10.109.7.4',
+  target       => '/etc/hosts',
+}
+
+host { 'node-2.test.domain.local' :
+  ensure       => 'present',
+  host_aliases => 'node-2',
+  ip           => '10.109.7.5',
+  target       => '/etc/hosts',
+}
+
+stage { 'main' :
+}
+

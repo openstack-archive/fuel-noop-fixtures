@@ -1,0 +1,592 @@
+class { 'Concat::Setup' :
+}
+
+class { 'Murano::Api' :
+  enabled        => true,
+  host           => '192.168.0.3',
+  manage_service => true,
+  package_ensure => 'present',
+  port           => '8082',
+  sync_db        => false,
+}
+
+class { 'Murano::Client' :
+  package_ensure => 'present',
+}
+
+class { 'Murano::Dashboard' :
+  client_debug_level    => 'ERROR',
+  collect_static_script => '/usr/share/openstack-dashboard/manage.py',
+  dashboard_debug_level => 'DEBUG',
+  max_file_size         => '5',
+  metadata_dir          => '/var/cache/murano-dashboard',
+  package_ensure        => 'present',
+  repo_url              => 'http://catalog.openstack.org/',
+}
+
+class { 'Murano::Db' :
+  database_connection     => 'mysql://murano:secrete@localhost:3306/murano',
+  database_idle_timeout   => '3600',
+  database_max_overflow   => '20',
+  database_max_pool_size  => '10',
+  database_max_retries    => '10',
+  database_min_pool_size  => '1',
+  database_retry_interval => '10',
+  require                 => [ Class[Mysql::Bindings], Class[Mysql::Bindings::Python] ],
+}
+
+class { 'Murano::Engine' :
+  enabled        => true,
+  manage_service => true,
+  package_ensure => 'present',
+  sync_db        => false,
+}
+
+class { 'Murano::Params' :
+}
+
+class { 'Murano::Policy' :
+  before      => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  policies    => {  },
+  policy_path => '/etc/murano/policy.json',
+}
+
+class { 'Murano' :
+  admin_password      => 'xP8WtHQw',
+  admin_tenant_name   => 'services',
+  admin_user          => 'murano',
+  auth_uri            => 'https://public.fuel.local:5000/v2.0/',
+  data_dir            => '/var/cache/murano',
+  database_connection => 'mysql://murano:R3SuvZbh@192.168.0.2/murano?read_timeout=60',
+  debug               => false,
+  default_nameservers => '8.8.8.8, 8.8.4.4',
+  default_router      => 'murano-default-router',
+  external_network    => 'net04custom_ext',
+  identity_uri        => 'http://192.168.0.2:35357/',
+  log_dir             => '/var/log/murano',
+  log_facility        => 'LOG_LOCAL0',
+  notification_driver => 'messagingv2',
+  package_ensure      => 'present',
+  rabbit_ha_queues    => true,
+  rabbit_os_host      => [ '192.168.0.3:5673', ' 192.168.0.2:5673', ' 192.168.0.4:5673' ],
+  rabbit_os_password  => 'c7fQJeSe',
+  rabbit_os_port      => '5673',
+  rabbit_os_user      => 'nova',
+  rabbit_own_host     => '192.168.0.2',
+  rabbit_own_password => 'c7fQJeSe',
+  rabbit_own_port     => '5673',
+  rabbit_own_user     => 'nova',
+  rabbit_own_vhost    => '/murano',
+  service_host        => '192.168.0.3',
+  service_port        => '8082',
+  signing_dir         => '/tmp/keystone-signing-muranoapi',
+  sync_db             => false,
+  use_neutron         => true,
+  use_ssl             => false,
+  use_stderr          => false,
+  use_syslog          => true,
+  use_trusts          => true,
+  verbose             => true,
+}
+
+class { 'Mysql::Bindings::Python' :
+}
+
+class { 'Mysql::Bindings' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'python-mysqldb',
+}
+
+class { 'Openstack::Firewall' :
+}
+
+concat::fragment { 'murano_dashboard_section' :
+  content => '## MURANO_CONFIG_BEGIN ##
+
+MURANO_REPO_URL = \'http://catalog.openstack.org/\'
+MAX_FILE_SIZE_MB = \'5\'
+METADATA_CACHE_DIR = \'/var/cache/murano-dashboard\'
+LOGGING[\'loggers\'][\'muranodashboard\'] = {\'handlers\': [\'syslog\'], \'level\': \'DEBUG\'}
+LOGGING[\'loggers\'][\'muranoclient\'] = {\'handlers\': [\'syslog\'], \'level\': \'ERROR\'}
+## MURANO_CONFIG_END ##
+',
+  order   => '2',
+  target  => '/etc/openstack-dashboard/local_settings.py',
+}
+
+concat::fragment { 'original_config' :
+  order  => '1',
+  source => '/etc/openstack-dashboard/local_settings.py',
+  target => '/etc/openstack-dashboard/local_settings.py',
+}
+
+concat { '/etc/openstack-dashboard/local_settings.py' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  mode           => '0644',
+  order          => 'alpha',
+  path           => '/etc/openstack-dashboard/local_settings.py',
+  replace        => true,
+  warn           => false,
+}
+
+exec { 'clean_horizon_config' :
+  before  => 'Concat[/etc/openstack-dashboard/local_settings.py]',
+  command => 'sed -e \'/^## MURANO_CONFIG_BEGIN/,/^## MURANO_CONFIG_END ##/ d\' -i /etc/openstack-dashboard/local_settings.py',
+  onlyif  => 'grep \'^## MURANO_CONFIG_BEGIN\' /etc/openstack-dashboard/local_settings.py',
+  path    => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ],
+}
+
+exec { 'concat_/etc/openstack-dashboard/local_settings.py' :
+  alias     => 'concat_/tmp//_etc_openstack-dashboard_local_settings.py',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat.out" -d "/tmp//_etc_openstack-dashboard_local_settings.py"',
+  notify    => File[/etc/openstack-dashboard/local_settings.py],
+  require   => [ File[/tmp//_etc_openstack-dashboard_local_settings.py], File[/tmp//_etc_openstack-dashboard_local_settings.py/fragments], File[/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat] ],
+  subscribe => File[/tmp//_etc_openstack-dashboard_local_settings.py],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat.out" -d "/tmp//_etc_openstack-dashboard_local_settings.py" -t',
+}
+
+exec { 'django_collectstatic' :
+  command     => '/usr/share/openstack-dashboard/manage.py collectstatic --noinput --clear',
+  environment => [ 'APACHE_USER=', 'APACHE_GROUP=' ],
+  notify      => 'Exec[django_compressstatic]',
+  refreshonly => true,
+}
+
+exec { 'django_compressstatic' :
+  command     => '/usr/share/openstack-dashboard/manage.py compress --force',
+  environment => [ 'APACHE_USER=', 'APACHE_GROUP=' ],
+  notify      => 'Exec[django_syncdb]',
+  refreshonly => true,
+}
+
+exec { 'django_syncdb' :
+  command     => '/usr/share/openstack-dashboard/manage.py syncdb --noinput',
+  environment => [ 'APACHE_USER=', 'APACHE_GROUP=' ],
+  refreshonly => true,
+}
+
+exec { 'remove_murano-api_override' :
+  before  => [ 'Service[murano-api]', 'Service[murano-api]' ],
+  command => 'rm -f /etc/init/murano-api.override',
+  onlyif  => 'test -f /etc/init/murano-api.override',
+  path    => [ '/sbin', '/bin', '/usr/bin', '/usr/sbin' ],
+}
+
+exec { 'remove_murano-engine_override' :
+  before  => [ 'Service[murano-engine]', 'Service[murano-engine]' ],
+  command => 'rm -f /etc/init/murano-engine.override',
+  onlyif  => 'test -f /etc/init/murano-engine.override',
+  path    => [ '/sbin', '/bin', '/usr/bin', '/usr/sbin' ],
+}
+
+file { '/etc/openstack-dashboard/local_settings.py' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/openstack-dashboard/local_settings.py',
+  backup  => 'puppet',
+  mode    => '0644',
+  path    => '/etc/openstack-dashboard/local_settings.py',
+  replace => true,
+  source  => '/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat.out',
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py/fragments/1_original_config' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_original_config',
+  backup  => 'puppet',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/openstack-dashboard/local_settings.py],
+  replace => true,
+  source  => '/etc/openstack-dashboard/local_settings.py',
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py/fragments/2_murano_dashboard_section' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_murano_dashboard_section',
+  backup  => 'puppet',
+  content => '## MURANO_CONFIG_BEGIN ##
+
+MURANO_REPO_URL = \'http://catalog.openstack.org/\'
+MAX_FILE_SIZE_MB = \'5\'
+METADATA_CACHE_DIR = \'/var/cache/murano-dashboard\'
+LOGGING[\'loggers\'][\'muranodashboard\'] = {\'handlers\': [\'syslog\'], \'level\': \'DEBUG\'}
+LOGGING[\'loggers\'][\'muranoclient\'] = {\'handlers\': [\'syslog\'], \'level\': \'ERROR\'}
+## MURANO_CONFIG_END ##
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/openstack-dashboard/local_settings.py],
+  replace => true,
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/openstack-dashboard/local_settings.py],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_openstack-dashboard_local_settings.py' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { 'create_murano-api_override' :
+  ensure  => 'present',
+  before  => 'Exec[remove_murano-api_override]',
+  content => 'manual',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/init/murano-api.override',
+}
+
+file { 'create_murano-engine_override' :
+  ensure  => 'present',
+  before  => 'Exec[remove_murano-engine_override]',
+  content => 'manual',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/init/murano-engine.override',
+}
+
+firewall { '202 murano-api' :
+  action => 'accept',
+  before => 'Class[Murano::Api]',
+  dport  => '8082',
+  proto  => 'tcp',
+}
+
+haproxy_backend_status { 'murano-api' :
+  name => 'murano-api',
+  url  => 'http://192.168.0.2:10000/;csv',
+}
+
+murano_config { 'DEFAULT/bind_host' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '192.168.0.3',
+}
+
+murano_config { 'DEFAULT/bind_port' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '8082',
+}
+
+murano_config { 'DEFAULT/debug' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => false,
+}
+
+murano_config { 'DEFAULT/default_log_levels' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'amqp=WARN,amqplib=WARN,boto=WARN,iso8601=WARN,keystonemiddleware=WARN,oslo.messaging=INFO,oslo_messaging=INFO,qpid=WARN,requests.packages.urllib3.connectionpool=WARN,requests.packages.urllib3.util.retry=WARN,routes.middleware=WARN,sqlalchemy=WARN,stevedore=WARN,suds=INFO,taskflow=WARN,urllib3.connectionpool=WARN,urllib3.util.retry=WARN,websocket=WARN',
+}
+
+murano_config { 'DEFAULT/log_dir' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '/var/log/murano',
+}
+
+murano_config { 'DEFAULT/notification_driver' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'messagingv2',
+}
+
+murano_config { 'DEFAULT/syslog_log_facility' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'LOG_LOCAL0',
+}
+
+murano_config { 'DEFAULT/use_stderr' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => false,
+}
+
+murano_config { 'DEFAULT/use_syslog' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'DEFAULT/use_syslog_rfc_format' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'DEFAULT/verbose' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'database/connection' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'mysql://murano:R3SuvZbh@192.168.0.2/murano?read_timeout=60',
+}
+
+murano_config { 'database/idle_timeout' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '3600',
+}
+
+murano_config { 'database/max_overflow' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '20',
+}
+
+murano_config { 'database/max_pool_size' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '10',
+}
+
+murano_config { 'database/max_retries' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '10',
+}
+
+murano_config { 'database/min_pool_size' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '1',
+}
+
+murano_config { 'database/retry_interval' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '10',
+}
+
+murano_config { 'engine/use_trusts' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'keystone_authtoken/admin_password' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'xP8WtHQw',
+}
+
+murano_config { 'keystone_authtoken/admin_tenant_name' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'services',
+}
+
+murano_config { 'keystone_authtoken/admin_user' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'murano',
+}
+
+murano_config { 'keystone_authtoken/auth_uri' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'https://public.fuel.local:5000/v2.0/',
+}
+
+murano_config { 'keystone_authtoken/identity_uri' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'http://192.168.0.2:35357/',
+}
+
+murano_config { 'keystone_authtoken/signing_dir' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '/tmp/keystone-signing-muranoapi',
+}
+
+murano_config { 'murano/url' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'http://192.168.0.3:8082',
+}
+
+murano_config { 'networking/create_router' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'networking/default_dns' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '8.8.8.8, 8.8.4.4',
+}
+
+murano_config { 'networking/external_network' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'net04custom_ext',
+}
+
+murano_config { 'networking/router_name' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'murano-default-router',
+}
+
+murano_config { 'oslo_messaging_rabbit/rabbit_ha_queues' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => true,
+}
+
+murano_config { 'oslo_messaging_rabbit/rabbit_hosts' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => [ '192.168.0.3:5673', ' 192.168.0.2:5673', ' 192.168.0.4:5673' ],
+}
+
+murano_config { 'oslo_messaging_rabbit/rabbit_password' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'c7fQJeSe',
+}
+
+murano_config { 'oslo_messaging_rabbit/rabbit_port' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '5673',
+}
+
+murano_config { 'oslo_messaging_rabbit/rabbit_userid' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'nova',
+}
+
+murano_config { 'rabbitmq/host' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '192.168.0.2',
+}
+
+murano_config { 'rabbitmq/login' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'nova',
+}
+
+murano_config { 'rabbitmq/password' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => 'c7fQJeSe',
+}
+
+murano_config { 'rabbitmq/port' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '5673',
+}
+
+murano_config { 'rabbitmq/virtual_host' :
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+  value  => '/murano',
+}
+
+murano_config { 'ssl/ca_file' :
+  ensure => 'absent',
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+}
+
+murano_config { 'ssl/cert_file' :
+  ensure => 'absent',
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+}
+
+murano_config { 'ssl/key_file' :
+  ensure => 'absent',
+  notify => [ 'Service[murano-api]', 'Service[murano-engine]' ],
+}
+
+package { 'murano-api' :
+  ensure => 'present',
+  name   => 'murano-api',
+  notify => 'Service[murano-api]',
+  tag    => [ 'openstack', 'murano-package' ],
+}
+
+package { 'murano-common' :
+  ensure => 'present',
+  name   => 'murano-common',
+  tag    => [ 'openstack', 'murano-package' ],
+}
+
+package { 'murano-dashboard' :
+  ensure => 'present',
+  before => 'Exec[clean_horizon_config]',
+  name   => 'python-murano-dashboard',
+  notify => 'Exec[django_collectstatic]',
+  tag    => 'openstack',
+}
+
+package { 'murano-engine' :
+  ensure => 'present',
+  name   => 'murano-engine',
+  notify => 'Service[murano-engine]',
+  tag    => [ 'openstack', 'murano-package' ],
+}
+
+package { 'python-muranoclient' :
+  ensure => 'present',
+  name   => 'python-muranoclient',
+  tag    => 'openstack',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'python-mysqldb',
+}
+
+service { 'murano-api' :
+  ensure  => 'running',
+  before  => 'Haproxy_backend_status[murano-api]',
+  enable  => true,
+  name    => 'murano-api',
+  require => Package[murano-api],
+  tag     => 'murano-service',
+}
+
+service { 'murano-engine' :
+  ensure  => 'running',
+  enable  => true,
+  name    => 'murano-engine',
+  require => Package[murano-engine],
+  tag     => 'murano-service',
+}
+
+stage { 'main' :
+}
+
+tweaks::ubuntu_service_override { 'murano-api' :
+  package_name => 'murano',
+  service_name => 'murano-api',
+}
+
+tweaks::ubuntu_service_override { 'murano-engine' :
+  package_name => 'murano',
+  service_name => 'murano-engine',
+}
+

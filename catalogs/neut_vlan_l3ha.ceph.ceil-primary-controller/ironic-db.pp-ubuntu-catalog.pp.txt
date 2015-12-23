@@ -1,0 +1,202 @@
+class { 'Galera::Client' :
+  before             => 'Class[Osnailyfacter::Mysql_access]',
+  custom_setup_class => 'galera',
+}
+
+class { 'Ironic::Db::Mysql' :
+  allowed_hosts => [ 'node-125', 'localhost', '127.0.0.1', '%' ],
+  charset       => 'utf8',
+  collate       => 'utf8_general_ci',
+  dbname        => 'ironic',
+  host          => '127.0.0.1',
+  password      => '5eqwkxY3',
+  user          => 'ironic',
+}
+
+class { 'Mysql::Config' :
+}
+
+class { 'Mysql::Params' :
+}
+
+class { 'Mysql::Python' :
+  package_ensure => 'present',
+  package_name   => 'python-mysqldb',
+}
+
+class { 'Mysql::Server' :
+}
+
+class { 'Osnailyfacter::Mysql_access' :
+  ensure      => 'present',
+  before      => 'Class[Ironic::Db::Mysql]',
+  db_host     => '192.168.0.7',
+  db_password => '5eqwkxY3',
+  db_user     => 'root',
+}
+
+database { 'ironic' :
+  ensure   => 'present',
+  charset  => 'utf8',
+  provider => 'mysql',
+  require  => Class[Mysql::Server],
+}
+
+database_grant { 'ironic@%/ironic' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[ironic@%],
+}
+
+database_grant { 'ironic@127.0.0.1/ironic' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[ironic@127.0.0.1],
+}
+
+database_grant { 'ironic@localhost/ironic' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[ironic@localhost],
+}
+
+database_grant { 'ironic@node-125/ironic' :
+  privileges => 'all',
+  provider   => 'mysql',
+  require    => Database_user[ironic@node-125],
+}
+
+database_user { 'ironic@%' :
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  provider      => 'mysql',
+  require       => Database[ironic],
+}
+
+database_user { 'ironic@127.0.0.1' :
+  ensure        => 'present',
+  password_hash => '*4DA6B21EDE4E3AB370EFC3CEAB423AA360092F4D',
+  provider      => 'mysql',
+  require       => Database[ironic],
+}
+
+database_user { 'ironic@localhost' :
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  provider      => 'mysql',
+  require       => Database[ironic],
+}
+
+database_user { 'ironic@node-125' :
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  provider      => 'mysql',
+  require       => Database[ironic],
+}
+
+file { '192.168.0.7-mysql-access' :
+  ensure  => 'present',
+  content => '
+[mysql]
+user     = \'root\'
+password = \'5eqwkxY3\'
+host     = \'192.168.0.7\'
+
+[client]
+user     = \'root\'
+password = \'5eqwkxY3\'
+host     = \'192.168.0.7\'
+
+[mysqldump]
+user     = \'root\'
+password = \'5eqwkxY3\'
+host     = \'192.168.0.7\'
+
+[mysqladmin]
+user     = \'root\'
+password = \'5eqwkxY3\'
+host     = \'192.168.0.7\'
+
+[mysqlcheck]
+user     = \'root\'
+password = \'5eqwkxY3\'
+host     = \'192.168.0.7\'
+
+',
+  group   => 'root',
+  mode    => '0640',
+  owner   => 'root',
+  path    => '/root/.my.192.168.0.7.cnf',
+}
+
+file { 'default-mysql-access-link' :
+  ensure => 'symlink',
+  path   => '/root/.my.cnf',
+  target => '/root/.my.192.168.0.7.cnf',
+}
+
+mysql::db { 'ironic' :
+  charset     => 'utf8',
+  enforce_sql => false,
+  grant       => 'all',
+  host        => '127.0.0.1',
+  password    => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  require     => Class[Mysql::Config],
+  sql         => '',
+  user        => 'ironic',
+}
+
+openstacklib::db::mysql::host_access { 'ironic_%' :
+  database      => 'ironic',
+  mysql_module  => '0.3',
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  privileges    => 'ALL',
+  user          => 'ironic',
+}
+
+openstacklib::db::mysql::host_access { 'ironic_127.0.0.1' :
+  database      => 'ironic',
+  mysql_module  => '0.3',
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  privileges    => 'ALL',
+  user          => 'ironic',
+}
+
+openstacklib::db::mysql::host_access { 'ironic_localhost' :
+  database      => 'ironic',
+  mysql_module  => '0.3',
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  privileges    => 'ALL',
+  user          => 'ironic',
+}
+
+openstacklib::db::mysql::host_access { 'ironic_node-125' :
+  database      => 'ironic',
+  mysql_module  => '0.3',
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  privileges    => 'ALL',
+  user          => 'ironic',
+}
+
+openstacklib::db::mysql { 'ironic' :
+  allowed_hosts => [ 'node-125', 'localhost', '127.0.0.1', '%' ],
+  charset       => 'utf8',
+  collate       => 'utf8_general_ci',
+  dbname        => 'ironic',
+  host          => '127.0.0.1',
+  mysql_module  => '0.3',
+  password_hash => '*023BD9B2AC7A32154086FA4E6EF02850B53A48B2',
+  privileges    => 'ALL',
+  require       => Class[Mysql::Python],
+  user          => 'ironic',
+}
+
+package { 'mysql-client' :
+  name => 'mysql-client-5.6',
+}
+
+package { 'python-mysqldb' :
+  ensure => 'present',
+  name   => 'python-mysqldb',
+}
+
+stage { 'main' :
+}
+

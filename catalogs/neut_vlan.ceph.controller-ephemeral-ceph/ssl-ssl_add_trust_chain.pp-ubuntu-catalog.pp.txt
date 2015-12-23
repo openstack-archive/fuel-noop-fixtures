@@ -1,0 +1,15 @@
+exec { 'add_trust' :
+  command     => 'update-ca-certificates',
+  path        => '/bin:/usr/bin:/sbin:/usr/sbin',
+  refreshonly => true,
+}
+
+file { '/usr/local/share/ca-certificates/public_haproxy.crt' :
+  ensure => 'file',
+  notify => 'Exec[add_trust]',
+  source => '/etc/pki/tls/certs/public_haproxy.pem',
+}
+
+stage { 'main' :
+}
+

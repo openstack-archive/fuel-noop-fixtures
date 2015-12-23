@@ -1,0 +1,698 @@
+class { 'Docker::Container' :
+  before       => 'Class[Nailgun::User]',
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Nailgun::Client' :
+  keystone_pass => 'admin',
+  keystone_port => '5000',
+  keystone_user => 'admin',
+  port          => '8000',
+  server        => '10.109.0.2',
+}
+
+class { 'Nailgun::Packages' :
+  before     => 'Class[Nailgun::Venv]',
+  gem_source => 'http://rubygems.org/',
+}
+
+class { 'Nailgun::Supervisor' :
+  conf_file       => 'nailgun/supervisord.conf.nailgun.erb',
+  nailgun_env     => '/usr',
+  ostf_env        => '/usr',
+  require         => Class[Nailgun::Venv],
+  restart_service => true,
+  service_enabled => false,
+}
+
+class { 'Nailgun::User' :
+  before        => 'Class[Nailgun::Packages]',
+  nailgun_group => 'nailgun',
+  nailgun_user  => 'nailgun',
+}
+
+class { 'Nailgun::Uwsgi' :
+  production => 'docker',
+  venv       => '/usr',
+}
+
+class { 'Nailgun::Venv' :
+  admin_network            => '10.109.0.0',
+  admin_network_cidr       => '24',
+  admin_network_first      => '10.109.0.3',
+  admin_network_gateway    => '10.109.0.1',
+  admin_network_ip         => '10.109.0.2',
+  admin_network_last       => '10.109.0.254',
+  admin_network_mac        => '64:60:46:2e:5d:37',
+  admin_network_netmask    => '255.255.255.0',
+  admin_network_size       => '256',
+  before                   => [ 'File[/etc/nailgun/uwsgi_nailgun.yaml]', 'File[/var/lib/nailgun-uwsgi]' ],
+  cobbler_host             => '10.109.0.2',
+  cobbler_password         => '0mMXE4t8',
+  cobbler_url              => 'http://10.109.0.2:80/cobbler_api',
+  cobbler_user             => 'cobbler',
+  database_engine          => 'postgresql',
+  database_host            => '10.109.0.2',
+  database_name            => 'nailgun',
+  database_passwd          => 'CYoU6RS6',
+  database_port            => '5432',
+  database_user            => 'nailgun',
+  dns_domain               => 'test.domain.local',
+  dns_upstream             => '10.109.0.1',
+  exclude_cidr             => '24',
+  exclude_network          => '10.109.0.0',
+  feature_groups           => [  ],
+  keystone_host            => '10.109.0.2',
+  keystone_nailgun_pass    => 'MtC5S2TN',
+  keystone_nailgun_user    => 'nailgun',
+  mco_connector            => 'rabbitmq',
+  mco_host                 => '10.109.0.2',
+  mco_password             => 'PPMi1XT2',
+  mco_pskey                => 'unset',
+  mco_user                 => 'mcollective',
+  mco_vhost                => 'mcollective',
+  nailgun_group            => 'nailgun',
+  nailgun_log_level        => 'INFO',
+  nailgun_user             => 'nailgun',
+  ntp_upstream             => '0.fuel.pool.ntp.org, 1.fuel.pool.ntp.org, 2.fuel.pool.ntp.org',
+  package                  => 'Nailgun',
+  pip_opts                 => '--no-index -f http://10.109.0.2:8080/eggs/',
+  production               => 'docker',
+  puppet_master_hostname   => 'nailgun.test.domain.local',
+  rabbitmq_astute_password => 'SwLCUx2H',
+  rabbitmq_astute_user     => 'naily',
+  rabbitmq_host            => '10.109.0.2',
+  staticdir                => '/usr/share/nailgun/static',
+  templatedir              => '/usr/share/nailgun/static',
+  venv                     => '/usr',
+  venv_opts                => '--system-site-packages',
+  version                  => '0.1.0',
+}
+
+class { 'Sysctl::Base' :
+}
+
+cron { 'oswl_cleaner' :
+  ensure      => 'present',
+  command     => 'oswl_cleaner',
+  environment => 'PATH=/bin:/usr/bin:/usr/sbin',
+  hour        => '1',
+  require     => Package[crontabs],
+  user        => 'nailgun',
+}
+
+exec { 'mkdir -p /root/.config/fuel' :
+  path   => [ '/bin', '/usr/bin' ],
+  unless => 'test -d /root/.config/fuel',
+}
+
+exec { 'nailgun_syncdb' :
+  command   => '/usr/bin/nailgun_syncdb',
+  path      => '/usr/bin:/bin:/usr/sbin:/sbin',
+  require   => File[/etc/nailgun/settings.yaml],
+  tries     => '50',
+  try_sleep => '5',
+}
+
+exec { 'nailgun_upload_fixtures' :
+  command   => '/usr/bin/nailgun_fixtures',
+  path      => '/usr/bin:/bin:/usr/sbin:/sbin',
+  require   => Exec[nailgun_syncdb],
+  tries     => '50',
+  try_sleep => '5',
+}
+
+file { '/etc/cron.daily/capacity' :
+  content => '#!/bin/sh
+
+curl -X PUT -d {} http://localhost:8000/api/capacity',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => Package[cronie-anacron],
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/nailgun/settings.yaml' :
+  content => 'LISTEN_ADDRESS: "0.0.0.0"
+LISTEN_PORT: "8001"
+DEVELOPMENT: false
+AUTH:
+  # Possible options:
+  # - none - authentication is disabled
+  # - fake - no keystone required, credentials: admin/admin
+  # - keystone - authentication enabled.
+  AUTHENTICATION_METHOD: "keystone"
+  # use only if AUTHENTICATION_METHOD is set to "keystone"
+  auth_host: "10.109.0.2"
+  auth_protocol: "http"
+  auth_version: "v2.0"
+  admin_user: "nailgun"
+  admin_password: "MtC5S2TN"
+  admin_tenant_name: "services"
+
+FEATURE_GROUPS: []
+
+DATABASE:
+  engine: "postgresql"
+  name: "nailgun"
+  host: "10.109.0.2"
+  port: "5432"
+  user: "nailgun"
+  passwd: "CYoU6RS6"
+
+FUEL_KEY: ""
+
+STATIC_DIR: "/usr/share/nailgun/static"
+TEMPLATE_DIR: "/usr/share/nailgun/static"
+NETWORK_POOLS:
+  public:
+    - "172.16.0.0/16"
+  private10:
+    - "10.0.0.0/8"
+  private192:
+    - "192.168.0.0/16"
+
+NET_EXCLUDE:
+  - "10.109.0.0/24"
+
+ADMIN_NETWORK:
+  cidr: "10.109.0.0/24"
+  netmask: "255.255.255.0"
+  mac: "64:60:46:2e:5d:37"
+  size: "256"
+  first: "10.109.0.3"
+  last: "10.109.0.254"
+  gateway: "10.109.0.1"
+
+VLANS_RANGE_START: "100"
+VLANS_RANGE_END: "1000"
+
+RABBITMQ:
+  fake: "0"
+  hostname: "10.109.0.2"
+  port: 5672
+  userid: "naily"
+  password: "SwLCUx2H"
+  virtual_host: "/"
+
+APP_LOG: "/var/log/nailgun/app.log"
+API_LOG: "/var/log/nailgun/api.log"
+
+# possible values: "CRITICAL", "ERROR", "WARNING", "INFO" and "DEBUG"
+APP_LOGLEVEL: "INFO"
+
+PATH_TO_SSH_KEY: "/root/.ssh/id_rsa"
+PATH_TO_BOOTSTRAP_SSH_KEY: "/root/.ssh/bootstrap.rsa"
+AUTHORIZED_KEYS:
+  - "key"
+
+MASTER_IP: "10.109.0.2"
+
+COBBLER_URL: "http://10.109.0.2:80/cobbler_api"
+COBBLER_USER: "cobbler"
+COBBLER_PASSWORD: "0mMXE4t8"
+COBBLER_PROFILE: "centos-x86_64"
+
+MCO_PSKEY: "unset"
+MCO_VHOST: "mcollective"
+MCO_HOST: 10.109.0.2
+MCO_USER: "mcollective"
+MCO_PASSWORD: "PPMi1XT2"
+MCO_CONNECTOR: "rabbitmq"
+
+PUPPET_MASTER_HOST: "nailgun.test.domain.local"
+PUPPET_VERSION: "2.7.19"
+
+DNS_DOMAIN: "test.domain.local"
+DNS_SERVERS: "10.109.0.2"
+DNS_SEARCH: "test.domain.local"
+DNS_UPSTREAM: "10.109.0.1"
+
+NTP_UPSTREAM: "0.fuel.pool.ntp.org, 1.fuel.pool.ntp.org, 2.fuel.pool.ntp.org"
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => File[/etc/nailgun],
+}
+
+file { '/etc/nailgun/uwsgi_nailgun.yaml' :
+  ensure  => 'present',
+  content => 'uwsgi:
+  enable-threads: 1
+  threads: 1
+  workers: 8
+  master: 1
+  socket: :8001
+  plugin: python
+  chown-socket: nginx:nginx
+  pythonpath: /usr/lib/python2.6/site-packages/nailgun
+  touch-reload: /var/lib/nailgun-uwsgi
+  virtualenv: /usr
+  module: nailgun.wsgi
+  buffer-size: 49180
+  listen: 4096
+  pidfile: /var/run/nailgun.pid
+  logto: /var/log/nailgun/app.log
+  mule: 1
+  lazy: true
+  shared-pyimport: /usr/lib/python2.6/site-packages/nailgun/utils/mule.py
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => Package[uwsgi],
+}
+
+file { '/etc/nailgun' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/etc/rc.d/init.d/supervisord' :
+  group   => 'root',
+  mode    => '0755',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  require => [ Package[supervisor], File[/etc/sysconfig/supervisord] ],
+  source  => 'puppet:///modules/nailgun/supervisor-init',
+}
+
+file { '/etc/supervisord.conf' :
+  content => '[rpcinterface:supervisor]
+; required for supervisorctl
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file=/var/run/supervisor.sock
+
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log
+loglevel=debug
+pidfile=/var/run/supervisord.pid
+childlogdir=/var/log/supervisor
+
+[supervisorctl]
+serverurl=unix:///var/run/supervisor.sock
+
+[program:nailgun]
+#command=/usr/bin/nailgund
+command=uwsgi -y /etc/nailgun/uwsgi_nailgun.yaml
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0,2
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/uwsgi.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:assassind]
+command=/usr/bin/assassind
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/assassind.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:receiverd]
+command=/usr/bin/receiverd
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/receiverd.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:statsenderd]
+command=/usr/bin/statsenderd
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/statsenderd.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_vm_collectord]
+command=/usr/bin/oswl_collectord vm
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_vm_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_flavor_collectord]
+command=/usr/bin/oswl_collectord flavor
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_flavor_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_image_collectord]
+command=/usr/bin/oswl_collectord image
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_image_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_volume_collectord]
+command=/usr/bin/oswl_collectord volume
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_volume_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_tenant_collectord]
+command=/usr/bin/oswl_collectord tenant
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_tenant_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+
+[program:oswl_keystone_user_collectord]
+command=/usr/bin/oswl_collectord keystone_user
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/nailgun/oswl_keystone_user_collectord.log
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+serverurl=AUTO
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  require => Package[supervisor],
+}
+
+file { '/etc/sysconfig/supervisord' :
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+  source => 'puppet:///modules/nailgun/supervisor-sysconfig',
+}
+
+file { '/etc/sysctl.conf' :
+  ensure => 'present',
+  group  => '0',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/root/.config/fuel/fuel_client.yaml' :
+  content => 'SERVER_ADDRESS: "10.109.0.2"
+SERVER_PORT: "8000"
+KEYSTONE_USER: "admin"
+KEYSTONE_PASS: "admin"
+KEYSTONE_PORT: "5000"
+',
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+  require => Exec[mkdir -p /root/.config/fuel],
+}
+
+file { '/usr/local/bin/fuel' :
+  ensure => 'link',
+  target => '/opt/nailgun/bin/fuel',
+}
+
+file { '/var/lib/nailgun-uwsgi' :
+  ensure => 'present',
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+group { 'nailgun' :
+  ensure   => 'present',
+  provider => 'groupadd',
+}
+
+nailgun::packages::nailgun_safe_package { 'acpid' :
+}
+
+nailgun::packages::nailgun_safe_package { 'cronie-anacron' :
+}
+
+nailgun::packages::nailgun_safe_package { 'crontabs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fence-agents' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fuel-migrate' :
+}
+
+nailgun::packages::nailgun_safe_package { 'iptables' :
+}
+
+nailgun::packages::nailgun_safe_package { 'nginx' :
+}
+
+nailgun::packages::nailgun_safe_package { 'postgresql-libs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'python-fuelclient' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsync' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsyslog' :
+}
+
+nailgun::packages::nailgun_safe_package { 'screen' :
+}
+
+nailgun::packages::nailgun_safe_package { 'supervisor' :
+}
+
+package { 'acpid' :
+  ensure => 'latest',
+}
+
+package { 'cronie-anacron' :
+}
+
+package { 'crontabs' :
+  ensure => 'latest',
+}
+
+package { 'fence-agents' :
+  ensure => 'latest',
+}
+
+package { 'fuel-migrate' :
+  ensure => 'latest',
+}
+
+package { 'fuel-nailgun' :
+}
+
+package { 'iptables' :
+  ensure => 'latest',
+}
+
+package { 'nginx' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+package { 'postgresql-libs' :
+  ensure => 'latest',
+}
+
+package { 'python-fuelclient' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+package { 'rsync' :
+  ensure => 'latest',
+}
+
+package { 'rsyslog' :
+  ensure => 'latest',
+}
+
+package { 'screen' :
+  ensure => 'latest',
+}
+
+package { 'supervisor' :
+  ensure => 'latest',
+  notify => 'Service[supervisord]',
+}
+
+package { 'uwsgi-plugin-common' :
+  ensure => 'installed',
+}
+
+package { 'uwsgi-plugin-python' :
+  ensure => 'installed',
+}
+
+package { 'uwsgi' :
+  ensure => 'installed',
+}
+
+service { 'crond' :
+  ensure => 'running',
+  enable => true,
+}
+
+service { 'supervisord' :
+  ensure     => false,
+  enable     => false,
+  hasrestart => true,
+  require    => Package[supervisor],
+  restart    => '/usr/bin/supervisorctl stop all; /etc/init.d/supervisord restart',
+}
+
+stage { 'main' :
+}
+
+sysctl::value { 'net.core.somaxconn' :
+  key     => 'net.core.somaxconn',
+  require => Class[Sysctl::Base],
+  value   => '4096',
+}
+
+sysctl { 'net.core.somaxconn' :
+  before => Sysctl_runtime[net.core.somaxconn],
+  val    => '4096',
+}
+
+sysctl_runtime { 'net.core.somaxconn' :
+  val => '4096',
+}
+
+user { 'nailgun' :
+  ensure  => 'present',
+  gid     => 'nailgun',
+  home    => '/',
+  require => Group[nailgun],
+  shell   => '/bin/false',
+}
+

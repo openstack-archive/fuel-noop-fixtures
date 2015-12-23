@@ -1,0 +1,419 @@
+class { 'Docker::Container' :
+  before       => 'Class[Rsyslog::Server]',
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Openstack::Logrotate' :
+  debug    => false,
+  keep     => '4',
+  maxsize  => '20M',
+  minsize  => '10M',
+  role     => 'server',
+  rotation => 'weekly',
+}
+
+class { 'Rsyslog::Config' :
+}
+
+class { 'Rsyslog::Install' :
+}
+
+class { 'Rsyslog::Params' :
+}
+
+class { 'Rsyslog::Server' :
+  before                    => 'Class[Openstack::Logrotate]',
+  custom_config             => '',
+  enable_tcp                => true,
+  enable_udp                => true,
+  escapenewline             => false,
+  high_precision_timestamps => true,
+  port                      => '514',
+  server_dir                => '/var/log/',
+}
+
+class { 'Rsyslog::Service' :
+}
+
+class { 'Rsyslog' :
+}
+
+cron { 'fuel-logrotate' :
+  command => '/usr/bin/fuel-logrotate',
+  minute  => '*/30',
+  user    => 'root',
+}
+
+file { '/etc/default/rsyslog' :
+  ensure  => 'file',
+  content => '# File is managed by puppet
+
+RSYSLOGD_OPTIONS=""
+# CentOS, RedHat, Fedora
+SYSLOGD_OPTIONS="${RSYSLOGD_OPTIONS}"
+',
+  group   => 'root',
+  mode    => '0640',
+  notify  => Class[Rsyslog::Service],
+  owner   => 'root',
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/logrotate.d/fuel.nodaily' :
+  content => '# managed by puppet
+
+"/var/lib/docker/containers/*/*.log"
+"/var/log/astute/*.log"
+"/var/log/audit/audit.log"
+"/var/log/auth.log"
+"/var/log/cobbler/*.log"
+"/var/log/cron.log"
+"/var/log/daemon.log"
+"/var/log/debug"
+"/var/log/docker"
+"/var/log/docker-*.log"
+"/var/log/docker-logs/astute/*.log"
+"/var/log/docker-logs/cobbler/*.log"
+"/var/log/docker-logs/dnsmasq.log"
+"/var/log/docker-logs/httpd/*.log"
+"/var/log/docker-logs/mcollective.log"
+"/var/log/docker-logs/messages"
+"/var/log/docker-logs/nailgun/*.log"
+"/var/log/docker-logs/nginx/*.log"
+"/var/log/docker-logs/ostf*.log"
+"/var/log/docker-logs/ostf/*.log"
+"/var/log/docker-logs/rabbitmq/*.log"
+"/var/log/docker-logs/rsync.log"
+"/var/log/docker-logs/shotgun.log"
+"/var/log/fuelmenu.log"
+"/var/log/httpd/*"
+"/var/log/kern.log"
+"/var/log/mail.log"
+"/var/log/nailgun-agent.log"
+"/var/log/nailgun/*.log"
+"/var/log/nginx/*.log"
+"/var/log/ostf*.log"
+"/var/log/rabbitmq/*"
+"/var/log/remote/[1-9]*/*.log"
+"/var/log/remote/[1-9]*/*/*.log"
+"/var/log/shotgun.log"
+"/var/log/syslog"
+"/var/log/user.log"
+"/var/log/upstart/*.log"
+{
+  # truncate file, do not delete & recreate
+  copytruncate
+
+  # compress rotated files with gzip
+  compress
+
+  # ignore missing files
+  missingok
+
+  # do not rotate empty files
+  notifempty
+
+  # logrotate allows to use only year, month, day and unix epoch
+  dateformat -%Y%m%d-%s
+
+  # number of rotated files to keep
+  rotate 4
+
+  # do not rotate files unless both size and time conditions are met
+  weekly
+  minsize 10M
+
+  # force rotate if filesize exceeded 20M
+  maxsize 20M
+
+  postrotate
+      # send SIGHUP to all rsyslog instances, including ones in containers
+      /usr/bin/pkill -HUP rsyslogd 2>/dev/null || true
+  endscript
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/etc/logrotate.d/upstart' :
+  ensure => 'absent',
+}
+
+file { '/etc/rsyslog.conf' :
+  ensure  => 'file',
+  content => '# file is managed by puppet
+
+#################
+#### MODULES ####
+#################
+
+$ModLoad imuxsock # provides support for local system logging
+$ModLoad imklog   # provides kernel logging support (previously done by rklogd)
+#$ModLoad immark  # provides --MARK-- message capability
+
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+#
+# Set the default permissions for all log files.
+#
+$FileOwner root
+$FileGroup adm
+$FileCreateMode 0640
+$DirCreateMode 0755
+$umask 0000
+$PrivDropToUser root
+$PrivDropToGroup root
+
+$MaxMessageSize 32k
+
+#
+# Include all config files in /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf
+
+',
+  group   => 'root',
+  mode    => '0640',
+  notify  => Class[Rsyslog::Service],
+  owner   => 'root',
+}
+
+file { '/etc/rsyslog.d/30-remote-log.conf' :
+  content => '# file is managed by puppet
+#
+# remote logs parsing based on syslogtag, uses predefined Fuel templates
+# Use high precision timestamps (date-rfc3339, 2010-12-05T02:21:41.889482+01:00)
+$Template RemoteLog, "%timegenerated:1:32:date-rfc3339% %syslogseverity-text%: %msg%\n"
+$ActionFileDefaultTemplate RemoteLog
+
+# Would match \'kernel:\' -> \'kernel\'  ;  \'rsyslogd[12345]:\' -> \'rsyslogd\'  ;  \'<180>(nova.api.wsgi):\'  ->  \'nova.api.wsgi\'  ;  \'install/anaconda\'  ->  \'install/anaconda\'
+$template RemoteLogFile, "/var/log/remote/%fromhost-ip%/%syslogtag:R,ERE,1,DFLT:([A-Za-z][A-Za-z0-9_./-]*)--end%.log"
+# Hardcode destination for puppet logs
+$template PuppetApplyLogFile, "/var/log/remote/%fromhost-ip%/puppet-apply.log"
+
+# Parse puppet logs
+:syslogtag, regex, "puppet-user" ?PuppetApplyLogFile;RemoteLog
+&~
+:syslogtag, regex, "puppet-error" ?PuppetApplyLogFile;RemoteLog
+&~
+
+:fromhost-ip, regex, "^[1-9]" ?RemoteLogFile;RemoteLog
+&~
+',
+  group   => 'root',
+  mode    => '0640',
+  notify  => Class[Rsyslog::Service],
+  owner   => 'root',
+  require => Class[Rsyslog::Server],
+}
+
+file { '/etc/rsyslog.d/' :
+  ensure  => 'directory',
+  force   => true,
+  group   => 'root',
+  mode    => '0640',
+  notify  => Class[Rsyslog::Service],
+  owner   => 'root',
+  purge   => true,
+  recurse => true,
+  require => Class[Rsyslog::Config],
+}
+
+file { '/etc/rsyslog.d/server.conf' :
+  ensure  => 'present',
+  content => '# File is managed by puppet
+
+# Load UDP module
+$ModLoad imudp
+$UDPServerRun 514
+
+# Load TCP module
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+$EscapeControlCharactersOnReceive off
+
+#
+# Disk-Assisted Memory Queues, async writes, no escape chars
+#
+$OMFileASyncWriting on
+$MainMsgQueueType LinkedList
+$WorkDirectory /var/spool/rsyslog/
+$MainMsgQueueFileName mainmsgqueue
+$MainMsgQueueSaveOnShutdown on
+$MainMsgQueueDequeueSlowdown 1000
+$MainMsgQueueWorkerThreads 2
+$MainMsgQueueDequeueBatchSize 128
+$ActionQueueType LinkedList
+$WorkDirectory /var/spool/rsyslog/
+$ActionQueueFileName acsdbq
+$ActionQueueMaxDiskSpace 1g
+$ActionQueueSaveOnShutdown on
+$ActionQueueLowWaterMark 2000
+$ActionQueueHighWaterMark 8000
+$ActionQueueSize 1000000       # Reserve 500Mb memory, each queue element is 512b
+$ActionQueueDiscardMark 950000 # If the queue looks like filling, start discarding to not block ssh/login/etc.
+$ActionQueueDiscardSeverity 0  # When in discarding mode discard everything.
+$ActionQueueTimeoutEnqueue 0   # When in discarding mode do not enable throttling.
+$ActionQueueDequeueSlowdown 1000
+$ActionQueueWorkerThreads 2
+$ActionQueueDequeueBatchSize 128
+$ActionResumeRetryCount -1
+$SystemLogRateLimitInterval 0   # disable rate limits for rsyslog
+
+
+# Templates
+#$Template dynAuthLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/auth.log"
+#$Template dynSyslog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/syslog"
+#$Template dynCronLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/cron.log"
+#$Template dynDaemonLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/daemon.log"
+#$Template dynKernLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/kern.log"
+#$Template dynUserLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/user.log"
+#$Template dynMailLog,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/mail.log"
+#$Template dynDebug,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/debug"
+#$Template dynMessages,"/var/log/%source:R,ERE,1,DFLT:([A-Za-z-]*)--end%/messages"
+$Template dynAuthLog,"/var/log/auth.log"
+$Template dynSyslog,"/var/log/syslog"
+$Template dynCronLog,"/var/log/cron.log"
+$Template dynDaemonLog,"/var/log/daemon.log"
+$Template dynKernLog,"/var/log/kern.log"
+$Template dynUserLog,"/var/log/user.log"
+$Template dynMailLog,"/var/log/mail.log"
+$Template dynDebug,"/var/log/debug"
+$Template dynMessages,"/var/log/messages"
+
+# Rules
+# Skip duplicates - all common debug, info, notice, warn go to
+# debug & messages files respectively; others should go to syslog
+auth,authpriv.*         ?dynAuthLog
+*.error;auth,authpriv.none,mail.none,cron.none      -?dynSyslog
+cron.*              ?dynCronLog
+daemon.*            -?dynDaemonLog
+# Do not send info to kern.log - it duplicates messages
+kern.*;kern.!=info  -?dynKernLog
+mail.*              -?dynMailLog
+user.*              -?dynUserLog
+
+#
+# Some "catch-all" log files.
+#
+*.=debug;\
+    auth,authpriv.none;\
+    news.none;mail.none      -?dynDebug
+*.=info;*.=notice;*.=warn;\
+    auth.none,authpriv.none;\
+    cron.none,daemon.none;\
+    mail.none,news.none     -?dynMessages
+',
+  group   => 'root',
+  mode    => '0640',
+  notify  => Class[Rsyslog::Service],
+  owner   => 'root',
+  require => Class[Rsyslog::Config],
+}
+
+file { '/var/lib/rsyslog' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0640',
+  notify => Class[Rsyslog::Service],
+  owner  => 'root',
+  path   => '/var/lib/rsyslog',
+}
+
+file { '/var/spool/rsyslog/' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0640',
+  notify => Class[Rsyslog::Service],
+  owner  => 'root',
+}
+
+file_line { 'logrotate-compress' :
+  ensure => 'present',
+  after  => '^tabooext',
+  before => 'File_line[logrotate-delaycompress]',
+  line   => 'compress',
+  match  => '^compress',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-delaycompress' :
+  ensure => 'present',
+  after  => '^compress',
+  before => 'File_line[logrotate-minsize]',
+  line   => 'delaycompress',
+  match  => '^delaycompress',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-maxsize' :
+  ensure => 'present',
+  after  => '^minsize',
+  line   => 'maxsize 20M',
+  match  => '^maxsize',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-minsize' :
+  ensure => 'present',
+  after  => '^delaycompress',
+  before => 'File_line[logrotate-maxsize]',
+  line   => 'minsize 10M',
+  match  => '^minsize',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-tabooext' :
+  ensure => 'present',
+  after  => '^create',
+  before => 'File_line[logrotate-compress]',
+  line   => 'tabooext + .nodaily',
+  match  => '^tabooext',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  path  => '/etc/yum.conf',
+}
+
+package { 'cronie-anacron' :
+  ensure => 'installed',
+}
+
+package { 'crontabs' :
+  ensure => 'installed',
+}
+
+package { 'rsyslog' :
+  ensure => 'installed',
+}
+
+service { 'rsyslog' :
+  ensure  => 'running',
+  enable  => true,
+  require => Class[Rsyslog::Config],
+}
+
+stage { 'main' :
+}
+

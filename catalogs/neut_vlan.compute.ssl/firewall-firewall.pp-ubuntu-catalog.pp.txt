@@ -1,0 +1,489 @@
+class { 'Firewall::Linux::Debian' :
+  ensure  => 'running',
+  enable  => true,
+  require => Package[iptables],
+}
+
+class { 'Firewall::Linux' :
+  ensure => 'running',
+}
+
+class { 'Firewall' :
+  ensure => 'running',
+  before => [ 'Firewall[000 accept all icmp requests]', 'Firewall[001 accept all to lo interface]', 'Firewall[002 accept related established rules]', 'Firewall[100 http]', 'Firewall[103 swift]', 'Firewall[104 glance]', 'Firewall[105 nova]', 'Firewall[111 dhcp-server]', 'Firewall[121 ceilometer]', 'Firewall[204 heat-api]', 'Firewall[205 heat-api-cfn]', 'Firewall[206 heat-api-cloudwatch]', 'Firewall[333 notrack gre]', 'Firewall[334 accept gre]', 'Firewall[340 vxlan_udp_port]', 'Firewall[999 drop all other requests]', 'Firewall[003 remote rabbitmq ]', 'Firewall[004 remote puppet ]', 'Firewall[005 local rabbitmq admin]', 'Firewall[006 reject non-local rabbitmq admin]', 'Firewall[030 allow connections from haproxy namespace]', 'Firewall[020 ssh from 10.122.5.0/24]', 'Firewall[020 ssh from 10.122.7.0/24]', 'Firewall[020 ssh from 10.122.9.0/24]', 'Firewall[101 mysql from 10.122.7.0/24]', 'Firewall[102 keystone from 10.122.7.0/24]', 'Firewall[105 nova internal - no ssl from 10.122.7.0/24]', 'Firewall[106 rabbitmq from 10.122.7.0/24]', 'Firewall[107 memcache tcp from 10.122.7.0/24]', 'Firewall[107 memcache udp from 10.122.7.0/24]', 'Firewall[108 rsync from 10.122.7.0/24]', 'Firewall[108 rsync from 10.122.9.0/24]', 'Firewall[109 iscsi from 10.122.9.0/24]', 'Firewall[110 neutron from 10.122.7.0/24]', 'Firewall[111 dns-server udp from 10.122.7.0/24]', 'Firewall[111 dns-server tcp from 10.122.7.0/24]', 'Firewall[112 ntp-server from 10.122.7.0/24]', 'Firewall[113 corosync-input from 10.122.7.0/24]', 'Firewall[114 corosync-output from 10.122.7.0/24]', 'Firewall[115 pcsd-server from 10.122.7.0/24]', 'Firewall[116 openvswitch db from 10.122.7.0/24]', 'Firewall[117 nrpe-server from 10.122.5.0/24]', 'Firewall[117 nrpe-server from 10.122.7.0/24]', 'Firewall[118 libvirt from 10.122.7.0/24]', 'Firewall[119 libvirt-migration from 10.122.7.0/24]', 'Openstack::Firewall::Multi_net[020 ssh]', 'Openstack::Firewall::Multi_net[101 mysql]', 'Openstack::Firewall::Multi_net[102 keystone]', 'Openstack::Firewall::Multi_net[105 nova internal - no ssl]', 'Openstack::Firewall::Multi_net[106 rabbitmq]', 'Openstack::Firewall::Multi_net[107 memcache tcp]', 'Openstack::Firewall::Multi_net[107 memcache udp]', 'Openstack::Firewall::Multi_net[108 rsync]', 'Openstack::Firewall::Multi_net[109 iscsi]', 'Openstack::Firewall::Multi_net[110 neutron]', 'Openstack::Firewall::Multi_net[111 dns-server udp]', 'Openstack::Firewall::Multi_net[111 dns-server tcp]', 'Openstack::Firewall::Multi_net[112 ntp-server]', 'Openstack::Firewall::Multi_net[113 corosync-input]', 'Openstack::Firewall::Multi_net[114 corosync-output]', 'Openstack::Firewall::Multi_net[115 pcsd-server]', 'Openstack::Firewall::Multi_net[116 openvswitch db]', 'Openstack::Firewall::Multi_net[117 nrpe-server]', 'Openstack::Firewall::Multi_net[118 libvirt]', 'Openstack::Firewall::Multi_net[119 libvirt-migration]' ],
+}
+
+firewall { '000 accept all icmp requests' :
+  action => 'accept',
+  proto  => 'icmp',
+}
+
+firewall { '001 accept all to lo interface' :
+  action  => 'accept',
+  iniface => 'lo',
+  proto   => 'all',
+}
+
+firewall { '002 accept related established rules' :
+  action => 'accept',
+  proto  => 'all',
+  state  => [ 'RELATED', 'ESTABLISHED' ],
+}
+
+firewall { '003 remote rabbitmq ' :
+  action => 'accept',
+  proto  => 'tcp',
+  source => '10.122.5.2',
+  sport  => [ '4369', '5672', '41055', '55672', '61613' ],
+}
+
+firewall { '004 remote puppet ' :
+  action => 'accept',
+  proto  => 'tcp',
+  source => '10.122.5.2',
+  sport  => '8140',
+}
+
+firewall { '005 local rabbitmq admin' :
+  action  => 'accept',
+  iniface => 'lo',
+  proto   => 'tcp',
+  sport   => '15672',
+}
+
+firewall { '006 reject non-local rabbitmq admin' :
+  action => 'drop',
+  proto  => 'tcp',
+  sport  => '15672',
+}
+
+firewall { '020 ssh from 10.122.5.0/24' :
+  action => 'accept',
+  port   => '22',
+  proto  => 'tcp',
+  source => '10.122.5.0/24',
+}
+
+firewall { '020 ssh from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '22',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '020 ssh from 10.122.9.0/24' :
+  action => 'accept',
+  port   => '22',
+  proto  => 'tcp',
+  source => '10.122.9.0/24',
+}
+
+firewall { '030 allow connections from haproxy namespace' :
+  action => 'accept',
+  source => '240.0.0.2',
+}
+
+firewall { '100 http' :
+  action => 'accept',
+  port   => [ '80', '443' ],
+  proto  => 'tcp',
+}
+
+firewall { '101 mysql from 10.122.7.0/24' :
+  action => 'accept',
+  port   => [ '3306', '3307', '4567', '4568', '49000' ],
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '102 keystone from 10.122.7.0/24' :
+  action => 'accept',
+  port   => [ '5000', '35357' ],
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '103 swift' :
+  action => 'accept',
+  port   => [ '8080', '6000', '6001', '6002', '49001' ],
+  proto  => 'tcp',
+}
+
+firewall { '104 glance' :
+  action => 'accept',
+  port   => [ '9292', '9191', '8773' ],
+  proto  => 'tcp',
+}
+
+firewall { '105 nova internal - no ssl from 10.122.7.0/24' :
+  action => 'accept',
+  port   => [ '8775', '5900-6100' ],
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '105 nova' :
+  action => 'accept',
+  port   => [ '8774', '8776', '6080' ],
+  proto  => 'tcp',
+}
+
+firewall { '106 rabbitmq from 10.122.7.0/24' :
+  action => 'accept',
+  port   => [ '4369', '5672', '5673', '41055' ],
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '107 memcache tcp from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '11211',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '107 memcache udp from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '11211',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '108 rsync from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '873',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '108 rsync from 10.122.9.0/24' :
+  action => 'accept',
+  port   => '873',
+  proto  => 'tcp',
+  source => '10.122.9.0/24',
+}
+
+firewall { '109 iscsi from 10.122.9.0/24' :
+  action => 'accept',
+  port   => '3260',
+  proto  => 'tcp',
+  source => '10.122.9.0/24',
+}
+
+firewall { '110 neutron from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '9696',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '111 dhcp-server' :
+  action => 'accept',
+  port   => '67',
+  proto  => 'udp',
+}
+
+firewall { '111 dns-server tcp from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '53',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '111 dns-server udp from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '53',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '112 ntp-server from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '123',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '113 corosync-input from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '5404',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '114 corosync-output from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '5405',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '115 pcsd-server from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '2224',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '116 openvswitch db from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '58882',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '117 nrpe-server from 10.122.5.0/24' :
+  action => 'accept',
+  port   => '5666',
+  proto  => 'udp',
+  source => '10.122.5.0/24',
+}
+
+firewall { '117 nrpe-server from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '5666',
+  proto  => 'udp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '118 libvirt from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '16509',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '119 libvirt-migration from 10.122.7.0/24' :
+  action => 'accept',
+  port   => '49152-49215',
+  proto  => 'tcp',
+  source => '10.122.7.0/24',
+}
+
+firewall { '121 ceilometer' :
+  action => 'accept',
+  port   => '8777',
+  proto  => 'tcp',
+}
+
+firewall { '204 heat-api' :
+  action => 'accept',
+  port   => '8004',
+  proto  => 'tcp',
+}
+
+firewall { '205 heat-api-cfn' :
+  action => 'accept',
+  port   => '8000',
+  proto  => 'tcp',
+}
+
+firewall { '206 heat-api-cloudwatch' :
+  action => 'accept',
+  port   => '8003',
+  proto  => 'tcp',
+}
+
+firewall { '333 notrack gre' :
+  chain => 'PREROUTING',
+  jump  => 'NOTRACK',
+  proto => 'gre',
+  table => 'raw',
+}
+
+firewall { '334 accept gre' :
+  action => 'accept',
+  chain  => 'INPUT',
+  proto  => 'gre',
+  table  => 'filter',
+}
+
+firewall { '340 vxlan_udp_port' :
+  action => 'accept',
+  port   => '4789',
+  proto  => 'udp',
+}
+
+firewall { '999 drop all other requests' :
+  action => 'drop',
+  chain  => 'INPUT',
+  proto  => 'all',
+}
+
+openstack::firewall::multi_net { '020 ssh' :
+  action      => 'accept',
+  port        => '22',
+  proto       => 'tcp',
+  rule_name   => '020 ssh',
+  source_nets => [ '10.122.5.0/24', '10.122.7.0/24', '10.122.9.0/24' ],
+}
+
+openstack::firewall::multi_net { '101 mysql' :
+  action      => 'accept',
+  port        => [ '3306', '3307', '4567', '4568', '49000' ],
+  proto       => 'tcp',
+  rule_name   => '101 mysql',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '102 keystone' :
+  action      => 'accept',
+  port        => [ '5000', '35357' ],
+  proto       => 'tcp',
+  rule_name   => '102 keystone',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '105 nova internal - no ssl' :
+  action      => 'accept',
+  port        => [ '8775', '5900-6100' ],
+  proto       => 'tcp',
+  rule_name   => '105 nova internal - no ssl',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '106 rabbitmq' :
+  action      => 'accept',
+  port        => [ '4369', '5672', '5673', '41055' ],
+  proto       => 'tcp',
+  rule_name   => '106 rabbitmq',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '107 memcache tcp' :
+  action      => 'accept',
+  port        => '11211',
+  proto       => 'tcp',
+  rule_name   => '107 memcache tcp',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '107 memcache udp' :
+  action      => 'accept',
+  port        => '11211',
+  proto       => 'udp',
+  rule_name   => '107 memcache udp',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '108 rsync' :
+  action      => 'accept',
+  port        => '873',
+  proto       => 'tcp',
+  rule_name   => '108 rsync',
+  source_nets => [ '10.122.7.0/24', '10.122.9.0/24' ],
+}
+
+openstack::firewall::multi_net { '109 iscsi' :
+  action      => 'accept',
+  port        => '3260',
+  proto       => 'tcp',
+  rule_name   => '109 iscsi',
+  source_nets => '10.122.9.0/24',
+}
+
+openstack::firewall::multi_net { '110 neutron' :
+  action      => 'accept',
+  port        => '9696',
+  proto       => 'tcp',
+  rule_name   => '110 neutron',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '111 dns-server tcp' :
+  action      => 'accept',
+  port        => '53',
+  proto       => 'tcp',
+  rule_name   => '111 dns-server tcp',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '111 dns-server udp' :
+  action      => 'accept',
+  port        => '53',
+  proto       => 'udp',
+  rule_name   => '111 dns-server udp',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '112 ntp-server' :
+  action      => 'accept',
+  port        => '123',
+  proto       => 'udp',
+  rule_name   => '112 ntp-server',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '113 corosync-input' :
+  action      => 'accept',
+  port        => '5404',
+  proto       => 'udp',
+  rule_name   => '113 corosync-input',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '114 corosync-output' :
+  action      => 'accept',
+  port        => '5405',
+  proto       => 'udp',
+  rule_name   => '114 corosync-output',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '115 pcsd-server' :
+  action      => 'accept',
+  port        => '2224',
+  proto       => 'tcp',
+  rule_name   => '115 pcsd-server',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '116 openvswitch db' :
+  action      => 'accept',
+  port        => '58882',
+  proto       => 'udp',
+  rule_name   => '116 openvswitch db',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '117 nrpe-server' :
+  action      => 'accept',
+  port        => '5666',
+  proto       => 'udp',
+  rule_name   => '117 nrpe-server',
+  source_nets => [ '10.122.5.0/24', '10.122.7.0/24' ],
+}
+
+openstack::firewall::multi_net { '118 libvirt' :
+  action      => 'accept',
+  port        => '16509',
+  proto       => 'tcp',
+  rule_name   => '118 libvirt',
+  source_nets => '10.122.7.0/24',
+}
+
+openstack::firewall::multi_net { '119 libvirt-migration' :
+  action      => 'accept',
+  port        => '49152-49215',
+  proto       => 'tcp',
+  rule_name   => '119 libvirt-migration',
+  source_nets => '10.122.7.0/24',
+}
+
+package { 'iptables-persistent' :
+  ensure => 'present',
+}
+
+package { 'iptables' :
+  ensure => 'present',
+}
+
+service { 'iptables-persistent' :
+  enable    => true,
+  hasstatus => true,
+  require   => Package[iptables-persistent],
+}
+
+stage { 'main' :
+}
+

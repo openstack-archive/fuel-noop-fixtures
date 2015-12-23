@@ -1,0 +1,1916 @@
+anchor { 'ntp::begin' :
+  before => 'Class[Ntp::Install]',
+}
+
+anchor { 'ntp::end' :
+}
+
+anchor { 'ssh::server::end' :
+}
+
+anchor { 'ssh::server::start' :
+  before => 'Class[Ssh::Server::Install]',
+}
+
+class { 'Cobbler::Iptables' :
+  chain => 'INPUT',
+}
+
+class { 'Concat::Setup' :
+}
+
+class { 'Docker::Dockerctl' :
+  admin_ipaddress => '10.109.0.2',
+  before          => 'Class[Docker]',
+  bin_dir         => '/usr/bin',
+  config_dir      => '/etc/dockerctl',
+  docker_engine   => 'native',
+  production      => 'docker',
+  profile_dir     => '/etc/profile.d',
+  release         => '8.0',
+  share_dir       => '/usr/share/dockerctl',
+  use_systemd     => false,
+}
+
+class { 'Docker' :
+  admin_ipaddress     => '10.109.0.2',
+  before              => 'Class[Openstack::Logrotate]',
+  dependent_dirs      => [ '/var/log/docker-logs', '/var/log/docker-logs/remote', '/var/log/docker-logs/audit', '/var/log/docker-logs/cobbler', '/var/log/docker-logs/ConsoleKit', '/var/log/docker-logs/coredump', '/var/log/docker-logs/httpd', '/var/log/docker-logs/nailgun', '/var/log/docker-logs/naily', '/var/log/docker-logs/nginx', '/var/log/docker-logs/ntpstats', '/var/log/docker-logs/puppet', '/var/log/docker-logs/rabbitmq', '/var/log/docker-logs/supervisor', '/var/lib/fuel', '/var/lib/fuel/keys', '/var/lib/fuel/ibp', '/var/lib/fuel/container_data', '/var/lib/fuel/container_data/8.0', '/var/lib/fuel/container_data/8.0/cobbler', '/var/lib/fuel/container_data/8.0/postgres' ],
+  docker_engine       => 'native',
+  docker_service      => 'docker',
+  docker_volume_group => 'docker',
+  limit               => '102400',
+  package_ensure      => 'latest',
+  release             => '8.0',
+}
+
+class { 'Monit::Config' :
+  httpd      => false,
+  interval   => '120',
+  notify     => Class[Monit::Service],
+  require    => Class[Monit::Package],
+  use_syslog => false,
+}
+
+class { 'Monit::Package' :
+  notify => Class[Monit::Service],
+}
+
+class { 'Monit::Params' :
+}
+
+class { 'Monit::Service' :
+  require => Class[Monit::Config],
+}
+
+class { 'Monit' :
+  httpd    => false,
+  interval => '120',
+}
+
+class { 'Nailgun::Auxiliaryrepos' :
+  fuel_version => '8.0',
+  priority     => '15',
+  repo_root    => '/var/www/nailgun/',
+}
+
+class { 'Nailgun::Client' :
+  before        => 'Class[Monit]',
+  keystone_pass => 'admin',
+  keystone_port => '5000',
+  keystone_user => 'admin',
+  port          => '8000',
+  server        => '10.109.0.2',
+}
+
+class { 'Nailgun::Host' :
+  admin_iface       => 'eth0',
+  admin_network     => '10.109.0.*',
+  before            => 'Class[Docker::Dockerctl]',
+  cobbler_host      => '10.109.0.2',
+  dns_domain        => 'test.domain.local',
+  dns_search        => 'test.domain.local',
+  dns_upstream      => '10.109.0.1',
+  fuel_version      => '8.0',
+  gem_source        => 'http://localhost/gems/',
+  monitord_password => '9IR0gsgd',
+  monitord_tenant   => 'services',
+  monitord_user     => 'monitord',
+  nailgun_group     => 'nailgun',
+  nailgun_user      => 'nailgun',
+  production        => 'docker',
+  repo_root         => '/var/www/nailgun/',
+}
+
+class { 'Nailgun::Iptables' :
+  admin_iface           => 'eth0',
+  chain                 => 'INPUT',
+  fuelweb_port          => '8443',
+  keystone_admin_port   => '35357',
+  keystone_port         => '5000',
+  nailgun_internal_port => '8001',
+  nailgun_repo_port     => '8080',
+  nailgun_web_port      => '8000',
+  ntp_port              => '123',
+  ostf_port             => '8777',
+  postgres_port         => '5432',
+  production            => 'docker',
+  rabbitmq_ports        => [ '4369', '5672', '15672', '61613' ],
+  rsync_port            => '873',
+  rsyslog_port          => '514',
+  ssh_port              => '22',
+}
+
+class { 'Nailgun::Packages' :
+  before     => 'Class[Nailgun::Host]',
+  gem_source => 'http://rubygems.org/',
+}
+
+class { 'Ntp::Config' :
+  notify => 'Class[Ntp::Service]',
+}
+
+class { 'Ntp::Install' :
+  before => 'Class[Ntp::Config]',
+}
+
+class { 'Ntp::Params' :
+}
+
+class { 'Ntp::Service' :
+  before => 'Anchor[ntp::end]',
+}
+
+class { 'Ntp' :
+  autoupdate        => false,
+  broadcastclient   => false,
+  config            => '/etc/ntp.conf',
+  config_template   => 'ntp/ntp.conf.erb',
+  disable_auth      => false,
+  disable_monitor   => true,
+  driftfile         => '/var/lib/ntp/drift',
+  fudge             => [  ],
+  iburst_enable     => true,
+  interfaces        => [  ],
+  keys_controlkey   => '',
+  keys_enable       => false,
+  keys_file         => '/etc/ntp/keys',
+  keys_requestkey   => '',
+  keys_trusted      => [  ],
+  maxpoll           => '9',
+  minpoll           => '3',
+  package_ensure    => 'present',
+  package_manage    => true,
+  package_name      => 'ntp',
+  panic             => '0',
+  peers             => [  ],
+  preferred_servers => [  ],
+  restrict          => [ 'default kod nomodify notrap nopeer noquery', '-6 default kod nomodify notrap nopeer noquery', '127.0.0.1', '-6 ::1' ],
+  servers           => [ '0.fuel.pool.ntp.org', '1.fuel.pool.ntp.org', '2.fuel.pool.ntp.org' ],
+  service_enable    => true,
+  service_ensure    => 'running',
+  service_manage    => true,
+  service_name      => 'ntpd',
+  stepout           => '5',
+  tinker            => true,
+  udlc              => false,
+  udlc_stratum      => '10',
+}
+
+class { 'Openstack::Clocksync' :
+  config_template => 'ntp/ntp.conf.erb',
+  ntp_servers     => [ '0.fuel.pool.ntp.org', '1.fuel.pool.ntp.org', '2.fuel.pool.ntp.org' ],
+}
+
+class { 'Openstack::Logrotate' :
+  before   => 'Class[Nailgun::Client]',
+  debug    => false,
+  keep     => '4',
+  maxsize  => '100M',
+  minsize  => '10M',
+  role     => 'server',
+  rotation => 'weekly',
+}
+
+class { 'Osnailyfacter::Atop' :
+  interval        => '20',
+  logpath         => '/var/log/atop',
+  rotate          => '7',
+  service_enabled => true,
+  service_state   => 'running',
+}
+
+class { 'Osnailyfacter::Ssh' :
+  ciphers        => 'aes256-ctr,aes192-ctr,aes128-ctr,arcfour256,arcfour128',
+  listen_address => [  ],
+  log_lvl        => 'VERBOSE',
+  macs           => 'hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,hmac-sha1',
+  password_auth  => 'yes',
+  ports          => '22',
+  protocol_ver   => '2',
+}
+
+class { 'Ssh::Params' :
+}
+
+class { 'Ssh::Server::Config' :
+  notify => 'Class[Ssh::Server::Service]',
+}
+
+class { 'Ssh::Server::Install' :
+  before => 'Class[Ssh::Server::Config]',
+}
+
+class { 'Ssh::Server::Service' :
+  before => 'Anchor[ssh::server::end]',
+}
+
+class { 'Ssh::Server' :
+  ensure               => 'present',
+  options              => { 'AllowTcpForwarding' => 'yes', 'ChallengeResponseAuthentication' => 'no', 'Ciphers' => 'aes256-ctr,aes192-ctr,aes128-ctr,arcfour256,arcfour128', 'GSSAPIAuthentication' => 'no', 'ListenAddress' => [  ], 'LogLevel' => 'VERBOSE', 'MACs' => 'hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,hmac-sha1', 'PasswordAuthentication' => 'yes', 'Port' => '22', 'Protocol' => '2', 'PubkeyAuthentication' => 'yes', 'RSAAuthentication' => 'yes', 'StrictModes' => 'yes', 'Subsystem' => 'sftp /usr/libexec/openssh/sftp-server', 'UseDNS' => 'no', 'UsePAM' => 'yes', 'UsePrivilegeSeparation' => 'yes', 'X11Forwarding' => 'no' },
+  storeconfigs_enabled => false,
+}
+
+class { 'Sysctl::Base' :
+}
+
+concat::fragment { 'global config' :
+  content => '# File is managed by Puppet
+Port 22
+
+AcceptEnv LANG LC_*
+AllowTcpForwarding yes
+ChallengeResponseAuthentication no
+Ciphers aes256-ctr,aes192-ctr,aes128-ctr,arcfour256,arcfour128
+GSSAPIAuthentication no
+LogLevel VERBOSE
+MACs hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,hmac-sha1
+PasswordAuthentication yes
+PrintMotd no
+Protocol 2
+PubkeyAuthentication yes
+RSAAuthentication yes
+StrictModes yes
+Subsystem sftp /usr/libexec/openssh/sftp-server
+UseDNS no
+UsePAM yes
+UsePrivilegeSeparation yes
+X11Forwarding no
+',
+  order   => '00',
+  target  => '/etc/ssh/sshd_config',
+}
+
+concat { '/etc/ssh/sshd_config' :
+  ensure         => 'present',
+  backup         => 'puppet',
+  ensure_newline => false,
+  force          => false,
+  group          => '0',
+  mode           => '0600',
+  notify         => Service[sshd],
+  order          => 'alpha',
+  owner          => '0',
+  path           => '/etc/ssh/sshd_config',
+  replace        => true,
+  warn           => false,
+}
+
+cron { 'fuel-logrotate' :
+  command => '/usr/bin/fuel-logrotate',
+  minute  => '*/30',
+  user    => 'root',
+}
+
+exec { 'Change protocol and port in in issue' :
+  command => 'sed -i -e "s|http://\(.*\):8000\(.*\)|https://\1:8443\2|g" /etc/issue',
+  onlyif  => 'grep -q 8000 /etc/issue',
+  path    => '/usr/bin:/bin:/usr/sbin:/sbin',
+}
+
+exec { 'Generate ssh key for #{username}' :
+  command => 'ssh-keygen -t rsa -b 2048 -N \'\' -f /root/.ssh/id_rsa',
+  creates => '/root/.ssh/id_rsa',
+  group   => 'root',
+  path    => '/usr/bin:/bin:/usr/sbin:/sbin',
+  require => File[/root/.ssh],
+  user    => 'root',
+}
+
+exec { 'Public ssh key for #{username}' :
+  command => 'ssh-keygen -y -f /root/.ssh/id_rsa > /root/.ssh/id_rsa.pub',
+  creates => '/root/.ssh/id_rsa.pub',
+  group   => 'root',
+  path    => '/usr/bin:/bin:/usr/sbin:/sbin',
+  require => [ File[/root/.ssh], Exec[Generate ssh key for #{username}] ],
+  user    => 'root',
+}
+
+exec { 'build docker containers' :
+  command   => 'dockerctl build all',
+  logoutput => true,
+  path      => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin',
+  require   => [ File[/var/log/docker-logs], File[/var/log/docker-logs/remote], File[/var/log/docker-logs/audit], File[/var/log/docker-logs/cobbler], File[/var/log/docker-logs/ConsoleKit], File[/var/log/docker-logs/coredump], File[/var/log/docker-logs/httpd], File[/var/log/docker-logs/nailgun], File[/var/log/docker-logs/naily], File[/var/log/docker-logs/nginx], File[/var/log/docker-logs/ntpstats], File[/var/log/docker-logs/puppet], File[/var/log/docker-logs/rabbitmq], File[/var/log/docker-logs/supervisor], File[/var/lib/fuel], File[/var/lib/fuel/keys], File[/var/lib/fuel/ibp], File[/var/lib/fuel/container_data], File[/var/lib/fuel/container_data/8.0], File[/var/lib/fuel/container_data/8.0/cobbler], File[/var/lib/fuel/container_data/8.0/postgres], Service[docker], Exec[wait for docker-to-become-ready] ],
+  timeout   => '7200',
+  unless    => 'docker ps -a | grep -q fuel',
+}
+
+exec { 'clocksync' :
+  before  => 'Service[ntp]',
+  command => 'bash -c \'for i in {1..10}; do ntpdate -p 4 -t 0.2 -ub 0.fuel.pool.ntp.org &&  break; sleep 1; done\'',
+  path    => [ '/usr/bin', '/usr/sbin', '/sbin', '/bin' ],
+  require => Package[ntpdate],
+  unless  => 'pidof ntpd',
+}
+
+exec { 'concat_/etc/ssh/sshd_config' :
+  alias     => 'concat_/tmp//_etc_ssh_sshd_config',
+  command   => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_ssh_sshd_config/fragments.concat.out" -d "/tmp//_etc_ssh_sshd_config"',
+  notify    => File[/etc/ssh/sshd_config],
+  require   => [ File[/tmp//_etc_ssh_sshd_config], File[/tmp//_etc_ssh_sshd_config/fragments], File[/tmp//_etc_ssh_sshd_config/fragments.concat] ],
+  subscribe => File[/tmp//_etc_ssh_sshd_config],
+  unless    => '/tmp//bin/concatfragments.rb -o "/tmp//_etc_ssh_sshd_config/fragments.concat.out" -d "/tmp//_etc_ssh_sshd_config" -t',
+}
+
+exec { 'copy public key to authorized_keys' :
+  command => 'cat /root/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys',
+  path    => '/usr/bin:/bin:/usr/sbin:/sbin',
+  require => File[/root/.ssh/id_rsa.pub],
+}
+
+exec { 'create_ubuntu_repo_Packages' :
+  before  => [ 'File[/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/Release]', 'File[/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/main/binary-amd64/Release]', 'File[/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/restricted/binary-amd64/Release]' ],
+  command => 'bash -c "touch /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/{main,restricted}/binary-amd64/Packages"',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  unless  => 'test -f /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/main/binary-amd64/Packages &&       test -f /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/restricted/binary-amd64/Packages',
+}
+
+exec { 'create_ubuntu_repo_dirs' :
+  before  => 'Exec[create_ubuntu_repo_Packages]',
+  command => 'bash -c "mkdir -p /var/www/nailgun//ubuntu/auxiliary//pool/{main,restricted} /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/{main,restricted}/binary-amd64/"',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+  unless  => 'test -d /var/www/nailgun//ubuntu/auxiliary//pool &&       test -d /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/main/binary-amd64 &&       test -d /var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/restricted/binary-amd64',
+}
+
+exec { 'createrepo /var/www/nailgun//centos/auxiliary/' :
+  before  => 'Yumrepo[8.0_auxiliary]',
+  creates => '/var/www/nailgun//centos/auxiliary//repodata/repomd.xml',
+  cwd     => '/var/www/nailgun//centos/auxiliary/',
+  path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+}
+
+exec { 'ln -s /var/log/atop/atop_current' :
+  command => 'ln -s /var/log/atop/atop_$(date +%Y%m%d) /var/log/atop/atop_current',
+  path    => [ '/bin', '/usr/bin' ],
+  require => Service[atop],
+  unless  => 'test -L /var/log/atop/atop_current',
+}
+
+exec { 'mkdir -p /root/.config/fuel' :
+  path   => [ '/bin', '/usr/bin' ],
+  unless => 'test -d /root/.config/fuel',
+}
+
+exec { 'wait for docker-to-become-ready' :
+  command   => 'docker ps 1>/dev/null',
+  path      => '/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin',
+  require   => Service[docker],
+  tries     => '10',
+  try_sleep => '3',
+}
+
+file { '/etc/cron.daily/atop_retention' :
+  content => '#!/bin/bash
+# Managed by puppet
+# This file manages the atop binary files. It will keep binary files for last
+# 7 days instead of 30 days provided by atop.
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+# remove files older than 7 days
+find /var/log/atop -type f -name \'atop_*\' -mtime +7 -delete
+
+# link current to todays file
+ln -f -s /var/log/atop/atop_$(date +%Y%m%d) /var/log/atop/atop_current
+',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+}
+
+file { '/etc/dhcp/dhclient.conf' :
+  content => 'prepend domain-name-servers 10.109.0.2;
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/etc/dhcp/dhcp-enter-hooks' :
+  content => '#!/bin/bash
+make_resolv_conf() {
+  return 0
+}
+',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+}
+
+file { '/etc/dockerctl/config' :
+  content => '#!/bin/bash
+
+### Container information
+#Paths
+DOCKER_ROOT="/var/www/nailgun/docker"
+IMAGE_DIR="${DOCKER_ROOT}/images"
+SOURCE_DIR="${DOCKER_ROOT}/sources"
+ASTUTE_YAML=""
+VERSION="${VERSION_OVERRIDE:-8.0}"
+DOCKER_ENGINE=""
+ADMIN_IP="10.109.0.2"
+LOCAL_IP="127.0.0.1"
+
+#Version of Fuel to deploy
+if [ -z "$VERSION" ]; then
+  VERSION="_VERSION_"
+fi
+
+SYSTEMD="false"
+
+IMAGE_PREFIX="fuel"
+# busybox image for storage containers
+BUSYBOX_IMAGE="busybox.tar.gz"
+# base centos image for all containers
+BASE_IMAGE="centos.tar.gz"
+# Order in which to start all containers
+CONTAINER_SEQUENCE="postgres rabbitmq keystone rsync astute rsyslog nailgun ostf nginx cobbler mcollective"
+
+# storage container names
+PREFIX_STORAGE="fuel-core-${VERSION}-volume-"
+
+# app container names
+declare -A CONTAINER_NAMES
+prefix="fuel-core-${VERSION}-"
+CONTAINER_NAMES[\'cobbler\']="${prefix}cobbler"
+CONTAINER_NAMES[\'postgres\']="${prefix}postgres"
+CONTAINER_NAMES[\'rabbitmq\']="${prefix}rabbitmq"
+CONTAINER_NAMES[\'rsync\']="${prefix}rsync"
+CONTAINER_NAMES[\'astute\']="${prefix}astute"
+CONTAINER_NAMES[\'nailgun\']="${prefix}nailgun"
+CONTAINER_NAMES[\'ostf\']="${prefix}ostf"
+CONTAINER_NAMES[\'nginx\']="${prefix}nginx"
+CONTAINER_NAMES[\'rsyslog\']="${prefix}rsyslog"
+CONTAINER_NAMES[\'mcollective\']="${prefix}mcollective"
+CONTAINER_NAMES[\'keystone\']="${prefix}keystone"
+
+# app container options
+declare -A CONTAINER_OPTIONS
+base_opts="-t --net=host"
+FOREGROUND="-i"
+BACKGROUND="-d"
+BIND_ALL=""
+BIND_ADMIN="${ADMIN_IP}:"
+BIND_LOCAL="${LOCAL_IP}:"
+CONTAINER_OPTIONS["cobbler"]="-p ${BIND_ALL}53:53/udp -p ${BIND_ALL}69:69/udp -p ${BIND_ALL}80:80 -p ${BIND_ALL}443:443 --privileged $base_opts"
+CONTAINER_OPTIONS["postgres"]="-p ${BIND_ADMIN}5432:5432 -p ${BIND_LOCAL}5432:5432 $base_opts"
+CONTAINER_OPTIONS["rabbitmq"]="-p ${BIND_ADMIN}5672:5672 -p ${BIND_LOCAL}5672:5672 -p ${BIND_ADMIN}4369:4369 -p ${BIND_LOCAL}4369:4369 -p ${BIND_ADMIN}15672:15672 -p ${BIND_LOCAL}15672:15672 -p ${BIND_ADMIN}61613:61613 -p ${BIND_LOCAL}61613:61613 $base_opts"
+CONTAINER_OPTIONS["rsync"]="-p ${BIND_ADMIN}873:873 -p ${BIND_LOCAL}873:873 $base_opts"
+CONTAINER_OPTIONS["astute"]="$base_opts"
+CONTAINER_OPTIONS["nailgun"]="--privileged -p ${BIND_ADMIN}8001:8001 -p ${BIND_LOCAL}8001:8001 $base_opts"
+CONTAINER_OPTIONS["ostf"]="-p ${BIND_ADMIN}8777:8777 -p ${BIND_LOCAL}8777:8777 $base_opts"
+CONTAINER_OPTIONS["nginx"]="-p ${BIND_ALL}8000:8000 -p ${BIND_ALL}8080:8080 $base_opts"
+CONTAINER_OPTIONS["rsyslog"]="--privileged -p ${BIND_ADMIN}514:514 -p ${BIND_LOCAL}514:514 -p ${BIND_ADMIN}514:514/udp -p ${BIND_LOCAL}514:514/udp -p ${BIND_ADMIN}25150:25150 -p ${BIND_LOCAL}25150:25150 $base_opts"
+CONTAINER_OPTIONS["mcollective"]="--privileged $base_opts"
+CONTAINER_OPTIONS["keystone"]="-p ${BIND_ALL}5000:5000 -p ${BIND_ALL}35357:35357 $base_opts"
+
+######
+#Dependency of volumes for deployment
+#####
+
+#Host volumes
+declare -A HOST_VOL
+HOST_VOL[\'repo\']="-v /var/www/nailgun:/var/www/nailgun:rw"
+HOST_VOL[\'puppet\']="-v /etc/puppet:/etc/puppet:ro"
+HOST_VOL[\'sshkey\']="-v /root/.ssh:/root/.ssh:ro"
+HOST_VOL[\'astuteyaml\']="-v /etc/fuel:/etc/fuel:ro"
+HOST_VOL[\'logs\']="-v /var/log/docker-logs:/var/log"
+HOST_VOL[\'keys\']="-v /var/lib/fuel/keys:/var/lib/fuel/keys:rw"
+HOST_VOL[\'ibp\']="-v /var/lib/fuel/ibp:/var/lib/fuel/ibp:rw"
+
+#Persistent directories for container data
+HOST_VOL[\'astute_data\']="-v /var/lib/fuel/container_data/$VERSION/astute:/var/lib/astute"
+HOST_VOL[\'cobbler_data\']="-v /var/lib/fuel/container_data/$VERSION/cobbler:/var/lib/cobbler"
+HOST_VOL[\'postgres_data\']="-v /var/lib/fuel/container_data/$VERSION/postgres:/var/lib/pgsql"
+HOST_VOL[\'dnsmasq\']="-v /var/lib/fuel/container_data/$VERSION/dnsmasq:/etc/dnsmasq.d"
+HOST_VOL[\'mcollective_data\']="-v /var/lib/fuel/container_data/$VERSION/mcollective:/etc/hiera"
+
+#Storage container volume mounts
+declare -A CONTAINER_VOLUMES
+#Format: CONTAINER_VOLUMES[$FOO_CNT]="${HOST_VOL[\'foo\']}"
+
+#Storage container volumes
+#Format: FOO_VOL="--volumes-from $FOO_CNT"
+
+#Nailgun static files are in nailgun container
+NAILGUN_VOL="--volumes-from ${CONTAINER_NAMES[\'nailgun\']}"
+COBBLER_VOL="--volumes-from ${CONTAINER_NAMES[\'cobbler\']}"
+ASTUTE_VOL="--volumes-from ${CONTAINER_NAMES[\'astute\']}"
+
+#App container volume mounts
+###requirements cheat sheet
+###ALL: astuteyaml repo logs
+###puppet: rsync
+###sshkey: nailgun cobbler astute mcollective ostf
+###repo: nginx mcollective
+###nailgun: nginx
+###cobbler: mcollective
+###astute: mcollective
+declare -A REQS
+REQS["${HOST_VOL[\'astuteyaml\']}"]="cobbler postgres rabbitmq rsync astute nailgun ostf nginx rsyslog mcollective keystone"
+REQS["${HOST_VOL[\'keys\']}"]="mcollective astute ostf cobbler nginx nailgun"
+REQS["${HOST_VOL[\'repo\']}"]="cobbler postgres rabbitmq rsync astute nailgun ostf nginx rsyslog mcollective keystone"
+REQS["${HOST_VOL[\'logs\']}"]="cobbler postgres rabbitmq rsync astute nailgun ostf nginx rsyslog mcollective keystone"
+#Most containers work from local integrated puppet, but rsync needs to serve host puppet
+REQS["${HOST_VOL[\'puppet\']}"]="rsync"
+#Uncomment to enable host puppet manifests
+#REQS["${HOST_VOL[\'puppet\']}"]="cobbler postgres rabbitmq rsync astute nailgun ostf nginx rsyslog mcollective keystone"
+REQS["${HOST_VOL[\'astute_data\']}"]="astute"
+REQS["${HOST_VOL[\'cobbler_data\']}"]="cobbler"
+REQS["${HOST_VOL[\'dnsmasq\']}"]="cobbler mcollective"
+REQS["${HOST_VOL[\'postgres_data\']}"]="postgres"
+REQS["${HOST_VOL[\'mcollective_data\']}"]="mcollective"
+REQS["${HOST_VOL[\'sshkey\']}"]="nailgun cobbler astute mcollective ostf"
+REQS["${HOST_VOL[\'ibp\']}"]="mcollective"
+REQS["$NAILGUN_VOL"]="nginx"
+REQS["$COBBLER_VOL"]="mcollective"
+REQS["$ASTUTE_VOL"]="mcollective"
+
+#assemble requirements
+for requirement in "${!REQS[@]}"; do
+  for container in ${REQS["$requirement"]}; do
+    CONTAINER_VOLUMES["$container"]+="${requirement} "
+  done
+done
+
+#backup settings
+SYSTEM_DIRS="/etc/fuel /var/lib/fuel /root/.ssh /var/www/nailgun/plugins"
+FULL_BACKUP_DIRS="/etc/puppet /var/www/nailgun"
+BACKUP_ROOT="/var/backup/fuel"
+
+# number of retries for "docker check"
+CHECK_RETRIES=80
+',
+  mode    => '0644',
+}
+
+file { '/etc/fuel/free_disk_check.yaml' :
+  content => 'monitord_user: monitord
+monitord_password: 9IR0gsgd
+monitord_tenant: services
+',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+}
+
+file { '/etc/logrotate.d/fuel.nodaily' :
+  content => '# managed by puppet
+
+"/var/lib/docker/containers/*/*.log"
+"/var/log/astute/*.log"
+"/var/log/audit/audit.log"
+"/var/log/auth.log"
+"/var/log/cobbler/*.log"
+"/var/log/cron.log"
+"/var/log/daemon.log"
+"/var/log/debug"
+"/var/log/docker"
+"/var/log/docker-*.log"
+"/var/log/docker-logs/astute/*.log"
+"/var/log/docker-logs/cobbler/*.log"
+"/var/log/docker-logs/dnsmasq.log"
+"/var/log/docker-logs/httpd/*.log"
+"/var/log/docker-logs/mcollective.log"
+"/var/log/docker-logs/messages"
+"/var/log/docker-logs/nailgun/*.log"
+"/var/log/docker-logs/nginx/*.log"
+"/var/log/docker-logs/ostf*.log"
+"/var/log/docker-logs/ostf/*.log"
+"/var/log/docker-logs/rabbitmq/*.log"
+"/var/log/docker-logs/rsync.log"
+"/var/log/docker-logs/shotgun.log"
+"/var/log/fuelmenu.log"
+"/var/log/httpd/*"
+"/var/log/kern.log"
+"/var/log/mail.log"
+"/var/log/nailgun-agent.log"
+"/var/log/nailgun/*.log"
+"/var/log/nginx/*.log"
+"/var/log/ostf*.log"
+"/var/log/rabbitmq/*"
+"/var/log/remote/[1-9]*/*.log"
+"/var/log/remote/[1-9]*/*/*.log"
+"/var/log/shotgun.log"
+"/var/log/syslog"
+"/var/log/user.log"
+"/var/log/upstart/*.log"
+{
+  # truncate file, do not delete & recreate
+  copytruncate
+
+  # compress rotated files with gzip
+  compress
+
+  # ignore missing files
+  missingok
+
+  # do not rotate empty files
+  notifempty
+
+  # logrotate allows to use only year, month, day and unix epoch
+  dateformat -%Y%m%d-%s
+
+  # number of rotated files to keep
+  rotate 4
+
+  # do not rotate files unless both size and time conditions are met
+  weekly
+  minsize 10M
+
+  # force rotate if filesize exceeded 100M
+  maxsize 100M
+
+  postrotate
+      # send SIGHUP to all rsyslog instances, including ones in containers
+      /usr/bin/pkill -HUP rsyslogd 2>/dev/null || true
+  endscript
+}
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/etc/logrotate.d/upstart' :
+  ensure => 'absent',
+}
+
+file { '/etc/monit.conf' :
+  ensure  => 'present',
+  content => '###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a \'#\' and extend through the end of the line. Keywords
+## are case insensitive. All path\'s MUST BE FULLY QUALIFIED, starting with \'/\'.
+##
+## Below you will find examples of some frequently used statements. For
+## information about the control file and a complete list of statements and
+## options, please have a look in the Monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+##
+## Start Monit in the background (run as a daemon):
+#
+  set daemon 120             # check services at 120-sec intervals
+#   with start delay 240    # optional: delay the first check by 4-minutes (by
+#                           # default Monit check immediately after Monit start)
+#
+#
+## Set syslog logging with the \'daemon\' facility. If the FACILITY option is
+## omitted, Monit will use \'user\' facility by default. If you want to log to
+## a standalone log file instead, specify the full path to the log file
+#
+
+  set logfile /var/log/monit.log
+
+#
+#
+## Set the location of the Monit id file which stores the unique id for the
+## Monit instance. The id is generated and stored on first Monit start. By
+## default the file is placed in $HOME/.monit.id.
+#
+  set idfile /var/.monit.id
+#
+## Set the location of the Monit state file which saves monitoring states
+## on each cycle. By default the file is placed in $HOME/.monit.state. If
+## the state file is stored on a persistent filesystem, Monit will recover
+## the monitoring state across reboots. If it is on temporary filesystem, the
+## state will be lost on reboot which may be convenient in some situations.
+#
+  set statefile /var/.monit.state
+#
+## Set the list of mail servers for alert delivery. Multiple servers may be
+## specified using a comma separator. If the first mail server fails, Monit
+# will use the second mail server in the list and so on. By default Monit uses
+# port 25 - it is possible to override this with the PORT option.
+#
+# set mailserver mail.bar.baz,               # primary mailserver
+#                backup.bar.baz port 10025,  # backup mailserver on port 10025
+#                localhost                   # fallback relay
+#
+#
+## By default Monit will drop alert events if no mail servers are available.
+## If you want to keep the alerts for later delivery retry, you can use the
+## EVENTQUEUE statement. The base directory where undelivered alerts will be
+## stored is specified by the BASEDIR option. You can limit the maximal queue
+## size using the SLOTS option (if omitted, the queue is limited by space
+## available in the back end filesystem).
+#
+  set eventqueue
+      basedir /var/monit # set the base directory where events will be stored
+      slots 100                     # optionally limit the queue size
+#
+#
+## Send status and events to M/Monit (for more informations about M/Monit
+## see http://mmonit.com/). By default Monit registers credentials with
+## M/Monit so M/Monit can smoothly communicate back to Monit and you don\'t
+## have to register Monit credentials manually in M/Monit. It is possible to
+## disable credential registration using the commented out option below.
+## Though, if safety is a concern we recommend instead using https when
+## communicating with M/Monit and send credentials encrypted.
+#
+# set mmonit http://monit:monit@192.168.1.10:8080/collector
+#     # and register without credentials     # Don\'t register credentials
+#
+#
+## Monit by default uses the following format for alerts if the the mail-format
+## statement is missing::
+## --8<--
+## set mail-format {
+##      from: monit@$HOST
+##   subject: monit alert --  $EVENT $SERVICE
+##   message: $EVENT Service $SERVICE
+##                 Date:        $DATE
+##                 Action:      $ACTION
+##                 Host:        $HOST
+##                 Description: $DESCRIPTION
+##
+##            Your faithful employee,
+##            Monit
+## }
+## --8<--
+##
+## You can override this message format or parts of it, such as subject
+## or sender using the MAIL-FORMAT statement. Macros such as $DATE, etc.
+## are expanded at runtime. For example, to override the sender, use:
+#
+# set mail-format { from: monit@foo.bar }
+#
+#
+## You can set alert recipients whom will receive alerts if/when a
+## service defined in this file has errors. Alerts may be restricted on
+## events by using a filter as in the second example below.
+#
+# set alert sysadm@foo.bar                       # receive all alerts
+# set alert manager@foo.bar only on { timeout }  # receive just service-
+#                                                # timeout alert
+#
+#
+## Monit has an embedded web server which can be used to view status of
+## services monitored and manage services from a web interface. See the
+## Monit Wiki if you want to enable SSL for the web server.
+#
+# set httpd port 2812 and
+#    use address localhost  # only accept connection from localhost
+#    allow localhost        # allow localhost to connect to the server and
+#    allow admin:monit      # require user \'admin\' with password \'monit\'
+#    allow @monit           # allow users of group \'monit\' to connect (rw)
+#    allow @users readonly  # allow users of group \'users\' to connect readonly
+#
+###############################################################################
+## Services
+###############################################################################
+##
+## Check general system resources such as load average, cpu and memory
+## usage. Each test specifies a resource, conditions and the action to be
+## performed should a test fail.
+#
+#  check system myhost.mydomain.tld
+#    if loadavg (1min) > 4 then alert
+#    if loadavg (5min) > 2 then alert
+#    if memory usage > 75% then alert
+#    if swap usage > 25% then alert
+#    if cpu usage (user) > 70% then alert
+#    if cpu usage (system) > 30% then alert
+#    if cpu usage (wait) > 20% then alert
+#
+#
+## Check if a file exists, checksum, permissions, uid and gid. In addition
+## to alert recipients in the global section, customized alert can be sent to
+## additional recipients by specifying a local alert handler. The service may
+## be grouped using the GROUP option. More than one group can be specified by
+## repeating the \'group name\' statement.
+#
+#  check file apache_bin with path /usr/local/apache/bin/httpd
+#    if failed checksum and
+#       expect the sum 8f7f419955cefa0b33a2ba316cba3659 then unmonitor
+#    if failed permission 755 then unmonitor
+#    if failed uid root then unmonitor
+#    if failed gid root then unmonitor
+#    alert security@foo.bar on {
+#           checksum, permission, uid, gid, unmonitor
+#        } with the mail-format { subject: Alarm! }
+#    group server
+#
+#
+## Check that a process is running, in this case Apache, and that it respond
+## to HTTP and HTTPS requests. Check its resource usage such as cpu and memory,
+## and number of children. If the process is not running, Monit will restart
+## it by default. In case the service is restarted very often and the
+## problem remains, it is possible to disable monitoring using the TIMEOUT
+## statement. This service depends on another service (apache_bin) which
+## is defined above.
+#
+#  check process apache with pidfile /usr/local/apache/logs/httpd.pid
+#    start program = "/etc/init.d/httpd start" with timeout 60 seconds
+#    stop program  = "/etc/init.d/httpd stop"
+#    if cpu > 60% for 2 cycles then alert
+#    if cpu > 80% for 5 cycles then restart
+#    if totalmem > 200.0 MB for 5 cycles then restart
+#    if children > 250 then restart
+#    if loadavg(5min) greater than 10 for 8 cycles then stop
+#    if failed host www.tildeslash.com port 80 protocol http
+#       and request "/somefile.html"
+#       then restart
+#    if failed port 443 type tcpssl protocol http
+#       with timeout 15 seconds
+#       then restart
+#    if 3 restarts within 5 cycles then timeout
+#    depends on apache_bin
+#    group server
+#
+#
+## Check filesystem permissions, uid, gid, space and inode usage. Other services,
+## such as databases, may depend on this resource and an automatically graceful
+## stop may be cascaded to them before the filesystem will become full and data
+## lost.
+#
+#  check filesystem datafs with path /dev/sdb1
+#    start program  = "/bin/mount /data"
+#    stop program  = "/bin/umount /data"
+#    if failed permission 660 then unmonitor
+#    if failed uid root then unmonitor
+#    if failed gid disk then unmonitor
+#    if space usage > 80% for 5 times within 15 cycles then alert
+#    if space usage > 99% then stop
+#    if inode usage > 30000 then alert
+#    if inode usage > 99% then stop
+#    group server
+#
+#
+## Check a file\'s timestamp. In this example, we test if a file is older
+## than 15 minutes and assume something is wrong if its not updated. Also,
+## if the file size exceed a given limit, execute a script
+#
+#  check file database with path /data/mydatabase.db
+#    if failed permission 700 then alert
+#    if failed uid data then alert
+#    if failed gid data then alert
+#    if timestamp > 15 minutes then alert
+#    if size > 100 MB then exec "/my/cleanup/script" as uid dba and gid dba
+#
+#
+## Check directory permission, uid and gid.  An event is triggered if the
+## directory does not belong to the user with uid 0 and gid 0.  In addition,
+## the permissions have to match the octal description of 755 (see chmod(1)).
+#
+#  check directory bin with path /bin
+#    if failed permission 755 then unmonitor
+#    if failed uid 0 then unmonitor
+#    if failed gid 0 then unmonitor
+#
+#
+## Check a remote host availability by issuing a ping test and check the
+## content of a response from a web server. Up to three pings are sent and
+## connection to a port and an application level network check is performed.
+#
+#  check host myserver with address 192.168.1.1
+#    if failed icmp type echo count 3 with timeout 3 seconds then alert
+#    if failed port 3306 protocol mysql with timeout 15 seconds then alert
+#    if failed url http://user:password@www.foo.bar:8080/?querystring
+#       and content == \'action="j_security_check"\'
+#       then alert
+#
+#
+###############################################################################
+## Includes
+###############################################################################
+##
+## It is possible to include additional configuration parts from other files or
+## directories.
+#
+   include /etc/monit.d/*
+#
+',
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+}
+
+file { '/etc/ntp.conf' :
+  ensure  => 'file',
+  content => '# ntp.conf: Managed by puppet.
+#
+# Enable next tinker options:
+# panic - keep ntpd from panicking in the event of a large clock skew
+# when a VM guest is suspended and resumed;
+# stepout - allow ntpd change offset faster
+tinker panic 0 stepout 5
+
+disable monitor
+
+# Permit time synchronization with our time source, but do not
+# permit the source to query or modify the service on this system.
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+
+
+
+# Set up servers for ntpd with next options:
+# server - IP address or DNS name of upstream NTP server
+# iburst - allow send sync packages faster if upstream unavailable
+# prefer - select preferrable server
+# minpoll - set minimal update frequency
+# maxpoll - set maximal update frequency
+server 0.fuel.pool.ntp.org iburst minpoll 3 maxpoll 9
+server 1.fuel.pool.ntp.org iburst minpoll 3 maxpoll 9
+server 2.fuel.pool.ntp.org iburst minpoll 3 maxpoll 9
+
+
+# Driftfile.
+driftfile /var/lib/ntp/drift
+
+
+
+
+',
+  group   => '0',
+  mode    => '0644',
+  owner   => '0',
+}
+
+file { '/etc/resolv.conf' :
+  content => 'search test.domain.local
+domain test.domain.local
+nameserver 10.109.0.2
+nameserver 10.109.0.1
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+}
+
+file { '/etc/ssh/sshd_config' :
+  ensure  => 'present',
+  alias   => 'concat_/etc/ssh/sshd_config',
+  backup  => 'puppet',
+  group   => '0',
+  mode    => '0600',
+  owner   => '0',
+  path    => '/etc/ssh/sshd_config',
+  replace => true,
+  source  => '/tmp//_etc_ssh_sshd_config/fragments.concat.out',
+}
+
+file { '/etc/sysconfig/atop' :
+  ensure  => 'present',
+  content => '# Managed by puppet
+#
+
+# Current Day format
+CURDAY=`date +%Y%m%d`
+# Log files path
+LOGPATH=/var/log/atop
+# Binaries path
+BINPATH=/usr/bin
+# PID File
+PIDFILE=/var/run/atop.pid
+# interval (default 10 minutes)
+INTERVAL=20
+',
+  notify  => 'Service[atop]',
+}
+
+file { '/etc/sysconfig/docker-storage-setup' :
+  content => 'VG=docker
+GROWPART=true
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[docker],
+  owner   => 'root',
+}
+
+file { '/etc/sysctl.conf' :
+  ensure => 'present',
+  group  => '0',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+file { '/root/.config/fuel/fuel_client.yaml' :
+  content => 'SERVER_ADDRESS: "10.109.0.2"
+SERVER_PORT: "8000"
+KEYSTONE_USER: "admin"
+KEYSTONE_PASS: "admin"
+KEYSTONE_PORT: "5000"
+',
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+  require => Exec[mkdir -p /root/.config/fuel],
+}
+
+file { '/root/.ssh/config' :
+  content => 'Host *
+  IdentityFile ~/.ssh/bootstrap.rsa
+  IdentityFile ~/.ssh/id_rsa
+
+Host *.test.domain.local node-* controller-* compute-* storage-* 10.* 192.168.* 172.30.* 172.31.* 172.2?.* 172.1?.* 10.109.0.*
+  CheckHostIP no
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  AddressFamily inet
+',
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+}
+
+file { '/root/.ssh/id_rsa.pub' :
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  require => Exec[Public ssh key for #{username}],
+}
+
+file { '/root/.ssh/id_rsa' :
+  group   => 'root',
+  mode    => '0600',
+  owner   => 'root',
+  require => Exec[Generate ssh key for #{username}],
+}
+
+file { '/root/.ssh' :
+  ensure  => 'directory',
+  group   => 'root',
+  mode    => '0700',
+  owner   => 'root',
+  require => File[/root],
+}
+
+file { '/root' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/tmp//_etc_ssh_sshd_config/fragments.concat.out' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_ssh_sshd_config/fragments.concat' :
+  ensure => 'present',
+  backup => 'puppet',
+  mode   => '0640',
+}
+
+file { '/tmp//_etc_ssh_sshd_config/fragments/00_global config' :
+  ensure  => 'file',
+  alias   => 'concat_fragment_global config',
+  backup  => 'puppet',
+  content => '# File is managed by Puppet
+Port 22
+
+AcceptEnv LANG LC_*
+AllowTcpForwarding yes
+ChallengeResponseAuthentication no
+Ciphers aes256-ctr,aes192-ctr,aes128-ctr,arcfour256,arcfour128
+GSSAPIAuthentication no
+LogLevel VERBOSE
+MACs hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,hmac-sha1
+PasswordAuthentication yes
+PrintMotd no
+Protocol 2
+PubkeyAuthentication yes
+RSAAuthentication yes
+StrictModes yes
+Subsystem sftp /usr/libexec/openssh/sftp-server
+UseDNS no
+UsePAM yes
+UsePrivilegeSeparation yes
+X11Forwarding no
+',
+  mode    => '0640',
+  notify  => Exec[concat_/etc/ssh/sshd_config],
+  replace => true,
+}
+
+file { '/tmp//_etc_ssh_sshd_config/fragments' :
+  ensure  => 'directory',
+  backup  => 'puppet',
+  force   => true,
+  ignore  => [ '.svn', '.git', '.gitignore' ],
+  mode    => '0750',
+  notify  => Exec[concat_/etc/ssh/sshd_config],
+  purge   => true,
+  recurse => true,
+}
+
+file { '/tmp//_etc_ssh_sshd_config' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0750',
+}
+
+file { '/tmp//bin/concatfragments.rb' :
+  ensure => 'file',
+  backup => 'puppet',
+  mode   => '0755',
+  source => 'puppet:///modules/concat/concatfragments.rb',
+}
+
+file { '/tmp//bin' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/tmp/' :
+  ensure => 'directory',
+  backup => 'puppet',
+  mode   => '0755',
+}
+
+file { '/var/lib/fuel/container_data/8.0/cobbler' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel/container_data/8.0/postgres' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel/container_data/8.0' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel/container_data' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel/ibp' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel/keys' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/lib/fuel' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/ConsoleKit' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/audit' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/cobbler' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/coredump' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/httpd' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/nailgun' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/naily' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/nginx' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/ntpstats' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/puppet' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/rabbitmq' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/remote' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs/supervisor' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/docker-logs' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/log/remote' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0750',
+  owner  => 'root',
+}
+
+file { '/var/www/nailgun//centos/auxiliary/' :
+  ensure => 'directory',
+  before => 'Package[createrepo]',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file { '/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/Release' :
+  ensure  => 'file',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  replace => false,
+  source  => 'puppet:///modules/nailgun/Release-auxiliary',
+}
+
+file { '/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/main/binary-amd64/Release' :
+  ensure  => 'file',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  replace => false,
+  source  => 'puppet:///modules/nailgun/Release-auxiliary',
+}
+
+file { '/var/www/nailgun//ubuntu/auxiliary//dists/auxiliary/restricted/binary-amd64/Release' :
+  ensure  => 'file',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  replace => false,
+  source  => 'puppet:///modules/nailgun/Release-auxiliary',
+}
+
+file { '/var/www/nailgun/dump' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+}
+
+file_line { 'logrotate-compress' :
+  ensure => 'present',
+  after  => '^tabooext',
+  before => 'File_line[logrotate-delaycompress]',
+  line   => 'compress',
+  match  => '^compress',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-delaycompress' :
+  ensure => 'present',
+  after  => '^compress',
+  before => 'File_line[logrotate-minsize]',
+  line   => 'delaycompress',
+  match  => '^delaycompress',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-maxsize' :
+  ensure => 'present',
+  after  => '^minsize',
+  line   => 'maxsize 100M',
+  match  => '^maxsize',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-minsize' :
+  ensure => 'present',
+  after  => '^delaycompress',
+  before => 'File_line[logrotate-maxsize]',
+  line   => 'minsize 10M',
+  match  => '^minsize',
+  path   => '/etc/logrotate.conf',
+}
+
+file_line { 'logrotate-tabooext' :
+  ensure => 'present',
+  after  => '^create',
+  before => 'File_line[logrotate-compress]',
+  line   => 'tabooext + .nodaily',
+  match  => '^tabooext',
+  path   => '/etc/logrotate.conf',
+}
+
+firewall { '002 accept related established rules' :
+  action => 'accept',
+  before => 'Class[Nailgun::Iptables]',
+  proto  => 'all',
+  state  => [ 'RELATED', 'ESTABLISHED' ],
+}
+
+firewall { '004 forward_admin_net' :
+  chain    => 'POSTROUTING',
+  jump     => 'MASQUERADE',
+  outiface => 'e+',
+  proto    => 'all',
+  source   => '10.109.0.0/24',
+  table    => 'nat',
+}
+
+firewall { '005 ssh' :
+  action => 'accept',
+  port   => '22',
+  proto  => 'tcp',
+}
+
+firewall { '006 ntp' :
+  action  => 'accept',
+  iniface => 'eth0',
+  port    => '123',
+  proto   => 'tcp',
+}
+
+firewall { '007 ntp_udp' :
+  action  => 'accept',
+  iniface => 'eth0',
+  port    => '123',
+  proto   => 'udp',
+}
+
+firewall { '008 snmp' :
+  action => 'accept',
+  port   => '162',
+  proto  => 'udp',
+}
+
+firewall { '009 nailgun_web' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '8000',
+  proto  => 'tcp',
+}
+
+firewall { '010 nailgun_internal' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'docker0',
+  port    => '8001',
+  proto   => 'tcp',
+}
+
+firewall { '011 nailgun_internal_local' :
+  action   => 'accept',
+  chain    => 'INPUT',
+  port     => '8001',
+  proto    => 'tcp',
+  src_type => 'LOCAL',
+}
+
+firewall { '012 nailgun_internal_block_ext' :
+  action => 'reject',
+  chain  => 'INPUT',
+  port   => '8001',
+  proto  => 'tcp',
+}
+
+firewall { '013 postgres_local' :
+  action   => 'accept',
+  chain    => 'INPUT',
+  port     => '5432',
+  proto    => 'tcp',
+  src_type => 'LOCAL',
+}
+
+firewall { '014 postgres' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'docker0',
+  port    => '5432',
+  proto   => 'tcp',
+}
+
+firewall { '015 postgres_block_ext' :
+  action => 'reject',
+  chain  => 'INPUT',
+  port   => '5432',
+  proto  => 'tcp',
+}
+
+firewall { '020 ostf_admin' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'eth0',
+  port    => '8777',
+  proto   => 'tcp',
+}
+
+firewall { '021 ostf_local' :
+  action   => 'accept',
+  chain    => 'INPUT',
+  port     => '8777',
+  proto    => 'tcp',
+  src_type => 'LOCAL',
+}
+
+firewall { '022 ostf_block_ext' :
+  action => 'reject',
+  chain  => 'INPUT',
+  port   => '8777',
+  proto  => 'tcp',
+}
+
+firewall { '023 rsync' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '873',
+  proto  => 'tcp',
+}
+
+firewall { '024 rsyslog' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'eth0',
+  port    => '514',
+  proto   => 'tcp',
+}
+
+firewall { '025 rsyslog' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'eth0',
+  port    => '514',
+  proto   => 'udp',
+}
+
+firewall { '040 rabbitmq_admin' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'eth0',
+  port    => [ '4369', '5672', '15672', '61613' ],
+  proto   => 'tcp',
+}
+
+firewall { '041 rabbitmq_local' :
+  action   => 'accept',
+  chain    => 'INPUT',
+  port     => [ '4369', '5672', '15672', '61613' ],
+  proto    => 'tcp',
+  src_type => 'LOCAL',
+}
+
+firewall { '042 rabbitmq_block_ext' :
+  action => 'reject',
+  chain  => 'INPUT',
+  port   => [ '4369', '5672', '15672', '61613' ],
+  proto  => 'tcp',
+}
+
+firewall { '043 fuelweb_port' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '8443',
+  proto  => 'tcp',
+}
+
+firewall { '046 keystone_admin' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '5000',
+  proto  => 'tcp',
+}
+
+firewall { '047 keystone_admin_port admin_net' :
+  action  => 'accept',
+  chain   => 'INPUT',
+  iniface => 'eth0',
+  port    => '35357',
+  proto   => 'tcp',
+}
+
+firewall { '049 nailgun_repo_admin' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '8080',
+  proto  => 'tcp',
+}
+
+firewall { '050 forward admin_net' :
+  action  => 'accept',
+  chain   => 'FORWARD',
+  iniface => 'eth0',
+  proto   => 'all',
+  source  => '10.109.0.0/24',
+}
+
+firewall { '051 forward admin_net conntrack' :
+  action  => 'accept',
+  chain   => 'FORWARD',
+  ctstate => [ 'ESTABLISHED', 'RELATED' ],
+  proto   => 'all',
+}
+
+firewall { '101 dns_tcp' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '53',
+  proto  => 'tcp',
+}
+
+firewall { '102 dns_udp' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '53',
+  proto  => 'udp',
+}
+
+firewall { '103 dhcp' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => [ '67', '68' ],
+  proto  => 'udp',
+}
+
+firewall { '104 tftp' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '69',
+  proto  => 'udp',
+}
+
+firewall { '110 squidproxy' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => '3128',
+  proto  => 'tcp',
+}
+
+firewall { '111 cobbler_web' :
+  action => 'accept',
+  chain  => 'INPUT',
+  port   => [ '80', '443' ],
+  proto  => 'tcp',
+}
+
+firewall { '999 iptables denied' :
+  chain      => 'INPUT',
+  jump       => 'LOG',
+  limit      => '5/min',
+  log_level  => '7',
+  log_prefix => 'iptables denied: ',
+}
+
+nailgun::packages::nailgun_safe_package { 'acpid' :
+}
+
+nailgun::packages::nailgun_safe_package { 'cronie-anacron' :
+}
+
+nailgun::packages::nailgun_safe_package { 'crontabs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fence-agents' :
+}
+
+nailgun::packages::nailgun_safe_package { 'fuel-migrate' :
+}
+
+nailgun::packages::nailgun_safe_package { 'iptables' :
+}
+
+nailgun::packages::nailgun_safe_package { 'nginx' :
+}
+
+nailgun::packages::nailgun_safe_package { 'postgresql-libs' :
+}
+
+nailgun::packages::nailgun_safe_package { 'python-fuelclient' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsync' :
+}
+
+nailgun::packages::nailgun_safe_package { 'rsyslog' :
+}
+
+nailgun::packages::nailgun_safe_package { 'screen' :
+}
+
+nailgun::packages::nailgun_safe_package { 'supervisor' :
+}
+
+nailgun::sshkeygen { '/root/.ssh/id_rsa' :
+  groupname => 'root',
+  homedir   => '/root',
+  keytype   => 'rsa',
+  length    => '2048',
+  username  => 'root',
+}
+
+package { 'acpid' :
+  ensure => 'latest',
+}
+
+package { 'atop' :
+  ensure => 'installed',
+  before => 'File[/etc/sysconfig/atop]',
+}
+
+package { 'createrepo' :
+  ensure => 'latest',
+  before => 'Exec[createrepo /var/www/nailgun//centos/auxiliary/]',
+}
+
+package { 'cronie-anacron' :
+  ensure => 'latest',
+}
+
+package { 'crontabs' :
+  ensure => 'latest',
+}
+
+package { 'dhcp' :
+  ensure => 'installed',
+}
+
+package { 'docker-io' :
+  ensure => 'latest',
+}
+
+package { 'fence-agents' :
+  ensure => 'latest',
+}
+
+package { 'fuel-migrate' :
+  ensure => 'latest',
+}
+
+package { 'fuel-notify' :
+  ensure => 'latest',
+  notify => Service[monit],
+}
+
+package { 'iptables' :
+  ensure => 'latest',
+}
+
+package { 'monit' :
+  ensure => 'present',
+}
+
+package { 'nginx' :
+  ensure => 'latest',
+}
+
+package { 'ntp' :
+  ensure => 'present',
+}
+
+package { 'ntpdate' :
+  ensure => 'present',
+}
+
+package { 'openssh-server' :
+  ensure => 'present',
+}
+
+package { 'postgresql-libs' :
+  ensure => 'latest',
+}
+
+package { 'python-fuelclient' :
+  ensure => 'latest',
+}
+
+package { 'rsync' :
+  ensure => 'latest',
+}
+
+package { 'rsyslog' :
+  ensure => 'latest',
+}
+
+package { 'screen' :
+  ensure => 'latest',
+}
+
+package { 'supervisor' :
+  ensure => 'latest',
+}
+
+package { 'yum-plugin-priorities' :
+  ensure => 'installed',
+}
+
+service { 'atop' :
+  ensure => 'running',
+  enable => true,
+  notify => 'Exec[ln -s /var/log/atop/atop_current]',
+}
+
+service { 'dhcrelay' :
+  ensure => 'stopped',
+}
+
+service { 'docker' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  require    => Package[docker-io],
+}
+
+service { 'monit' :
+  ensure => 'running',
+}
+
+service { 'ntp' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  name       => 'ntpd',
+}
+
+service { 'sshd' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+  require    => Class[Ssh::Server::Config],
+}
+
+stage { 'main' :
+}
+
+sysctl::value { 'kernel.printk' :
+  key     => 'kernel.printk',
+  require => Class[Sysctl::Base],
+  value   => '4 1 1 7',
+}
+
+sysctl::value { 'net.ipv4.ip_forward' :
+  key     => 'net.ipv4.ip_forward',
+  require => Class[Sysctl::Base],
+  value   => '1',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh1' :
+  key     => 'net.ipv4.neigh.default.gc_thresh1',
+  require => Class[Sysctl::Base],
+  value   => '256',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh2' :
+  key     => 'net.ipv4.neigh.default.gc_thresh2',
+  require => Class[Sysctl::Base],
+  value   => '1024',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh3' :
+  key     => 'net.ipv4.neigh.default.gc_thresh3',
+  require => Class[Sysctl::Base],
+  value   => '2048',
+}
+
+sysctl { 'kernel.printk' :
+  before => Sysctl_runtime[kernel.printk],
+  val    => '4	1	1	7',
+}
+
+sysctl { 'net.ipv4.ip_forward' :
+  before => Sysctl_runtime[net.ipv4.ip_forward],
+  val    => '1',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh1' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh1],
+  val    => '256',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh2' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh2],
+  val    => '1024',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh3' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh3],
+  val    => '2048',
+}
+
+sysctl_runtime { 'kernel.printk' :
+  val => '4	1	1	7',
+}
+
+sysctl_runtime { 'net.ipv4.ip_forward' :
+  val => '1',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh1' :
+  val => '256',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh2' :
+  val => '1024',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh3' :
+  val => '2048',
+}
+
+yumrepo { '8.0_auxiliary' :
+  baseurl  => 'file:///var/www/nailgun//centos/auxiliary/',
+  descr    => '8.0_auxiliary',
+  gpgcheck => '0',
+  name     => '8.0_auxiliary',
+  priority => '15',
+}
+

@@ -1,0 +1,945 @@
+anchor { 'mcollective::client::config::begin' :
+  name => 'mcollective::client::config::begin',
+}
+
+anchor { 'mcollective::client::config::end' :
+  name => 'mcollective::client::config::end',
+}
+
+anchor { 'mcollective::common::config::begin' :
+  name => 'mcollective::common::config::begin',
+}
+
+anchor { 'mcollective::common::config::end' :
+  name => 'mcollective::common::config::end',
+}
+
+class { 'Docker::Container' :
+  before       => 'Class[Nailgun::Astute]',
+  name         => 'Docker::Container',
+  tz           => 'UTC',
+  yum_retries  => '5',
+  yum_timeout  => '5',
+  zoneinfo_dir => '/usr/share/zoneinfo',
+}
+
+class { 'Mcollective::Client::Config' :
+  name => 'Mcollective::Client::Config',
+}
+
+class { 'Mcollective::Client::Install' :
+  before => 'Class[Mcollective::Client::Config]',
+  name   => 'Mcollective::Client::Install',
+}
+
+class { 'Mcollective::Client' :
+  name => 'Mcollective::Client',
+}
+
+class { 'Mcollective::Common::Config::Connector::Rabbitmq' :
+  before  => Anchor[mcollective::common::config::end],
+  name    => 'Mcollective::Common::Config::Connector::Rabbitmq',
+  require => Anchor[mcollective::common::config::begin],
+}
+
+class { 'Mcollective::Common::Config::Securityprovider::Psk' :
+  before  => Anchor[mcollective::common::config::end],
+  name    => 'Mcollective::Common::Config::Securityprovider::Psk',
+  require => Anchor[mcollective::common::config::begin],
+}
+
+class { 'Mcollective::Common::Config' :
+  name => 'Mcollective::Common::Config',
+}
+
+class { 'Mcollective::Common' :
+  name => 'Mcollective::Common',
+}
+
+class { 'Mcollective::Defaults' :
+  name => 'Mcollective::Defaults',
+}
+
+class { 'Mcollective' :
+  classesfile               => '/var/lib/puppet/state/classes.txt',
+  client                    => true,
+  client_logger_type        => 'console',
+  client_loglevel           => 'warn',
+  client_package            => 'mcollective-client',
+  collectives               => 'mcollective',
+  confdir                   => '/etc/mcollective',
+  connector                 => 'rabbitmq',
+  core_libdir               => '/usr/libexec/mcollective',
+  excluded_facts            => [  ],
+  factsource                => 'yaml',
+  main_collective           => 'mcollective',
+  manage_packages           => false,
+  middleware_admin_password => 'secret',
+  middleware_admin_user     => 'admin',
+  middleware_hosts          => 'undef',
+  middleware_password       => 'marionette',
+  middleware_port           => '61613',
+  middleware_ssl            => false,
+  middleware_ssl_fallback   => false,
+  middleware_ssl_port       => '61614',
+  middleware_user           => 'mcollective',
+  name                      => 'Mcollective',
+  psk                       => 'unset',
+  rabbitmq_vhost            => '/mcollective',
+  require                   => [ Package[ruby21-rubygem-mcollective-client], Package[ruby21-nailgun-mcagents] ],
+  rpcauditprovider          => 'logfile',
+  rpcauthprovider           => 'action_policy',
+  ruby_stomp_ensure         => 'installed',
+  ruby_stomp_package        => 'ruby-stomp',
+  securityprovider          => 'psk',
+  server                    => false,
+  server_daemonize          => '1',
+  server_logfile            => '/var/log/mcollective.log',
+  server_loglevel           => 'info',
+  server_package            => 'mcollective',
+  service_name              => 'mcollective',
+  site_libdir               => '/usr/local/libexec/mcollective',
+  ssl_client_certs          => 'puppet:///modules/mcollective/empty',
+  version                   => 'present',
+}
+
+class { 'Nailgun::Astute' :
+  bootstrap_flavor         => 'centos',
+  gem_source               => 'http://rubygems.org/',
+  name                     => 'Nailgun::Astute',
+  production               => 'docker',
+  rabbitmq_astute_password => 'SwLCUx2H',
+  rabbitmq_astute_user     => 'naily',
+  rabbitmq_host            => '10.109.0.2',
+}
+
+class { 'Nailgun::Supervisor' :
+  conf_file       => 'nailgun/supervisord.conf.astute.erb',
+  nailgun_env     => '/opt/nailgun',
+  name            => 'Nailgun::Supervisor',
+  ostf_env        => '/opt/nailgun',
+  require         => Class[Nailgun::Astute],
+  restart_service => true,
+  service_enabled => true,
+}
+
+datacat { 'mcollective::client' :
+  collects  => [  ],
+  group     => '0',
+  mode      => '0444',
+  name      => 'mcollective::client',
+  owner     => 'root',
+  path      => '/etc/mcollective/client.cfg',
+  show_diff => 'UNSET',
+  template  => 'mcollective/settings.cfg.erb',
+}
+
+datacat_collector { 'mcollective::client' :
+  before          => File[mcollective::client],
+  collects        => [  ],
+  path            => 'mcollective::client',
+  target_field    => 'content',
+  target_resource => File[mcollective::client],
+  template        => 'mcollective/settings.cfg.erb',
+  template_body   => '<% @data.keys.sort.each do |setting| -%>
+<% if @data[setting] != \'\' -%>
+<%= setting %> = <%= @data[setting] -%>
+<%- end %>
+<%- end %>
+',
+}
+
+datacat_collector { 'mcollective::site_libdir' :
+  before          => File[/usr/local/libexec/mcollective],
+  path            => 'mcollective::site_libdir',
+  source_key      => 'source_path',
+  target_field    => 'source',
+  target_resource => File[/usr/local/libexec/mcollective],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting direct_addressing' :
+  data   => { 'direct_addressing' => '1' },
+  name   => 'mcollective::setting mcollective::client::setting direct_addressing',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting logger_type' :
+  data   => { 'logger_type' => 'console' },
+  name   => 'mcollective::setting mcollective::client::setting logger_type',
+  order  => '30',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting loglevel' :
+  data   => { 'loglevel' => 'warn' },
+  name   => 'mcollective::setting mcollective::client::setting loglevel',
+  order  => '30',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.heartbeat_interval' :
+  data   => { 'plugin.rabbitmq.heartbeat_interval' => '30' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.heartbeat_interval',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.host' :
+  data   => { 'plugin.rabbitmq.pool.1.host' => '10.109.0.2' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.host',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.password' :
+  data   => { 'plugin.rabbitmq.pool.1.password' => 'PPMi1XT2' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.password',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.port' :
+  data   => { 'plugin.rabbitmq.pool.1.port' => '61613' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.port',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.user' :
+  data   => { 'plugin.rabbitmq.pool.1.user' => 'mcollective' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.1.user',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.size' :
+  data   => { 'plugin.rabbitmq.pool.size' => '1' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.pool.size',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting plugin.rabbitmq.vhost' :
+  data   => { 'plugin.rabbitmq.vhost' => 'mcollective' },
+  name   => 'mcollective::setting mcollective::client::setting plugin.rabbitmq.vhost',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::client::setting ttl' :
+  data   => { 'ttl' => '4294957' },
+  name   => 'mcollective::setting mcollective::client::setting ttl',
+  order  => '90',
+  target => [ 'mcollective::client', 'mcollective::user' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting collectives' :
+  data   => { 'collectives' => 'mcollective' },
+  name   => 'mcollective::setting mcollective::common::setting collectives',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting connector' :
+  data   => { 'connector' => 'rabbitmq' },
+  name   => 'mcollective::setting mcollective::common::setting connector',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting direct_addressing' :
+  data   => { 'direct_addressing' => '1' },
+  name   => 'mcollective::setting mcollective::common::setting direct_addressing',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting libdir' :
+  data   => { 'libdir' => '/usr/local/libexec/mcollective:/usr/libexec/mcollective' },
+  name   => 'mcollective::setting mcollective::common::setting libdir',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting main_collective' :
+  data   => { 'main_collective' => 'mcollective' },
+  name   => 'mcollective::setting mcollective::common::setting main_collective',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.psk' :
+  data   => { 'plugin.psk' => 'unset' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.psk',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.host' :
+  data   => { 'plugin.rabbitmq.pool.1.host' => 'undef' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.host',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.password' :
+  data   => { 'plugin.rabbitmq.pool.1.password' => 'marionette' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.password',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.port' :
+  data   => { 'plugin.rabbitmq.pool.1.port' => '61613' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.port',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.user' :
+  data   => { 'plugin.rabbitmq.pool.1.user' => 'mcollective' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.1.user',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.size' :
+  data   => { 'plugin.rabbitmq.pool.size' => '1' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.pool.size',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.randomize' :
+  data   => { 'plugin.rabbitmq.randomize' => 'true' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.randomize',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting plugin.rabbitmq.vhost' :
+  data   => { 'plugin.rabbitmq.vhost' => '/mcollective' },
+  name   => 'mcollective::setting mcollective::common::setting plugin.rabbitmq.vhost',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::setting mcollective::common::setting securityprovider' :
+  data   => { 'securityprovider' => 'psk' },
+  name   => 'mcollective::setting mcollective::common::setting securityprovider',
+  order  => '50',
+  target => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+datacat_fragment { 'mcollective::site_libdir' :
+  data   => { 'source_path' => [ 'puppet:///modules/mcollective/site_libdir' ] },
+  name   => 'mcollective::site_libdir',
+  target => 'mcollective::site_libdir',
+}
+
+file { '/etc/astute/astuted.conf' :
+  content => '# Warning! If you restart container, this file will be return
+# to original state by puppet. If you do not want it, please comment
+# `puppet apply -v /etc/puppet/modules/nailgun/examples/astute-only.pp`
+# in /usr/local/bin/start.sh
+
+broker_host: \'10.109.0.2\'
+broker_port: 5672
+broker_username: \'naily\'
+broker_password: \'SwLCUx2H\'
+broker_queue: \'naily\'
+broker_publisher_queue: \'nailgun\'
+broker_exchange: \'nailgun\'
+iops:
+bootstrap_profile: \'bootstrap\'
+#reboot_timeout: 120              # Wait for reboot request
+#provisioning_timeout: 5400       # Timeout for target nodes to install OS
+#dump_timeout: 3600               # Timeout for dump
+#puppet_timeout: 5400             # Timeout for single puppet run
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/astute/astuted.conf',
+  require => File[/etc/astute],
+}
+
+file { '/etc/astute' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+  path   => '/etc/astute',
+}
+
+file { '/etc/localtime' :
+  ensure => 'present',
+  path   => '/etc/localtime',
+  target => '/usr/share/zoneinfo/UTC',
+}
+
+file { '/etc/rc.d/init.d/supervisord' :
+  group   => 'root',
+  mode    => '0755',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  path    => '/etc/rc.d/init.d/supervisord',
+  require => [ Package[supervisor], File[/etc/sysconfig/supervisord] ],
+  source  => 'puppet:///modules/nailgun/supervisor-init',
+}
+
+file { '/etc/supervisord.conf' :
+  content => '[rpcinterface:supervisor]
+; required for supervisorctl
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file=/var/run/supervisor.sock
+
+[supervisord]
+logfile=/var/log/supervisor/supervisord.log
+loglevel=debug
+pidfile=/var/run/supervisord.pid
+childlogdir=/var/log/supervisor
+
+[supervisorctl]
+serverurl=unix:///var/run/supervisor.sock
+
+[program:astute]
+command=/usr/bin/astuted -c /etc/astute/astuted.conf -l /var/log/astute/astute.log -w 7
+process_name=%(program_name)s
+numprocs=1
+numprocs_start=0
+autostart=true
+autorestart=true
+startsecs=10
+startretries=1000000
+exitcodes=0,2
+stopsignal=KILL
+killasgroup=true
+stopwaitsecs=5
+redirect_stderr=true
+stdout_logfile=/var/log/astute/app.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10
+stdout_capture_maxbytes=0
+stdout_events_enabled=false
+stderr_logfile=/var/log/astute/err.log
+stderr_logfile_maxbytes=50MB
+stderr_logfile_backups=10
+stderr_capture_maxbytes=0
+stderr_events_enabled=false
+serverurl=AUTO
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[supervisord],
+  owner   => 'root',
+  path    => '/etc/supervisord.conf',
+  require => Package[supervisor],
+}
+
+file { '/etc/sysconfig/astute' :
+  content => 'ASTUTE_OPTIONS="--config /etc/astute/astuted.conf --logfile /var/log/astute/astute.log --loglevel debug --workers 7"
+',
+  group   => 'root',
+  mode    => '0644',
+  owner   => 'root',
+  path    => '/etc/sysconfig/astute',
+}
+
+file { '/etc/sysconfig/supervisord' :
+  group  => 'root',
+  mode   => '0644',
+  owner  => 'root',
+  path   => '/etc/sysconfig/supervisord',
+  source => 'puppet:///modules/nailgun/supervisor-sysconfig',
+}
+
+file { '/usr/bin/astuted' :
+  content => '#!/bin/bash
+ruby -r \'rubygems\' -e "gem \'astute\', \'>= 0\'; load Gem.bin_path(\'astute\', \'astuted\', \'>= 0\')" -- $@',
+  group   => 'root',
+  mode    => '0755',
+  owner   => 'root',
+  path    => '/usr/bin/astuted',
+}
+
+file { '/usr/local/libexec/mcollective' :
+  ensure       => 'directory',
+  force        => true,
+  group        => '0',
+  owner        => 'root',
+  path         => '/usr/local/libexec/mcollective',
+  purge        => true,
+  recurse      => true,
+  source       => [  ],
+  sourceselect => 'all',
+}
+
+file { '/var/log/astute' :
+  ensure => 'directory',
+  group  => 'root',
+  mode   => '0755',
+  owner  => 'root',
+  path   => '/var/log/astute',
+}
+
+file { 'mcollective::client' :
+  content => 'To be replaced by datacat_collector[mcollective::client]
+',
+  group   => '0',
+  mode    => '0444',
+  owner   => 'root',
+  path    => '/etc/mcollective/client.cfg',
+}
+
+file_line { 'yum retries' :
+  after => '\[main\]',
+  line  => 'retries=5',
+  name  => 'yum retries',
+  path  => '/etc/yum.conf',
+}
+
+file_line { 'yum timeout' :
+  after => '\[main\]',
+  line  => 'timeout=5',
+  name  => 'yum timeout',
+  path  => '/etc/yum.conf',
+}
+
+mcollective::client::setting { 'direct_addressing' :
+  name    => 'direct_addressing',
+  order   => '90',
+  setting => 'direct_addressing',
+  value   => '1',
+}
+
+mcollective::client::setting { 'logger_type' :
+  name    => 'logger_type',
+  order   => '30',
+  setting => 'logger_type',
+  value   => 'console',
+}
+
+mcollective::client::setting { 'loglevel' :
+  name    => 'loglevel',
+  order   => '30',
+  setting => 'loglevel',
+  value   => 'warn',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.heartbeat_interval' :
+  name    => 'plugin.rabbitmq.heartbeat_interval',
+  order   => '90',
+  setting => 'plugin.rabbitmq.heartbeat_interval',
+  value   => '30',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.pool.1.host' :
+  name    => 'plugin.rabbitmq.pool.1.host',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.host',
+  value   => '10.109.0.2',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.pool.1.password' :
+  name    => 'plugin.rabbitmq.pool.1.password',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.password',
+  value   => 'PPMi1XT2',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.pool.1.port' :
+  name    => 'plugin.rabbitmq.pool.1.port',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.port',
+  value   => '61613',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.pool.1.user' :
+  name    => 'plugin.rabbitmq.pool.1.user',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.user',
+  value   => 'mcollective',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.pool.size' :
+  name    => 'plugin.rabbitmq.pool.size',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.size',
+  value   => '1',
+}
+
+mcollective::client::setting { 'plugin.rabbitmq.vhost' :
+  name    => 'plugin.rabbitmq.vhost',
+  order   => '90',
+  setting => 'plugin.rabbitmq.vhost',
+  value   => 'mcollective',
+}
+
+mcollective::client::setting { 'ttl' :
+  name    => 'ttl',
+  order   => '90',
+  setting => 'ttl',
+  value   => '4294957',
+}
+
+mcollective::common::config::connector::rabbitmq::hosts_iteration { '1' :
+  name => '1',
+}
+
+mcollective::common::setting { 'collectives' :
+  name    => 'collectives',
+  order   => '10',
+  setting => 'collectives',
+  value   => 'mcollective',
+}
+
+mcollective::common::setting { 'connector' :
+  name    => 'connector',
+  order   => '10',
+  setting => 'connector',
+  value   => 'rabbitmq',
+}
+
+mcollective::common::setting { 'direct_addressing' :
+  name    => 'direct_addressing',
+  order   => '10',
+  setting => 'direct_addressing',
+  value   => '1',
+}
+
+mcollective::common::setting { 'libdir' :
+  name    => 'libdir',
+  order   => '10',
+  setting => 'libdir',
+  value   => '/usr/local/libexec/mcollective:/usr/libexec/mcollective',
+}
+
+mcollective::common::setting { 'main_collective' :
+  name    => 'main_collective',
+  order   => '10',
+  setting => 'main_collective',
+  value   => 'mcollective',
+}
+
+mcollective::common::setting { 'plugin.psk' :
+  name    => 'plugin.psk',
+  order   => '10',
+  setting => 'plugin.psk',
+  value   => 'unset',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.pool.1.host' :
+  name    => 'plugin.rabbitmq.pool.1.host',
+  order   => '10',
+  setting => 'plugin.rabbitmq.pool.1.host',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.pool.1.password' :
+  name    => 'plugin.rabbitmq.pool.1.password',
+  order   => '10',
+  setting => 'plugin.rabbitmq.pool.1.password',
+  value   => 'marionette',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.pool.1.port' :
+  name    => 'plugin.rabbitmq.pool.1.port',
+  order   => '10',
+  setting => 'plugin.rabbitmq.pool.1.port',
+  value   => '61613',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.pool.1.user' :
+  name    => 'plugin.rabbitmq.pool.1.user',
+  order   => '10',
+  setting => 'plugin.rabbitmq.pool.1.user',
+  value   => 'mcollective',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.pool.size' :
+  name    => 'plugin.rabbitmq.pool.size',
+  order   => '10',
+  setting => 'plugin.rabbitmq.pool.size',
+  value   => '1',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.randomize' :
+  name    => 'plugin.rabbitmq.randomize',
+  order   => '10',
+  setting => 'plugin.rabbitmq.randomize',
+  value   => 'true',
+}
+
+mcollective::common::setting { 'plugin.rabbitmq.vhost' :
+  name    => 'plugin.rabbitmq.vhost',
+  order   => '10',
+  setting => 'plugin.rabbitmq.vhost',
+  value   => '/mcollective',
+}
+
+mcollective::common::setting { 'securityprovider' :
+  name    => 'securityprovider',
+  order   => '10',
+  setting => 'securityprovider',
+  value   => 'psk',
+}
+
+mcollective::setting { 'mcollective::client::setting direct_addressing' :
+  name    => 'mcollective::client::setting direct_addressing',
+  order   => '90',
+  setting => 'direct_addressing',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '1',
+}
+
+mcollective::setting { 'mcollective::client::setting logger_type' :
+  name    => 'mcollective::client::setting logger_type',
+  order   => '30',
+  setting => 'logger_type',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => 'console',
+}
+
+mcollective::setting { 'mcollective::client::setting loglevel' :
+  name    => 'mcollective::client::setting loglevel',
+  order   => '30',
+  setting => 'loglevel',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => 'warn',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.heartbeat_interval' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.heartbeat_interval',
+  order   => '90',
+  setting => 'plugin.rabbitmq.heartbeat_interval',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '30',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.pool.1.host' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.pool.1.host',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.host',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '10.109.0.2',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.pool.1.password' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.pool.1.password',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.password',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => 'PPMi1XT2',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.pool.1.port' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.pool.1.port',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.port',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '61613',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.pool.1.user' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.pool.1.user',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.1.user',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => 'mcollective',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.pool.size' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.pool.size',
+  order   => '90',
+  setting => 'plugin.rabbitmq.pool.size',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '1',
+}
+
+mcollective::setting { 'mcollective::client::setting plugin.rabbitmq.vhost' :
+  name    => 'mcollective::client::setting plugin.rabbitmq.vhost',
+  order   => '90',
+  setting => 'plugin.rabbitmq.vhost',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => 'mcollective',
+}
+
+mcollective::setting { 'mcollective::client::setting ttl' :
+  name    => 'mcollective::client::setting ttl',
+  order   => '90',
+  setting => 'ttl',
+  target  => [ 'mcollective::client', 'mcollective::user' ],
+  value   => '4294957',
+}
+
+mcollective::setting { 'mcollective::common::setting collectives' :
+  name    => 'mcollective::common::setting collectives',
+  order   => '50',
+  setting => 'collectives',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'mcollective',
+}
+
+mcollective::setting { 'mcollective::common::setting connector' :
+  name    => 'mcollective::common::setting connector',
+  order   => '50',
+  setting => 'connector',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'rabbitmq',
+}
+
+mcollective::setting { 'mcollective::common::setting direct_addressing' :
+  name    => 'mcollective::common::setting direct_addressing',
+  order   => '50',
+  setting => 'direct_addressing',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => '1',
+}
+
+mcollective::setting { 'mcollective::common::setting libdir' :
+  name    => 'mcollective::common::setting libdir',
+  order   => '50',
+  setting => 'libdir',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => '/usr/local/libexec/mcollective:/usr/libexec/mcollective',
+}
+
+mcollective::setting { 'mcollective::common::setting main_collective' :
+  name    => 'mcollective::common::setting main_collective',
+  order   => '50',
+  setting => 'main_collective',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'mcollective',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.psk' :
+  name    => 'mcollective::common::setting plugin.psk',
+  order   => '50',
+  setting => 'plugin.psk',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'unset',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.pool.1.host' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.pool.1.host',
+  order   => '50',
+  setting => 'plugin.rabbitmq.pool.1.host',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.pool.1.password' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.pool.1.password',
+  order   => '50',
+  setting => 'plugin.rabbitmq.pool.1.password',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'marionette',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.pool.1.port' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.pool.1.port',
+  order   => '50',
+  setting => 'plugin.rabbitmq.pool.1.port',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => '61613',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.pool.1.user' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.pool.1.user',
+  order   => '50',
+  setting => 'plugin.rabbitmq.pool.1.user',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'mcollective',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.pool.size' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.pool.size',
+  order   => '50',
+  setting => 'plugin.rabbitmq.pool.size',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => '1',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.randomize' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.randomize',
+  order   => '50',
+  setting => 'plugin.rabbitmq.randomize',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'true',
+}
+
+mcollective::setting { 'mcollective::common::setting plugin.rabbitmq.vhost' :
+  name    => 'mcollective::common::setting plugin.rabbitmq.vhost',
+  order   => '50',
+  setting => 'plugin.rabbitmq.vhost',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => '/mcollective',
+}
+
+mcollective::setting { 'mcollective::common::setting securityprovider' :
+  name    => 'mcollective::common::setting securityprovider',
+  order   => '50',
+  setting => 'securityprovider',
+  target  => [ 'mcollective::server', 'mcollective::client' ],
+  value   => 'psk',
+}
+
+mcollective::soft_include { '::mcollective::client::config::connector::rabbitmq' :
+  end   => Anchor[mcollective::client::config::end],
+  name  => '::mcollective::client::config::connector::rabbitmq',
+  start => Anchor[mcollective::client::config::begin],
+}
+
+mcollective::soft_include { '::mcollective::client::config::securityprovider::psk' :
+  end   => Anchor[mcollective::client::config::end],
+  name  => '::mcollective::client::config::securityprovider::psk',
+  start => Anchor[mcollective::client::config::begin],
+}
+
+mcollective::soft_include { '::mcollective::common::config::connector::rabbitmq' :
+  end   => Anchor[mcollective::common::config::end],
+  name  => '::mcollective::common::config::connector::rabbitmq',
+  start => Anchor[mcollective::common::config::begin],
+}
+
+mcollective::soft_include { '::mcollective::common::config::securityprovider::psk' :
+  end   => Anchor[mcollective::common::config::end],
+  name  => '::mcollective::common::config::securityprovider::psk',
+  start => Anchor[mcollective::common::config::begin],
+}
+
+package { 'ruby21-nailgun-mcagents' :
+  ensure => 'present',
+  name   => 'ruby21-nailgun-mcagents',
+}
+
+package { 'ruby21-rubygem-astute' :
+  name => 'ruby21-rubygem-astute',
+}
+
+package { 'ruby21-rubygem-mcollective-client' :
+  ensure => 'present',
+  name   => 'ruby21-rubygem-mcollective-client',
+}
+
+package { 'supervisor' :
+  before => 'Class[Nailgun::Supervisor]',
+  name   => 'supervisor',
+  notify => 'Service[supervisord]',
+}
+
+service { 'supervisord' :
+  ensure     => true,
+  enable     => true,
+  hasrestart => true,
+  name       => 'supervisord',
+  require    => Package[supervisor],
+  restart    => '/usr/bin/supervisorctl stop all; /etc/init.d/supervisord restart',
+}
+
+stage { 'main' :
+  name => 'main',
+}
+

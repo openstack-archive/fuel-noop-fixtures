@@ -1,0 +1,13 @@
+class { 'Nova::Params' :
+}
+
+service { 'nova-compute' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+}
+
+stage { 'main' :
+}
+

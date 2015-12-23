@@ -1,0 +1,6 @@
+class { 'Openstack::Firewall' :
+}
+
+stage { 'main' :
+}
+

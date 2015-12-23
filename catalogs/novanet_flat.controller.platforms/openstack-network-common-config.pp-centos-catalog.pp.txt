@@ -1,0 +1,73 @@
+class { 'Sysctl::Base' :
+}
+
+file { '/etc/sysctl.conf' :
+  ensure => 'present',
+  group  => '0',
+  mode   => '0644',
+  owner  => 'root',
+}
+
+stage { 'main' :
+}
+
+sysctl::value { 'net.ipv4.ip_forward' :
+  key     => 'net.ipv4.ip_forward',
+  require => Class[Sysctl::Base],
+  value   => '1',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh1' :
+  key     => 'net.ipv4.neigh.default.gc_thresh1',
+  require => Class[Sysctl::Base],
+  value   => '4096',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh2' :
+  key     => 'net.ipv4.neigh.default.gc_thresh2',
+  require => Class[Sysctl::Base],
+  value   => '8192',
+}
+
+sysctl::value { 'net.ipv4.neigh.default.gc_thresh3' :
+  key     => 'net.ipv4.neigh.default.gc_thresh3',
+  require => Class[Sysctl::Base],
+  value   => '16384',
+}
+
+sysctl { 'net.ipv4.ip_forward' :
+  before => Sysctl_runtime[net.ipv4.ip_forward],
+  val    => '1',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh1' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh1],
+  val    => '4096',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh2' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh2],
+  val    => '8192',
+}
+
+sysctl { 'net.ipv4.neigh.default.gc_thresh3' :
+  before => Sysctl_runtime[net.ipv4.neigh.default.gc_thresh3],
+  val    => '16384',
+}
+
+sysctl_runtime { 'net.ipv4.ip_forward' :
+  val => '1',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh1' :
+  val => '4096',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh2' :
+  val => '8192',
+}
+
+sysctl_runtime { 'net.ipv4.neigh.default.gc_thresh3' :
+  val => '16384',
+}
+

@@ -1,0 +1,48 @@
+class { 'Memcached::Params' :
+}
+
+class { 'Memcached' :
+  install_dev     => false,
+  item_size       => false,
+  listen_ip       => '192.168.0.2',
+  lock_memory     => false,
+  logfile         => '/var/log/memcached.log',
+  manage_firewall => false,
+  max_connections => '8192',
+  max_memory      => '50%',
+  package_ensure  => 'present',
+  processorcount  => '4',
+  service_restart => true,
+  tcp_port        => '11211',
+  udp_port        => '11211',
+  user            => 'memcached',
+}
+
+file { '/etc/sysconfig/memcached' :
+  content => 'PORT="11211"
+USER="memcached"
+MAXCONN="8192"
+CACHESIZE="16071"
+OPTIONS="-l 192.168.0.2 -U 11211 -t 4 >> /var/log/memcached.log 2>&1"
+',
+  group   => 'root',
+  mode    => '0644',
+  notify  => Service[memcached],
+  owner   => 'root',
+  require => Package[memcached],
+}
+
+package { 'memcached' :
+  ensure => 'present',
+}
+
+service { 'memcached' :
+  ensure     => 'running',
+  enable     => true,
+  hasrestart => true,
+  hasstatus  => true,
+}
+
+stage { 'main' :
+}
+
