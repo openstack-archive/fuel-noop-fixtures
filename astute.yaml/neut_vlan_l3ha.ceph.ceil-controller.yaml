@@ -294,7 +294,7 @@ network_metadata:
       network_roles:
         keystone/api: 192.168.0.5
         neutron/api: 192.168.0.5
-        mgmt/database: 192.168.0.5
+        mgmt/database: 192.168.0.9
         sahara/api: 192.168.0.5
         heat/api: 192.168.0.5
         ceilometer/api: 192.168.0.5
@@ -372,12 +372,41 @@ network_metadata:
   vips:
     vrouter:
       ipaddr: 192.168.0.6
+      network_role: mgmt/vip
+      vendor_specific:
+      namespace: vrouter
+      node_roles:
+      - controller
+      - primary-controller
     management:
       ipaddr: 192.168.0.7
+      network_role: mgmt/vip
+      vendor_specific:
+      namespace: haproxy
+      node_roles:
+      - controller
+      - primary-controller
     public:
       ipaddr: 172.16.0.3
+      network_role: public/vip
+      vendor_specific:
+      namespace: haproxy
+      node_roles:
+      - controller
+      - primary-controller
     vrouter_pub:
       ipaddr: 172.16.0.3
+      network_role: public/vip
+      vendor_specific:
+        iptables_rules:
+          ns_start:
+          - iptables -t nat -A POSTROUTING -o <%INT%> -j MASQUERADE
+          ns_stop:
+          - iptables -t nat -D POSTROUTING -o <%INT%> -j MASQUERADE
+      namespace: vrouter
+      node_roles:
+      - controller
+      - primary-controller
 network_scheme:
   endpoints:
     br-ex:
@@ -744,6 +773,13 @@ storage:
   objects_ceph: true
   osd_pool_size: '2'
   pg_num: 256
+  per_pool_pg_nums:
+    default_pg_num: 256
+    volumes: 64
+    compute: 1024
+    backups: 512
+    ".rgw": 512
+    images:  256
   volumes_ceph: true
   volumes_lvm: false
 storage_network_range: 192.168.1.0/24

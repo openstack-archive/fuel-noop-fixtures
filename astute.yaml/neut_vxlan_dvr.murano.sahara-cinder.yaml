@@ -110,6 +110,8 @@ murano:
   enabled: true
   rabbit_password: ZNdTAgF3
   user_password: xP8WtHQw
+murano_glance_artifacts_plugin:
+  enabled: true
 murano_settings:
   metadata:
     label: Murano Settings
@@ -331,12 +333,41 @@ network_metadata:
   vips:
     vrouter:
       ipaddr: 192.168.0.3
+      network_role: mgmt/vip
+      vendor_specific:
+      namespace: vrouter
+      node_roles:
+      - controller
+      - primary-controller
     management:
       ipaddr: 192.168.0.2
+      network_role: mgmt/vip
+      vendor_specific:
+      namespace: haproxy
+      node_roles:
+      - controller
+      - primary-controller
     public:
       ipaddr: 10.109.1.2
+      network_role: public/vip
+      vendor_specific:
+      namespace: haproxy
+      node_roles:
+      - controller
+      - primary-controller
     vrouter_pub:
       ipaddr: 10.109.1.3
+      network_role: public/vip
+      vendor_specific:
+        iptables_rules:
+          ns_start:
+          - iptables -t nat -A POSTROUTING -o <%INT%> -j MASQUERADE
+          ns_stop:
+          - iptables -t nat -D POSTROUTING -o <%INT%> -j MASQUERADE
+      namespace: vrouter
+      node_roles:
+      - controller
+      - primary-controller
 network_scheme:
   endpoints:
     br-fw-admin:
@@ -660,6 +691,12 @@ storage:
   objects_ceph: false
   osd_pool_size: '2'
   pg_num: 128
+  per_pool_pg_nums:
+    default_pg_num: 128
+    compute: 1024
+    backups: 512
+    ".rgw": 512
+    images:  256
   volumes_ceph: false
   volumes_lvm: true
 storage_network_range: 192.168.1.0/24
