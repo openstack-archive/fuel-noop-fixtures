@@ -1,0 +1,8 @@
+Code-Review+2: Aleksandr Didenko <adidenko@mirantis.com>
+Workflow+1: Aleksandr Didenko <adidenko@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 26 Jan 2016 09:49:23 +0000
+Reviewed-on: https://review.openstack.org/272444
+Project: openstack/fuel-noop-fixtures
+Branch: refs/heads/master
