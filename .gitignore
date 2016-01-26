@@ -22,3 +22,5 @@ Gemfile.lock
 # Misc
 *.log
 .librarian
+
+./astute.yaml/globals/*
