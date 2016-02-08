@@ -24,7 +24,8 @@ fuel-noop-fixtures
 ├── LICENSE
 ├── README.md
 ├── catalogs
-├── astute.yaml
+├── hiera
+├── facts
 ```
 
 ### root
