@@ -1,0 +1,8 @@
+Code-Review+2: Bogdan Dobrelya <bdobrelia@mirantis.com>
+Workflow+1: Bogdan Dobrelya <bdobrelia@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 09 Feb 2016 13:04:04 +0000
+Reviewed-on: https://review.openstack.org/277413
+Project: openstack/fuel-noop-fixtures
+Branch: refs/heads/master
