@@ -176,9 +176,19 @@ module Noop
           if line =~ /^\s*#\s*(?:yamls|hiera):\s*(.*)/
             task_spec_metadata[:hiera] = get_list_of_yamls $1
           end
+
           if line =~ /^\s*#\s*facts:\s*(.*)/
             task_spec_metadata[:facts] = get_list_of_yamls $1
           end
+
+          if line =~ /^\s*#\s*(?:skip_yamls|skip_hiera):\s(.*)/
+            task_spec_metadata[:skip_hiera] = get_list_of_yamls $1
+          end
+
+          if line =~ /^\s*#\s*skip_facts:\s(.*)/
+            task_spec_metadata[:skip_facts] = get_list_of_yamls $1
+          end
+
           if line =~ /disable_spec/
             task_spec_metadata[:disable] = true
           end
@@ -216,8 +226,11 @@ module Noop
       metadata = spec_run_metadata.fetch file_name_spec, {}
       metadata[:facts] = [Noop::Config.default_facts_file_name] unless metadata[:facts]
       metadata[:hiera] = assign_spec_to_hiera.fetch file_name_spec, [] unless metadata[:hiera]
+
       runs = []
       metadata[:facts].product metadata[:hiera] do |facts, hiera|
+        next if metadata[:skip_hiera].is_a? Array and metadata[:skip_hiera].include? hiera
+        next if metadata[:skip_facts].is_a? Array and metadata[:skip_facts].include? hiera
         run_record = {
             :hiera => hiera,
             :facts => facts,

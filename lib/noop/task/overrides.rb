@@ -24,7 +24,13 @@ module Noop
       end
 
       class << Hiera::Config
-        attr_accessor :config
+        def config
+          @config
+        end
+
+        def config=(value)
+          @config = value
+        end
 
         def load(source)
           @config ||= {}

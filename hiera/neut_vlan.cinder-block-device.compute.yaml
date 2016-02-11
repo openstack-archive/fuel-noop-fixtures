@@ -743,7 +743,8 @@ public_ssl:
   hostname: public.fuel.local
   horizon: true
   services: true
-  cert_data: ''
+  cert_data:
+    content: 'somedataaboutyourkeypair'
   cert_source: self_signed
   metadata:
     group: security

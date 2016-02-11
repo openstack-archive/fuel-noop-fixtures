@@ -119,7 +119,7 @@ module Noop
     end
 
     # @return [Object]
-    def hiera_structure(key, default = nil, separator = '/', resolution_type = :priority)
+    def hiera_structure(key, default = nil, separator = '/', resolution_type = :hash)
       path_lookup = lambda do |data, path, default_value|
         break default_value unless data
         break data unless path.is_a? Array and path.any?

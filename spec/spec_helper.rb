@@ -28,3 +28,5 @@ RSpec.configure do |c|
   end
 
 end
+
+Noop.setup_overrides

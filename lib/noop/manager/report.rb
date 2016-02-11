@@ -130,10 +130,23 @@ module Noop
       end.max
     end
 
+    def output_task_totals
+      tasks = 0
+      failed = 0
+      pending = 0
+      task_list.each do |task|
+        pending += 1 if task.pending?
+        failed += 1 if task.failed?
+        tasks += 1
+      end
+      output "Tasks: #{tasks} Failed: #{failed} Pending: #{pending}"
+    end
+
     def task_report
       task_list.each do |task|
         output_task_status task
       end
+      output_task_totals
     end
 
     def show_filters
