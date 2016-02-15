@@ -5,7 +5,7 @@ module Noop
     def dir_path_gem_home
       return Pathname.new ENV['GEM_HOME'] if ENV['GEM_HOME']
       dir_name_bundle = Pathname.new '.bundled_gems'
-      Noop::Utils.dir_path_workspace + dir_name_bundle
+      Noop::Config.dir_path_workspace + dir_name_bundle
     end
 
     def bundle_installed?

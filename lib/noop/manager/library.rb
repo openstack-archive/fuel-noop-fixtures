@@ -143,7 +143,8 @@ module Noop
       @assign_spec_to_hiera = {}
       assign_spec_to_roles.each do |file_name_spec, spec_roles|
         hiera_files = assign_hiera_to_roles.select do |file_name_hiera, hiera_roles|
-          hiera_roles.intersect? spec_roles
+          roles_intersection = hiera_roles & spec_roles
+          roles_intersection.any?
         end.keys
         @assign_spec_to_hiera[file_name_spec] = hiera_files if hiera_files.any?
       end
