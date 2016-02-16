@@ -2,6 +2,8 @@ require 'erb'
 require 'colorize'
 require 'rexml/document'
 
+# TODO: cli report should use data from tasks_report_structure instead of reimplementing it
+
 module Noop
   class Manager
     STATUS_STRING_LENGTH = 8
@@ -60,7 +62,7 @@ module Noop
       line += "#{task.file_base_facts.to_s.ljust max_length_facts + 1}"
       line += "#{task.file_base_hiera.to_s.ljust max_length_hiera + 1}"
       output line
-      output_task_examples task
+      output_task_examples task unless options[:report_only_tasks]
     end
 
     def output_task_examples(task)
@@ -131,21 +133,46 @@ module Noop
     end
 
     def output_task_totals
-      tasks = 0
-      failed = 0
-      pending = 0
+      count = {
+          :total => 0,
+          :failed => 0,
+          :pending => 0,
+      }
       task_list.each do |task|
-        pending += 1 if task.pending?
-        failed += 1 if task.failed?
-        tasks += 1
+        count[:pending] += 1 if task.pending?
+        count[:failed] += 1 if task.failed?
+        count[:total] += 1
       end
-      output "Tasks: #{tasks} Failed: #{failed} Pending: #{pending}"
+      output "Tasks: #{count[:total]} Failed: #{count[:failed]} Pending: #{count[:pending]}"
+    end
+
+    def output_examples_total
+      count = {
+          :total => 0,
+          :failed => 0,
+          :pending => 0,
+      }
+
+      task_list.each do |task|
+        examples = task.report['examples']
+        next unless examples.is_a? Array
+        examples.each do |example|
+          count[:total] += 1
+          if example['status'] == 'failed'
+            count[:failed] += 1
+          elsif example['status'] == 'pending'
+            count[:pending] += 1
+          end
+        end
+      end
+      output "Examples: #{count[:total]} Failed: #{count[:failed]} Pending: #{count[:pending]}"
     end
 
     def task_report
       task_list.each do |task|
         output_task_status task
       end
+      output_examples_total unless options[:report_only_tasks]
       output_task_totals
     end
 

@@ -32,6 +32,9 @@ module Noop
         opts.on('-o', '--report_only_failed', 'Show only failed tasks and examples in the report') do
           @options[:report_only_failed] = true
         end
+        opts.on('-O', '--report_only_tasks', 'Show only tasks, skip individual examples') do
+          @options[:report_only_tasks] = true
+        end
         opts.on('-r', '--load_saved_reports', 'Read saved report JSON files from the previous run and show tasks report') do
           @options[:load_saved_reports] = true
         end

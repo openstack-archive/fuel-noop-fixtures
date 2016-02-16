@@ -39,20 +39,27 @@ module Noop
     end
 
     # convert resource catalog to a RAL catalog
-    # and run "generate" hook for all resources
+    # and run both "generate" functions for each resource
+    # that has it and then add results to the catalog
+    # @return <Lambda>
     def create_ral_catalog(context)
       catalog = context.subject
       catalog = catalog.call if catalog.is_a? Proc
       ral_catalog = catalog.to_ral
+      generate_functions = [:generate, :eval_generate]
+
       ral_catalog.resources.each do |resource|
-        next unless resource.respond_to? :generate
-        generated = resource.generate
-        next unless generated.is_a? Array
-        generated.each do |generated_resource|
-          next unless generated_resource.is_a? Puppet::Type
-          ral_catalog.add_resource generated_resource
+        generate_functions.each do |function_name|
+          next unless resource.respond_to? function_name
+          generated = resource.send function_name
+          next unless generated.is_a? Array
+          generated.each do |generated_resource|
+            next unless generated_resource.is_a? Puppet::Type
+            ral_catalog.add_resource generated_resource
+          end
         end
       end
+
       lambda { ral_catalog }
     end
 

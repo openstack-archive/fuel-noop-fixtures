@@ -199,6 +199,10 @@ You can use **-r** and **-R** options to load the saved reports from the
 previous run and display the report again, or to load reports and run the tasks
 that have previously failed after you have tried to somehow fix them.
 
+You can use option **-o** to filter out only failed tasks and examples from
+the report and **-O** options to show only tasks without showing the individual
+examples. These options can be used together to show only failed tasks.
+
 The task manager can also generate a test report in *jUnit XML* format using
 the **-x** options. It will be saves to the **report.xml** file in the *reports*
 folder of the fixtures repository. This file can be used by many tools to
