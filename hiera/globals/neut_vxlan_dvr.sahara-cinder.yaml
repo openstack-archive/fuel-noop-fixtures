@@ -8,7 +8,7 @@
     password: admin
     tenant: admin
     user: admin
-  amqp_hosts: "192.168.0.2:5673, 192.168.0.3:5673, 192.168.0.4:5673"
+  amqp_hosts: "192.168.0.3:5673, 192.168.0.4:5673, 192.168.0.2:5673"
   amqp_port: "5673"
   apache_api_proxy_address: "10.108.0.7"
   apache_ports: 
@@ -56,7 +56,6 @@
         fw-admin: "10.108.0.3"
         glance/api: "192.168.0.2"
         mgmt/vip: "192.168.0.2"
-        murano/api: "192.168.0.2"
         nova/api: "192.168.0.2"
         horizon: "192.168.0.2"
         mgmt/memcache: "192.168.0.2"
@@ -98,7 +97,6 @@
         fw-admin: "10.108.0.6"
         glance/api: "192.168.0.3"
         mgmt/vip: "192.168.0.3"
-        murano/api: "192.168.0.3"
         nova/api: "192.168.0.3"
         horizon: "192.168.0.3"
         mgmt/memcache: "192.168.0.3"
@@ -140,7 +138,6 @@
         fw-admin: "10.109.0.9"
         glance/api: "192.168.0.4"
         mgmt/vip: "192.168.0.4"
-        murano/api: "192.168.0.4"
         nova/api: "192.168.0.4"
         horizon: "192.168.0.4"
         mgmt/memcache: "192.168.0.4"
@@ -228,24 +225,6 @@
     - primary-mongo
     - mongo
   multi_host: true
-  murano_hash: 
-    rabbit: 
-      vhost: /
-      port: "55572"
-    db_password: R3SuvZbh
-    enabled: true
-    rabbit_password: ZNdTAgF3
-    user_password: xP8WtHQw
-    plugins: 
-      glance_artifacts_plugin: 
-        enabled: true
-  murano_nodes: 
-    node-128: *id001
-    node-129: *id003
-    node-131: *id004
-  murano_roles: 
-    - primary-controller
-    - controller
   mysql_hash: 
     root_password: Lz18BpbQ
     wsrep_password: JrlrVOHu
@@ -319,7 +298,6 @@
       fw-admin: br-fw-admin
       glance/api: br-mgmt
       heat/api: br-mgmt
-      murano/api: br-mgmt
       nova/api: br-mgmt
       horizon: br-mgmt
       mgmt/memcache: br-mgmt
@@ -428,7 +406,6 @@
       fw-admin: "10.109.0.9"
       glance/api: "192.168.0.1"
       mgmt/vip: "192.168.0.1"
-      murano/api: "192.168.0.1"
       nova/api: "192.168.0.1"
       horizon: "192.168.0.1"
       mgmt/memcache: "192.168.0.1"
@@ -536,16 +513,17 @@
   "keystone::logging::default_log_levels": *id006
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
+  "ironic::logging::default_log_levels": *id006
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
   syslog_log_facility_glance: LOG_LOCAL2
   syslog_log_facility_heat: LOG_LOCAL0
   syslog_log_facility_keystone: LOG_LOCAL7
-  syslog_log_facility_murano: LOG_LOCAL0
   syslog_log_facility_neutron: LOG_LOCAL4
   syslog_log_facility_nova: LOG_LOCAL6
   syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
   use_monit: false
@@ -573,12 +551,10 @@
     node-128: *id001
     node-129: *id003
     node-131: *id004
-  swift_proxies: &id007
-    
+  swift_proxies: 
     node-128: *id001
     node-129: *id003
     node-131: *id004
-  swift_proxy_caches: *id007
   is_primary_swift_proxy: false
   nova_api_nodes: *id002
   ironic_api_nodes: *id002

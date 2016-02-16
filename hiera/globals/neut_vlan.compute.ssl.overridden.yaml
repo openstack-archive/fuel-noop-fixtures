@@ -54,7 +54,6 @@
         fw-admin: "10.122.5.3"
         glance/api: "10.122.7.1"
         mgmt/vip: "10.122.7.1"
-        murano/api: "10.122.7.1"
         nova/api: "10.122.7.1"
         horizon: "10.122.7.1"
         nova/migration: "10.122.7.1"
@@ -96,7 +95,6 @@
         fw-admin: "10.122.5.6"
         glance/api: "10.122.7.5"
         mgmt/vip: "10.122.7.5"
-        murano/api: "10.122.7.5"
         nova/api: "10.122.7.5"
         horizon: "10.122.7.5"
         nova/migration: "10.122.7.5"
@@ -138,7 +136,6 @@
         fw-admin: "10.122.5.7"
         glance/api: "10.122.7.4"
         mgmt/vip: "10.122.7.4"
-        murano/api: "10.122.7.4"
         nova/api: "10.122.7.4"
         horizon: "10.122.7.4"
         nova/migration: "10.122.7.4"
@@ -228,23 +225,6 @@
     - primary-mongo
     - mongo
   multi_host: true
-  murano_hash: 
-    rabbit: 
-      vhost: /
-      port: "55572"
-    db_password: gjBrHFFZ
-    user_password: crLmJ5b0
-    enabled: false
-    rabbit_password: ra45kjwS
-    plugins: 
-      glance_artifacts_plugin: {}
-  murano_nodes: 
-    node-1: *id001
-    node-3: *id003
-    node-2: *id004
-  murano_roles: 
-    - primary-controller
-    - controller
   mysql_hash: 
     root_password: PBmaN2YX
     wsrep_password: FsatnsoY
@@ -277,7 +257,6 @@
         bridge: br-storage
         name: eth0.102
     roles: 
-      murano/api: br-mgmt
       keystone/api: br-mgmt
       neutron/api: br-mgmt
       mgmt/database: br-mgmt
@@ -399,7 +378,6 @@
     uid: "5"
     fqdn: node-5.domain.local
     network_roles: 
-      murano/api: "10.122.7.3"
       keystone/api: "10.122.7.3"
       neutron/api: "10.122.7.3"
       mgmt/database: "10.122.7.3"
@@ -530,16 +508,17 @@
   "keystone::logging::default_log_levels": *id006
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
+  "ironic::logging::default_log_levels": *id006
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
   syslog_log_facility_glance: LOG_LOCAL2
   syslog_log_facility_heat: LOG_LOCAL0
   syslog_log_facility_keystone: LOG_LOCAL7
-  syslog_log_facility_murano: LOG_LOCAL0
   syslog_log_facility_neutron: LOG_LOCAL4
   syslog_log_facility_nova: LOG_LOCAL6
   syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
   use_monit: false
@@ -567,12 +546,10 @@
     node-1: *id001
     node-3: *id003
     node-2: *id004
-  swift_proxies: &id007
-    
+  swift_proxies: 
     node-1: *id001
     node-3: *id003
     node-2: *id004
-  swift_proxy_caches: *id007
   is_primary_swift_proxy: false
   nova_api_nodes: *id002
   ironic_api_nodes: *id002

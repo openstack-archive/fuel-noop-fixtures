@@ -10,13 +10,13 @@
     user: admin
   amqp_hosts: "192.168.0.2:5673, 192.168.0.3:5673, 192.168.0.4:5673"
   amqp_port: "5673"
-  apache_api_proxy_address: "10.108.0.3"
+  apache_api_proxy_address: "10.108.0.4"
   apache_ports: 
     - "127.0.0.1:80"
-    - "192.168.0.2:80"
-    - "10.108.0.3:8888"
-    - "192.168.0.2:5000"
-    - "192.168.0.2:35357"
+    - "192.168.0.5:80"
+    - "10.108.0.4:8888"
+    - "192.168.0.5:5000"
+    - "192.168.0.5:35357"
   base_mac: "fa:16:3e:00:00:00"
   base_syslog_hash: 
     syslog_port: "514"
@@ -56,16 +56,13 @@
         fw-admin: "10.108.0.3"
         glance/api: "192.168.0.2"
         mgmt/vip: "192.168.0.2"
-        murano/api: "192.168.0.2"
-        murano/cfapi: "192.168.0.2"
         nova/api: "192.168.0.2"
         horizon: "192.168.0.2"
         mgmt/memcache: "192.168.0.2"
         cinder/iscsi: "192.168.1.2"
         ceph/replication: "192.168.1.2"
       user_node_name: "Untitled (6a:e7)"
-      node_roles: &id005
-        
+      node_roles: 
         - primary-controller
       name: node-128
     node-129: &id003
@@ -100,8 +97,6 @@
         fw-admin: "10.108.0.6"
         glance/api: "192.168.0.3"
         mgmt/vip: "192.168.0.3"
-        murano/api: "192.168.0.3"
-        murano/cfapi: "192.168.0.3"
         nova/api: "192.168.0.3"
         horizon: "192.168.0.3"
         mgmt/memcache: "192.168.0.3"
@@ -143,8 +138,6 @@
         fw-admin: "10.109.0.9"
         glance/api: "192.168.0.4"
         mgmt/vip: "192.168.0.4"
-        murano/api: "192.168.0.4"
-        murano/cfapi: "192.168.0.4"
         nova/api: "192.168.0.4"
         horizon: "192.168.0.4"
         mgmt/memcache: "192.168.0.4"
@@ -192,7 +185,7 @@
   glance_backend: file
   glance_hash: 
     db_password: "0UYCFNfc"
-    image_cache_max_size: "13868466176"
+    image_cache_max_size: "5368709120"
     user_password: "94lWbeNn"
   glance_known_stores: false
   glance_nodes: *id002
@@ -211,7 +204,7 @@
     - controller
   horizon_nodes: *id002
   custom_theme_path: themes/vendor
-  node_name: node-128
+  node_name: node-132
   idle_timeout: "3600"
   keystone_hash: 
     service_token_off: false
@@ -232,24 +225,6 @@
     - primary-mongo
     - mongo
   multi_host: true
-  murano_hash: 
-    rabbit: 
-      vhost: /
-      port: "55572"
-    db_password: R3SuvZbh
-    enabled: true
-    rabbit_password: ZNdTAgF3
-    user_password: xP8WtHQw
-    plugins: 
-      glance_artifacts_plugin: 
-        enabled: true
-  murano_nodes: 
-    node-128: *id001
-    node-129: *id003
-    node-131: *id004
-  murano_roles: 
-    - primary-controller
-    - controller
   mysql_hash: 
     root_password: Lz18BpbQ
     wsrep_password: JrlrVOHu
@@ -257,28 +232,28 @@
   network_manager: 
   network_scheme: 
     endpoints: 
+      br-fw-admin: 
+        IP: 
+          - "10.108.0.4/24"
       br-ex: 
         IP: 
-          - "172.16.0.2/24"
+          - "172.16.0.5/24"
         gateway: "172.16.0.1"
         vendor_specific: 
           phy_interfaces: 
             - eth1
       br-floating: 
         IP: none
-      br-fw-admin: 
-        IP: 
-          - "10.108.0.3/24"
       br-mgmt: 
         IP: 
-          - "192.168.0.2/24"
+          - "192.168.0.5/24"
         vendor_specific: 
           phy_interfaces: 
             - eth0
           vlans: 101
       br-storage: 
         IP: 
-          - "192.168.1.2/24"
+          - "192.168.1.5/24"
         vendor_specific: 
           phy_interfaces: 
             - eth0
@@ -331,8 +306,6 @@
       fw-admin: br-fw-admin
       glance/api: br-mgmt
       heat/api: br-mgmt
-      murano/api: br-mgmt
-      murano/cfapi: br-mgmt
       nova/api: br-mgmt
       horizon: br-mgmt
       mgmt/memcache: br-mgmt
@@ -391,7 +364,7 @@
     predefined_networks: 
       net04custom: 
         L2: 
-          network_type: vxlan
+          network_type: gre
           physnet: 
           router_ext: false
           segment_id: 
@@ -423,7 +396,47 @@
   neutron_metadata_proxy_secret: fp618p5V
   neutron_nodes: *id002
   neutron_user_password: oT56DSZF
-  node_hash: *id001
+  node_hash: 
+    swift_zone: "1"
+    uid: "132"
+    fqdn: node-132.test.domain.local
+    network_roles: 
+      keystone/api: "192.168.0.5"
+      neutron/api: "192.168.0.5"
+      mgmt/database: "192.168.0.5"
+      sahara/api: "192.168.0.5"
+      heat/api: "192.168.0.5"
+      ceilometer/api: "192.168.0.5"
+      ex: 
+      ceph/public: "192.168.0.5"
+      ceph/radosgw: 
+      management: "192.168.0.5"
+      swift/api: "192.168.0.5"
+      mgmt/api: "192.168.0.5"
+      storage: "192.168.1.5"
+      mgmt/corosync: "192.168.0.5"
+      cinder/api: "192.168.0.5"
+      public/vip: 
+      swift/replication: "192.168.1.5"
+      mgmt/messaging: "192.168.0.5"
+      neutron/mesh: "192.168.0.5"
+      admin/pxe: "10.108.0.4"
+      mongo/db: "192.168.0.5"
+      neutron/private: 
+      neutron/floating: 
+      fw-admin: "10.108.0.4"
+      glance/api: "192.168.0.5"
+      mgmt/vip: "192.168.0.5"
+      nova/api: "192.168.0.5"
+      horizon: "192.168.0.5"
+      mgmt/memcache: "192.168.0.5"
+      cinder/iscsi: "192.168.1.5"
+      ceph/replication: "192.168.1.5"
+    user_node_name: "Untitled (6a:e7)"
+    node_roles: &id005
+      
+      - compute
+    name: node-132
   nova_db_password: mqnsUMgC
   nova_hash: 
     db_password: mqnsUMgC
@@ -441,7 +454,7 @@
   novanetwork_params: {}
   num_networks: 
   openstack_version: "2014.2-6.1"
-  primary_controller: true
+  primary_controller: false
   private_int: 
   queue_provider: rabbitmq
   rabbit_ha_queues: true
@@ -521,16 +534,17 @@
   "keystone::logging::default_log_levels": *id006
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
+  "ironic::logging::default_log_levels": *id006
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
   syslog_log_facility_glance: LOG_LOCAL2
   syslog_log_facility_heat: LOG_LOCAL0
   syslog_log_facility_keystone: LOG_LOCAL7
-  syslog_log_facility_murano: LOG_LOCAL0
   syslog_log_facility_neutron: LOG_LOCAL4
   syslog_log_facility_nova: LOG_LOCAL6
   syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
   use_monit: false
@@ -550,20 +564,19 @@
     - primary-controller
     - controller
   memcached_addresses: 
-    - "10.20.30.40"
-    - "10.20.30.41"
+    - "192.168.0.2"
+    - "192.168.0.3"
+    - "192.168.0.4"
   swift_master_role: primary-controller
   swift_nodes: 
     node-128: *id001
     node-129: *id003
     node-131: *id004
-  swift_proxies: &id007
-    
+  swift_proxies: 
     node-128: *id001
     node-129: *id003
     node-131: *id004
-  swift_proxy_caches: *id007
-  is_primary_swift_proxy: true
+  is_primary_swift_proxy: false
   nova_api_nodes: *id002
   ironic_api_nodes: *id002
   workers_max: "17"

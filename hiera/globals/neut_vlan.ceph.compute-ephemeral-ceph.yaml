@@ -54,7 +54,6 @@
         fw-admin: "10.122.10.6"
         glance/api: "10.122.12.3"
         mgmt/vip: "10.122.12.3"
-        murano/api: "10.122.12.3"
         nova/api: "10.122.12.3"
         horizon: "10.122.12.3"
         nova/migration: "10.122.12.3"
@@ -142,21 +141,6 @@
     - primary-mongo
     - mongo
   multi_host: true
-  murano_hash: 
-    rabbit: 
-      vhost: /
-      port: "55572"
-    db_password: SHNCzmlD
-    user_password: FAzO3etA
-    enabled: false
-    rabbit_password: "8yYepd8f"
-    plugins: 
-      glance_artifacts_plugin: {}
-  murano_nodes: 
-    node-1: *id001
-  murano_roles: 
-    - primary-controller
-    - controller
   mysql_hash: 
     root_password: sx2tGnw7
     wsrep_password: qEYkmkV7
@@ -189,7 +173,6 @@
         bridge: br-storage
         name: eth0.102
     roles: 
-      murano/api: br-mgmt
       keystone/api: br-mgmt
       neutron/api: br-mgmt
       mgmt/database: br-mgmt
@@ -311,7 +294,6 @@
     uid: "2"
     fqdn: node-2.domain.local
     network_roles: 
-      murano/api: "10.122.12.6"
       keystone/api: "10.122.12.6"
       neutron/api: "10.122.12.6"
       mgmt/database: "10.122.12.6"
@@ -441,16 +423,17 @@
   "keystone::logging::default_log_levels": *id004
   "nova::logging::default_log_levels": *id004
   "sahara::logging::default_log_levels": *id004
+  "ironic::logging::default_log_levels": *id004
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
   syslog_log_facility_glance: LOG_LOCAL2
   syslog_log_facility_heat: LOG_LOCAL0
   syslog_log_facility_keystone: LOG_LOCAL7
-  syslog_log_facility_murano: LOG_LOCAL0
   syslog_log_facility_neutron: LOG_LOCAL4
   syslog_log_facility_nova: LOG_LOCAL6
   syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
   use_monit: false
@@ -474,10 +457,8 @@
   swift_master_role: primary-controller
   swift_nodes: 
     node-1: *id001
-  swift_proxies: &id005
-    
+  swift_proxies: 
     node-1: *id001
-  swift_proxy_caches: *id005
   is_primary_swift_proxy: false
   nova_api_nodes: *id002
   ironic_api_nodes: *id002

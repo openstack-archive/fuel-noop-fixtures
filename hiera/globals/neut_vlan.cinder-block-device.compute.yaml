@@ -9,7 +9,7 @@
     user: admin
     tenant: admin
     email: "admin@localhost"
-  amqp_hosts: "192.168.0.6:5673, 192.168.0.3:5673"
+  amqp_hosts: "192.168.0.3:5673, 192.168.0.6:5673"
   amqp_port: "5673"
   apache_api_proxy_address: "10.20.0.10"
   apache_ports: 
@@ -31,7 +31,6 @@
       uid: "1"
       fqdn: node-1.domain.tld
       network_roles: 
-        murano/api: "192.168.0.3"
         keystone/api: "192.168.0.3"
         neutron/api: "192.168.0.3"
         mgmt/database: "192.168.0.3"
@@ -73,7 +72,6 @@
       uid: "3"
       fqdn: node-3.domain.tld
       network_roles: 
-        murano/api: "192.168.0.6"
         keystone/api: "192.168.0.6"
         neutron/api: "192.168.0.6"
         mgmt/database: "192.168.0.6"
@@ -186,22 +184,6 @@
     - primary-mongo
     - mongo
   multi_host: true
-  murano_hash: 
-    rabbit: 
-      vhost: /
-      port: "55572"
-    db_password: "5uCzknw9OPs1xn0yOoCkJz2L"
-    user_password: eMmLpzvRBmaK6shCMdqCcvJl
-    enabled: false
-    rabbit_password: t2o8zY995hJDZxBVgNhGs3eN
-    plugins: 
-      glance_artifacts_plugin: {}
-  murano_nodes: 
-    node-1: *id001
-    node-3: *id003
-  murano_roles: 
-    - primary-controller
-    - controller
   mysql_hash: 
     root_password: KAfHLQ6UllBAJstHfC7O4rJG
     wsrep_password: XN1CXe7VRTjPxj8njhDe1ZHJ
@@ -230,7 +212,6 @@
         bridge: br-mesh
         name: eth0.103
     roles: 
-      murano/api: br-mgmt
       keystone/api: br-mgmt
       neutron/api: br-mgmt
       mgmt/database: br-mgmt
@@ -337,7 +318,6 @@
     uid: "2"
     fqdn: node-2.domain.tld
     network_roles: 
-      murano/api: "192.168.0.7"
       keystone/api: "192.168.0.7"
       neutron/api: "192.168.0.7"
       mgmt/database: "192.168.0.7"
@@ -453,16 +433,17 @@
   "keystone::logging::default_log_levels": *id005
   "nova::logging::default_log_levels": *id005
   "sahara::logging::default_log_levels": *id005
+  "ironic::logging::default_log_levels": *id005
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
   syslog_log_facility_glance: LOG_LOCAL2
   syslog_log_facility_heat: LOG_LOCAL0
   syslog_log_facility_keystone: LOG_LOCAL7
-  syslog_log_facility_murano: LOG_LOCAL0
   syslog_log_facility_neutron: LOG_LOCAL4
   syslog_log_facility_nova: LOG_LOCAL6
   syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
   use_monit: false
@@ -488,11 +469,9 @@
   swift_nodes: 
     node-1: *id001
     node-3: *id003
-  swift_proxies: &id006
-    
+  swift_proxies: 
     node-1: *id001
     node-3: *id003
-  swift_proxy_caches: *id006
   is_primary_swift_proxy: false
   nova_api_nodes: *id002
   ironic_api_nodes: *id002
