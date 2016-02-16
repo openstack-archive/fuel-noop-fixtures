@@ -17,10 +17,10 @@ module Noop
           ENV['SPEC_UPDATE_GLOBALS'] = 'YES'
           options[:filter_specs] = [Noop::Config.spec_name_globals]
         end
-        opts.on('-b', '--bundle_setup', 'Setup Ruby environment using Bundle') do
+        opts.on('-B', '--bundle_setup', 'Setup Ruby environment using Bundle') do
           @options[:bundle_setup] = true
         end
-        opts.on('-B', '--bundle_exec', 'Use "bundle exec" to run rspec') do
+        opts.on('-b', '--bundle_exec', 'Use "bundle exec" to run rspec') do
           ENV['SPEC_BUNDLE_EXEC'] = 'YES'
         end
         opts.on('-l', '--update-librarian', 'Run librarian-puppet update in the deployment directory prior to testing') do

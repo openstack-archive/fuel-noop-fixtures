@@ -18,7 +18,7 @@ end
 if ENV['PUPPET_GEM_VERSION']
   gem 'puppet', ENV['PUPPET_GEM_VERSION']
 else
-  gem 'puppet', '3.4.3'
+  gem 'puppet', '~> 3.8.0'
 end
 
 # vim:ft=ruby

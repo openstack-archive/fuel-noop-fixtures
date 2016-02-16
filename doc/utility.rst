@@ -71,7 +71,8 @@ can be used to perform some common actions.
 - **tests/noop/rub_all.sh** This wrapper will run all tests in parallel mode.
 - **tests/noop/rub_global.sh** This wrapper will run all globals tasks and save
   the generated globals yaml files.
-- **tests/noop/rub_diagnostics.sh** This wrapper will run the noop tests in the
+- **tests/noop/rub_diagnostics.sh** This wrapper will first setup the
+  Ruby environment, download Fuel Library modules and run the noop tests in the
   diagnostics mode to check the presence of all folders in the structure and
   the numbers of tasks in the library.
 - **run_failed_tasks.sh** This wrapper will load the saved reports files from

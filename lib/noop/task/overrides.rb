@@ -1,7 +1,7 @@
 module Noop
   class Task
     def setup_overrides
-      # puppet_default_settings
+      puppet_default_settings
       hiera_config_override
       puppet_debug_override if ENV['SPEC_PUPPET_DEBUG']
       setup_manifest

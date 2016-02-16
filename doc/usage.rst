@@ -4,6 +4,26 @@ Typical use cases
 Let's discuss the most common use cases of the Noop test framework and how it
 can be used.
 
+Initial setup
+-------------
+
+In most cases you should setup the environment before using the Noop tests
+framework. The setup consists of three parts:
+
+- Fixtures repository clone
+- Ruby gems installation
+- Puppet modules download
+
+There is a wrapper script **tests/noop/setup_and_diagnostics.sh** that will try
+to do all these things. First, it will clone the fixtures repository unless
+it have already been cloned, then it will run **tests/noop/noop_tests.sh**
+with options **-b** and **-B** to create and use the bundle gems folder,
+**-l** options will enable Puppet modules update and **-t** option will
+initiate check procedures for paths and task library content.
+
+If you are using *RVM* or are managing Ruby gems manually you are free to
+bypass this stem and clone fixtures repository manually.
+
 Running all tests using multiple processes
 ------------------------------------------
 
@@ -198,18 +218,6 @@ out what resources and classes are there or to see what values the parameters
 and properties actually have after all the catalog logic is processed. It's
 very helpful when you are debugging a strange task behaviour or writing a spec
 file.
-
-Initial setup options
----------------------
-
-The *tests/noop/noop_tests.sh* script will try to do some initial Ruby
-environment setup but there are also **-b** and **-B** options to run the
-environment setup using *bundle* and to run rspec processes using *bundle exec*
-respectively.
-
-You can also work with the external Puppet modules by using the **-l** and
-**-L** options to either install the missing modules or to reset them to the
-initial state.
 
 Using external environment variables and custom paths
 -----------------------------------------------------
