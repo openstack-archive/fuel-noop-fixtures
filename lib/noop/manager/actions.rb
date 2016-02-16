@@ -94,7 +94,7 @@ module Noop
       exit 0
     end
 
-
+#########################################
 
     def main
       options
@@ -114,7 +114,7 @@ module Noop
       end
 
       if options[:update_librarian_puppet]
-        prepare_library
+        setup_library
       end
 
       if options[:self_check]
