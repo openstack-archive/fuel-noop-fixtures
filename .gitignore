@@ -8,7 +8,7 @@
 .tox
 
 # Doc
-_build
+doc/build
 
 # Editors
 *.swp
