@@ -8,7 +8,7 @@
 .tox
 
 # Doc
-_build
+doc/build
 
 # Editors
 *.swp
@@ -22,3 +22,5 @@ Gemfile.lock
 # Misc
 *.log
 .librarian
+AUTHORS
+ChangeLog
