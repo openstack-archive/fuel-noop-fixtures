@@ -24,8 +24,10 @@ fuel-noop-fixtures
 ├── LICENSE
 ├── README.md
 ├── catalogs
+├── doc
 ├── hiera
 ├── facts
+├── noop_tests.rb
 ```
 
 ### root
@@ -37,12 +39,33 @@ information.
 
 The catalogs directory contains a committed state of Fuel Library deployment
 data fixtures used for
-[data regression checks](https://blueprints.launchpad.net/fuel/+spec/deployment-data-dryrun)
+[data regression checks](https://blueprints.launchpad.net/fuel/+spec/deployment-data-dryrun).
 
-### astute.yaml
+### doc
 
-This directory contains hiera data templates for
-[Fuel Library Noop tests](https://github.com/openstack/fuel-library/tree/master/tests/noop)
+Here live The Docs for the noop tests framework. From these, Fuel developers
+may find out how to write integration tests for supported composition layers.
+
+### hiera
+
+This directory contains hiera data templates for integration
+[Fuel Library Noop tests](https://github.com/openstack/fuel-library/tree/master/tests/noop).
+
+### facts
+
+This directory contains known facts for the Fuel Library Noop integration tests.
+
+### lib
+
+This directory contains the noop tests framework itself.
+
+### spec
+
+This directory contains unit tests for the noop tests framework.
+
+### noop_tests.rb
+
+The main executable file.
 
 ## Development
 --------------
