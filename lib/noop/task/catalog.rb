@@ -2,6 +2,7 @@ require 'erb'
 
 module Noop
   class Task
+    # Generate the report of the currently using files in this spec
     # @return [String]
     def status_report(context)
       task = context.task
@@ -30,7 +31,7 @@ Facts hierarchy:
       ERB.new(template, nil, '-').result(binding)
     end
 
-    # dumps the entire catalog structure to the text
+    # Dumps the entire catalog structure to the text
     # representation in the Puppet language
     # @param context [Object] the context from the rspec test
     # @param resources_filter [Array] the list of resources to dump. Dump all resources if not given
@@ -56,7 +57,7 @@ Facts hierarchy:
       text
     end
 
-    # takes a parameter value and formats it to the literal value
+    # Takes a parameter value and formats it to the literal value
     # that could be placed in the Puppet manifest
     # @param value [String, Array, Hash, true, false, nil]
     # @return [String]
@@ -88,7 +89,7 @@ Facts hierarchy:
       end
     end
 
-    # take a resource object and generate a manifest representation of it
+    # Take a resource object and generate a manifest representation of it
     # in the Puppet language. Replaces "to_manifest" Puppet function which
     # is not working correctly.
     # @param resource [Puppet::Resource]
@@ -131,7 +132,7 @@ Facts hierarchy:
       clear_data.join "\n"
     end
 
-    # check if two resources have same type and title
+    # Check if two resources have same type and title
     # @param res1 [Puppet::Resource]
     # @param res2 [Puppet::Resource]
     # @return [TrueClass, False,Class]

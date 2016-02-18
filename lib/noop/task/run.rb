@@ -2,6 +2,8 @@ require 'json'
 
 module Noop
   class Task
+    # Run the actual spec of this task.
+    # It will execute the rspec command and will manage report files.
     def run
       return unless pending?
       self.pid = Process.pid
@@ -15,10 +17,18 @@ module Noop
       status
     end
 
+    # Load a report file of this task if it's present
     def file_load_report_json
       self.report = file_data_report_json
     end
 
+    # Check if this task has report loaded
+    # @return [true,false]
+    def has_report?
+      report.is_a? Hash and report['examples'].is_a? Array
+    end
+
+    # Set the status string of the task according to run results
     def set_status_value(value)
       if value.is_a? TrueClass
         self.status = :success
@@ -29,6 +39,7 @@ module Noop
       end
     end
 
+    # Try to determine the task status based on the report data
     def determine_task_status
       if report.is_a? Hash
         failures = report.fetch('summary', {}).fetch('failure_count', nil)
@@ -41,7 +52,7 @@ module Noop
 
     # @return [Pathname]
     def file_name_report_json
-      Noop::Utils.convert_to_path "#{file_name_task_extension.sub_ext ''}_#{file_base_hiera}_#{file_base_facts}.json"
+      file_name_base_task_report.sub_ext '.json'
     end
 
     # @return [Pathname]
@@ -63,6 +74,7 @@ module Noop
       file_data
     end
 
+    # Remove the report file
     def file_remove_report_json
       file_path_report_json.unlink if file_present_report_json?
     end
@@ -72,12 +84,17 @@ module Noop
       file_path_report_json.exist?
     end
 
+    # Additional RSpec options
     def rspec_options
       options = '--color --tty'
       options += ' --format documentation' unless parallel_run?
       options
     end
 
+    # Run the RSpec command and pass Hiera, facts and spec files names
+    # using the environment variables.
+    # Use bundler if it's enabled.
+    # Set the task status according to the RSpec exit code.
     # @return [true,false]
     def rspec_command_run
       environment = {
@@ -89,6 +106,10 @@ module Noop
       command = "bundle exec #{command}" if ENV['SPEC_BUNDLE_EXEC']
       Dir.chdir Noop::Config.dir_path_root
       success = Noop::Utils.run environment, command
+      if success.nil?
+        Noop::Utils.debug 'RSpec command is not found!'
+        success = false
+      end
       set_status_value success
       success
     end

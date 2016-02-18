@@ -3,6 +3,8 @@ require 'optparse'
 module Noop
   class Manager
 
+    # Parse the CLI options
+    # @return [Hash]
     def options
       return @options if @options
       @options = {}
@@ -141,30 +143,35 @@ module Noop
         # opts.on('--spec_coverage', 'Show spec coverage statistics') do
         #   ENV['SPEC_COVERAGE'] = 'YES'
         # end
-        # opts.on('--puppet_binary_files', 'Check if Puppet installs binary files') do
-        #   ENV['SPEC_PUPPET_BINARY_FILES'] = 'YES'
-        # end
-        # opts.on('--file_resources DIR', 'Save file resources to this dir') do |dir|
-        #   ENV['SPEC_SAVE_FILE_RESOURCES'] = dir
-        # end
+        opts.on('--puppet_binary_files', 'Check if Puppet installs binary files') do
+          ENV['SPEC_PUPPET_BINARY_FILES'] = 'YES'
+        end
+        opts.on('--save_file_resources', 'Save file resources list to a report file') do
+          ENV['SPEC_SAVE_FILE_RESOURCES'] = 'YES'
+        end
 
       end
       optparse.parse!
       @options
     end
 
+    # Import a list of spec files form the option
+    # @return [Array<Pathname>]
     def import_specs_list(specs)
       specs.map do |spec|
         Noop::Utils.convert_to_spec spec
       end
     end
 
+    # Import a list of Hiera or facts files form the option
+    # @return [Array<Pathname>]
     def import_yamls_list(yamls)
       yamls.map do |yaml|
         Noop::Utils.convert_to_yaml yaml
       end
     end
 
+    # Any default options values can be set here
     def options_defaults(options)
       options[:parallel_run] = 0
     end

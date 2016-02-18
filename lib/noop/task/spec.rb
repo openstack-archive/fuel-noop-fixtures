@@ -44,5 +44,10 @@ module Noop
       Noop::Utils.convert_to_path(file_base_spec.to_s.gsub('/', '-') + '.yaml')
     end
 
+    # @return [Pathname]
+    def file_name_base_task_report
+      Noop::Utils.convert_to_path("#{file_name_task_extension.sub_ext ''}_#{file_base_hiera}_#{file_base_facts}")
+    end
+
   end
 end

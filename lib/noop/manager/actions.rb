@@ -2,6 +2,10 @@ require 'parallel'
 
 module Noop
   class Manager
+
+    # Loop through all task files and find those that
+    # do not have a corresponding spec present
+    # @return [Array<Pathname>]
     def find_tasks_without_specs
       task_file_names.reject do |manifest|
         spec = Noop::Utils.convert_to_spec manifest
@@ -9,18 +13,26 @@ module Noop
       end
     end
 
+    # Write a debug message to the logger
+    # @return [void]
     def debug(message)
       Noop::Config.log.debug message
     end
 
+    # Output a message to the console
+    # @return [void]
     def output(message)
-      puts message
+      Noop::Utils.output message
     end
 
+    # Check if parallel run option is enabled
+    # @return [true,false]
     def parallel_run?
       options[:parallel_run] and options[:parallel_run] > 0
     end
 
+    # Output a list of all discovered Hiera file names taking filers into account
+    # @return [void]
     def list_hiera_files
       hiera_file_names.sort.each do |file_name_hiera|
         next unless hiera_included? file_name_hiera
@@ -29,6 +41,8 @@ module Noop
       exit(0)
     end
 
+    # Output a list of all discovered facts file names taking filers into account
+    # @return [void]
     def list_facts_files
       facts_file_names.sort.each do |file_name_facts|
         next unless facts_included? file_name_facts
@@ -37,6 +51,8 @@ module Noop
       exit(0)
     end
 
+    # Output a list of all discovered spec file names taking filers into account
+    # @return [void]
     def list_spec_files
       spec_file_names.sort.each do |file_name_spec|
         next unless spec_included? file_name_spec
@@ -45,6 +61,8 @@ module Noop
       exit(0)
     end
 
+    # Output a list of all discovered task file names taking filers into account
+    # @return [void]
     def list_task_files
       task_file_names.sort.each do |file_name_task|
         output file_name_task
@@ -52,6 +70,10 @@ module Noop
       exit(0)
     end
 
+    # Try to run all discovered tasks in the task list, using
+    # parallel run if enabled
+    # Does not run tasks if :pretend option is given
+    # return [Array<Noop::Task>]
     def run_all_tasks
       Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
         task.run unless options[:pretend]
@@ -59,6 +81,10 @@ module Noop
       end
     end
 
+    # Try to run anly those tasks that have failed status by reseting them
+    # to the :pending status first.
+    # Does not run tasks if :pretend option is given
+    # return [Array<Noop::Task>]
     def run_failed_tasks
       Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
         next if task.success?
@@ -68,6 +94,9 @@ module Noop
       end
     end
 
+    # Ask every task in the task list to load its report file and status
+    # from the previous run attempt
+    # return [Array<Noop::Task>]
     def load_task_reports
       Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
         task.file_load_report_json
@@ -76,6 +105,8 @@ module Noop
       end
     end
 
+    # Output a list of tasks without a spec file.
+    # Raise error if there are some of them.
     def list_tasks_without_specs
       tasks_without_specs = find_tasks_without_specs.to_a
       if tasks_without_specs.any?
@@ -83,12 +114,16 @@ module Noop
       end
     end
 
+    # Check if there are any failed tasks in the list.
+    # @return [true, false]
     def have_failed_tasks?
       task_list.any? do |task|
         task.failed?
       end
     end
 
+    # Exit with error if there are failed tasks
+    # or without the error code if none.
     def exit_with_error_code
       exit 1 if have_failed_tasks?
       exit 0
@@ -118,9 +153,7 @@ module Noop
       end
 
       if options[:self_check]
-        check_paths
-        show_filters
-        show_library
+        self_check
         exit(0)
       end
 
@@ -132,19 +165,19 @@ module Noop
       if options[:run_failed_tasks]
         load_task_reports
         run_failed_tasks
-        task_report
+        tasks_report
         exit_with_error_code
       end
 
       if options[:load_saved_reports]
         load_task_reports
-        task_report
+        tasks_report
         save_xunit_report if options[:xunit_report]
         exit_with_error_code
       end
 
       run_all_tasks
-      task_report
+      tasks_report
       save_xunit_report if options[:xunit_report]
       exit_with_error_code
     end

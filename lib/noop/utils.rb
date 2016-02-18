@@ -77,5 +77,13 @@ module Noop
       Noop::Config.log.fatal message
       exit(1)
     end
+
+    def self.output(message)
+      puts message
+    end
+
+    def self.separator
+      '=' * 70
+    end
   end
 end

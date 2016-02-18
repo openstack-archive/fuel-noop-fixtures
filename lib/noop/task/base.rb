@@ -16,14 +16,17 @@ module Noop
     attr_accessor :thread
     attr_accessor :status
 
+    # @return [true,false]
     def success?
       status == :success
     end
 
+    # @return [true,false]
     def failed?
       status == :failed
     end
 
+    # @return [true,false]
     def pending?
       status == :pending
     end
@@ -59,6 +62,7 @@ module Noop
       "Task[#{file_base_spec}]"
     end
 
+    # @return [String]
     def description
       message = ''
       message += "Task: #{file_name_manifest}"
@@ -69,6 +73,7 @@ module Noop
       message
     end
 
+    # @return [String]
     def process_info
       message = ''
       message + "Object: #{object_id}"
@@ -81,5 +86,6 @@ module Noop
     def inspect
       "Task[#{description}]"
     end
+
   end
 end

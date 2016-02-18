@@ -1,22 +1,30 @@
 module Noop
   class Manager
 
+    # Get a GEM_HOME either from the environment (using RVM)
+    # or from the default value (using bundle)
+    # @return [Pathname]
     def dir_path_gem_home
       return Pathname.new ENV['GEM_HOME'] if ENV['GEM_HOME']
       dir_name_bundle = Pathname.new 'bundled_gems'
       Noop::Config.dir_path_workspace + dir_name_bundle
     end
 
+    # Check if bundle command is installed
+    # @return [true,false]
     def bundle_installed?
       `bundle --version`
       $?.exitstatus == 0
     end
 
+    # Check if librarian-puppet command is installed
+    # @return [true,false]
     def librarian_installed?
       `librarian-puppet version`
       $?.exitstatus == 0
     end
 
+    # Setup bundle in the fixtures repo and bundle for puppet librarian
     def setup_bundle
       ENV['GEM_HOME'] = dir_path_gem_home.to_s
       Dir.chdir Noop::Config.dir_path_root
@@ -26,6 +34,7 @@ module Noop
       Dir.chdir Noop::Config.dir_path_root
     end
 
+    # Run update script to setup external Puppet modules
     def setup_library
       ENV['GEM_HOME'] = dir_path_gem_home.to_s
       Dir.chdir Noop::Config.dir_path_deployment
@@ -33,6 +42,7 @@ module Noop
       Dir.chdir Noop::Config.dir_path_root
     end
 
+    # Run bundles install and update actions
     def bundle_install_and_update
       Noop::Utils.error 'Bundle is not installed!' unless bundle_installed?
       Noop::Utils.debug "Starting 'bundle install' in the Gem home: #{ENV['GEM_HOME']}"
@@ -43,7 +53,7 @@ module Noop
       Noop::Utils.error 'Could not update bundle environment!' if $?.exitstatus != 0
     end
 
-    # run librarian-puppet to fetch modules as necessary
+    # Run librarian-puppet to fetch modules as necessary modules
     def update_puppet_modules
       Noop::Utils.error 'Puppet Librarian is not installed!' unless librarian_installed?
       command = './update_modules.sh -v'
