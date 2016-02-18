@@ -1,11 +1,15 @@
+# python
+*.egg-info
+*.eggs
+*.egg
+.venv
+*.pyc
+.tox
+
 # IDEs
 .idea
 .settings
 .project
-
-# Python
-*.pyc
-.tox
 
 # Doc
 doc/build
