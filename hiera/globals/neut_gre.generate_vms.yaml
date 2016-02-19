@@ -10,19 +10,10 @@
     user: admin
   amqp_hosts: "192.168.0.3:5673, 192.168.0.4:5673"
   amqp_port: "5673"
-  apache_api_proxy_address: "10.108.0.3"
-  apache_ports: 
-    - "127.0.0.1:80"
-    - "192.168.0.2:80"
-    - "10.108.0.3:8888"
-    - "192.168.0.2:5000"
-    - "192.168.0.2:35357"
-  base_mac: "fa:16:3e:00:00:00"
-  base_syslog_hash: 
-    syslog_port: "514"
-    syslog_server: "10.108.0.2"
-  ceph_tuning_settings: {}
-  ceph_monitor_nodes: &id001
+  aodh_hash: 
+    user_password: Be0Oloop
+    db_password: Thu5ieY6
+  aodh_nodes: &id001
     
     node-129: &id002
       
@@ -36,6 +27,7 @@
         sahara/api: "192.168.0.3"
         heat/api: "192.168.0.3"
         ceilometer/api: "192.168.0.3"
+        aodh/api: "192.168.0.3"
         ex: "172.16.0.3"
         ceph/public: "192.168.0.3"
         ceph/radosgw: "172.16.0.3"
@@ -77,6 +69,7 @@
         sahara/api: "192.168.0.4"
         heat/api: "192.168.0.4"
         ceilometer/api: "192.168.0.4"
+        aodh/api: "192.168.0.4"
         ex: "172.16.0.4"
         ceph/public: "192.168.0.4"
         ceph/radosgw: "172.16.0.4"
@@ -106,6 +99,19 @@
       node_roles: 
         - controller
       name: node-131
+  apache_api_proxy_address: "10.108.0.3"
+  apache_ports: 
+    - "127.0.0.1:80"
+    - "192.168.0.2:80"
+    - "10.108.0.3:8888"
+    - "192.168.0.2:5000"
+    - "192.168.0.2:35357"
+  base_mac: "fa:16:3e:00:00:00"
+  base_syslog_hash: 
+    syslog_port: "514"
+    syslog_server: "10.108.0.2"
+  ceph_tuning_settings: {}
+  ceph_monitor_nodes: *id001
   ceph_primary_monitor_node: {}
   ceph_rgw_nodes: *id001
   ceilometer_hash: 
@@ -268,6 +274,7 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      aodh/api: br-mgmt
     transformations: 
       - action: add-br
         name: br-fw-admin
@@ -361,6 +368,7 @@
       sahara/api: "192.168.0.2"
       heat/api: "192.168.0.2"
       ceilometer/api: "192.168.0.2"
+      aodh/api: "192.168.0.2"
       ex: "172.16.0.2"
       ceph/public: "192.168.0.2"
       ceph/radosgw: "172.16.0.2"
@@ -480,6 +488,7 @@
     routes.middleware: WARN
     stevedore: WARN
     taskflow: WARN
+  "aodh::logging::default_log_levels": *id005
   "ceilometer::logging::default_log_levels": *id005
   "cinder::logging::default_log_levels": *id005
   "glance::api::logging::default_log_levels": *id005
@@ -489,6 +498,7 @@
   "nova::logging::default_log_levels": *id005
   "sahara::logging::default_log_levels": *id005
   "ironic::logging::default_log_levels": *id005
+  syslog_log_facility_aodh: LOG_LOCAL0
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
@@ -500,6 +510,7 @@
   syslog_log_facility_sahara: LOG_LOCAL0
   syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
+  use_aodh: false
   use_ceilometer: false
   use_monit: false
   use_neutron: true

@@ -10,21 +10,12 @@
     user: admin
   amqp_hosts: "192.168.0.3:5673, 192.168.0.4:5673, 192.168.0.2:5673"
   amqp_port: "5673"
-  apache_api_proxy_address: "10.108.0.7"
-  apache_ports: 
-    - "127.0.0.1:80"
-    - "192.168.0.1:80"
-    - "10.108.0.7:8888"
-    - "192.168.0.1:5000"
-    - "192.168.0.1:35357"
-  base_mac: "fa:16:3e:00:00:00"
-  base_syslog_hash: 
-    syslog_port: "514"
-    syslog_server: "10.108.0.2"
-  ceph_tuning_settings: {}
-  ceph_monitor_nodes: &id002
+  aodh_hash: 
+    user_password: Be0Oloop
+    db_password: Thu5ieY6
+  aodh_nodes: &id001
     
-    node-128: &id001
+    node-128: &id002
       
       swift_zone: "1"
       uid: "128"
@@ -36,6 +27,7 @@
         sahara/api: "192.168.0.2"
         heat/api: "192.168.0.2"
         ceilometer/api: "192.168.0.2"
+        aodh/api: "192.168.0.2"
         ex: "172.16.0.2"
         ceph/public: "192.168.0.2"
         ceph/radosgw: "172.16.0.2"
@@ -77,6 +69,7 @@
         sahara/api: "192.168.0.3"
         heat/api: "192.168.0.3"
         ceilometer/api: "192.168.0.3"
+        aodh/api: "192.168.0.3"
         ex: "172.16.0.3"
         ceph/public: "192.168.0.3"
         ceph/radosgw: "172.16.0.3"
@@ -118,6 +111,7 @@
         sahara/api: "192.168.0.4"
         heat/api: "192.168.0.4"
         ceilometer/api: "192.168.0.4"
+        aodh/api: "192.168.0.4"
         ex: "172.16.0.4"
         ceph/public: "192.168.0.4"
         ceph/radosgw: "172.16.0.4"
@@ -147,9 +141,22 @@
       node_roles: 
         - controller
       name: node-131
+  apache_api_proxy_address: "10.108.0.7"
+  apache_ports: 
+    - "127.0.0.1:80"
+    - "192.168.0.1:80"
+    - "10.108.0.7:8888"
+    - "192.168.0.1:5000"
+    - "192.168.0.1:35357"
+  base_mac: "fa:16:3e:00:00:00"
+  base_syslog_hash: 
+    syslog_port: "514"
+    syslog_server: "10.108.0.2"
+  ceph_tuning_settings: {}
+  ceph_monitor_nodes: *id001
   ceph_primary_monitor_node: 
-    node-128: *id001
-  ceph_rgw_nodes: *id002
+    node-128: *id002
+  ceph_rgw_nodes: *id001
   ceilometer_hash: 
     alarm_history_time_to_live: "604800"
     event_time_to_live: "604800"
@@ -160,12 +167,12 @@
     enabled: false
     metering_secret: "7aqxzabx"
     user_password: FQUfTQ6a
-  ceilometer_nodes: *id002
+  ceilometer_nodes: *id001
   cinder_hash: 
     db_password: "71kNkN9U"
     fixed_key: "0ded0202e2a355df942df2bacbaba992658a0345f68f2db6e1bdb6dbb8f682cf"
     user_password: O2st17AP
-  cinder_nodes: *id002
+  cinder_nodes: *id001
   cinder_rate_limits: 
     POST: "100000"
     POST_SERVERS: "100000"
@@ -176,7 +183,7 @@
     - primary-controller
     - controller
   custom_mysql_setup_class: galera
-  database_nodes: *id002
+  database_nodes: *id001
   debug: false
   default_gateway: 
     - "192.168.0.7"
@@ -188,7 +195,7 @@
     image_cache_max_size: "5368709120"
     user_password: "94lWbeNn"
   glance_known_stores: false
-  glance_nodes: *id002
+  glance_nodes: *id001
   heat_hash: 
     auth_encryption_key: "8edb899a7e81e56abe51639880aa32dd"
     db_password: AuaPc3Yq
@@ -196,13 +203,13 @@
     rabbit_password: Nmn2wr9S
     user_password: EWJfBLJ9
   heat_nodes: 
-    node-128: *id001
+    node-128: *id002
     node-129: *id003
     node-131: *id004
   heat_roles: 
     - primary-controller
     - controller
-  horizon_nodes: *id002
+  horizon_nodes: *id001
   custom_theme_path: themes/vendor
   node_name: node-118
   idle_timeout: "3600"
@@ -210,7 +217,7 @@
     service_token_off: false
     admin_token: "0be9G8hj"
     db_password: "32TWl29R"
-  keystone_nodes: *id002
+  keystone_nodes: *id001
   manage_volumes: iscsi
   management_network_range: "192.168.0.0/24"
   master_ip: "10.108.0.2"
@@ -303,6 +310,7 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      aodh/api: br-mgmt
     transformations: 
       - action: add-br
         name: br-fw-admin
@@ -373,7 +381,7 @@
         tenant: admin
   neutron_db_password: QRpCfPk8
   neutron_metadata_proxy_secret: fp618p5V
-  neutron_nodes: *id002
+  neutron_nodes: *id001
   neutron_user_password: oT56DSZF
   node_hash: 
     swift_zone: "1"
@@ -386,6 +394,7 @@
       sahara/api: "192.168.0.1"
       heat/api: "192.168.0.1"
       ceilometer/api: "192.168.0.1"
+      aodh/api: "192.168.0.1"
       ex: 
       ceph/public: "192.168.0.1"
       ceph/radosgw: 
@@ -446,7 +455,7 @@
     enabled: true
     user_password: pJc2zAOx
   sahara_nodes: 
-    node-128: *id001
+    node-128: *id002
     node-129: *id003
     node-131: *id004
   sahara_roles: 
@@ -505,6 +514,7 @@
     routes.middleware: WARN
     stevedore: WARN
     taskflow: WARN
+  "aodh::logging::default_log_levels": *id006
   "ceilometer::logging::default_log_levels": *id006
   "cinder::logging::default_log_levels": *id006
   "glance::api::logging::default_log_levels": *id006
@@ -514,6 +524,7 @@
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
   "ironic::logging::default_log_levels": *id006
+  syslog_log_facility_aodh: LOG_LOCAL0
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
@@ -525,6 +536,7 @@
   syslog_log_facility_sahara: LOG_LOCAL0
   syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
+  use_aodh: false
   use_ceilometer: false
   use_monit: false
   use_neutron: true
@@ -548,16 +560,16 @@
     - "192.168.0.4"
   swift_master_role: primary-controller
   swift_nodes: 
-    node-128: *id001
+    node-128: *id002
     node-129: *id003
     node-131: *id004
   swift_proxies: 
-    node-128: *id001
+    node-128: *id002
     node-129: *id003
     node-131: *id004
   is_primary_swift_proxy: false
-  nova_api_nodes: *id002
-  ironic_api_nodes: *id002
+  nova_api_nodes: *id001
+  ironic_api_nodes: *id001
   workers_max: "17"
   external_lb: false
   node_name_prefix_for_messaging: messaging-

@@ -10,21 +10,12 @@
       label: Access
   amqp_hosts: "10.122.7.1:5673, 10.122.7.4:5673, 10.122.7.5:5673"
   amqp_port: "5673"
-  apache_api_proxy_address: "10.122.5.4"
-  apache_ports: 
-    - "127.0.0.1:80"
-    - "10.122.7.3:80"
-    - "10.122.5.4:8888"
-    - "10.122.7.3:5000"
-    - "10.122.7.3:35357"
-  base_mac: "fa:16:3e:00:00:00"
-  base_syslog_hash: 
-    syslog_port: "514"
-    syslog_server: "10.122.5.2"
-  ceph_tuning_settings: {}
-  ceph_monitor_nodes: &id002
+  aodh_hash: 
+    user_password: Be0Oloop
+    db_password: Thu5ieY6
+  aodh_nodes: &id001
     
-    node-1: &id001
+    node-1: &id002
       
       swift_zone: "1"
       uid: "1"
@@ -36,6 +27,7 @@
         sahara/api: "10.122.7.1"
         heat/api: "10.122.7.1"
         ceilometer/api: "10.122.7.1"
+        aodh/api: "10.122.7.1"
         ex: "10.122.6.2"
         ceph/public: "10.122.7.1"
         mgmt/messaging: "10.122.7.1"
@@ -77,6 +69,7 @@
         sahara/api: "10.122.7.5"
         heat/api: "10.122.7.5"
         ceilometer/api: "10.122.7.5"
+        aodh/api: "10.122.7.5"
         ex: "10.122.6.3"
         ceph/public: "10.122.7.5"
         mgmt/messaging: "10.122.7.5"
@@ -118,6 +111,7 @@
         sahara/api: "10.122.7.4"
         heat/api: "10.122.7.4"
         ceilometer/api: "10.122.7.4"
+        aodh/api: "10.122.7.4"
         ex: "10.122.6.4"
         ceph/public: "10.122.7.4"
         mgmt/messaging: "10.122.7.4"
@@ -147,9 +141,22 @@
         - cinder
         - controller
       name: node-2
+  apache_api_proxy_address: "10.122.5.4"
+  apache_ports: 
+    - "127.0.0.1:80"
+    - "10.122.7.3:80"
+    - "10.122.5.4:8888"
+    - "10.122.7.3:5000"
+    - "10.122.7.3:35357"
+  base_mac: "fa:16:3e:00:00:00"
+  base_syslog_hash: 
+    syslog_port: "514"
+    syslog_server: "10.122.5.2"
+  ceph_tuning_settings: {}
+  ceph_monitor_nodes: *id001
   ceph_primary_monitor_node: 
-    node-1: *id001
-  ceph_rgw_nodes: *id002
+    node-1: *id002
+  ceph_rgw_nodes: *id001
   ceilometer_hash: 
     alarm_history_time_to_live: "604800"
     event_time_to_live: "604800"
@@ -160,12 +167,12 @@
     user_password: ycMeNdmo
     metering_secret: zjAKZxtd
     enabled: false
-  ceilometer_nodes: *id002
+  ceilometer_nodes: *id001
   cinder_hash: 
     db_password: qeN6frZT
     user_password: "7Al0iWfl"
     fixed_key: "264ecf97cf69264f775e549fe5fd1ce3db6a92df94d37745819892803a83b19c"
-  cinder_nodes: *id002
+  cinder_nodes: *id001
   cinder_rate_limits: 
     POST: "100000"
     POST_SERVERS: "100000"
@@ -176,7 +183,7 @@
     - primary-controller
     - controller
   custom_mysql_setup_class: galera
-  database_nodes: *id002
+  database_nodes: *id001
   debug: false
   default_gateway: 
     - "10.122.5.2"
@@ -188,7 +195,7 @@
     user_password: DztOMLWg
     db_password: LtDxFLyX
   glance_known_stores: false
-  glance_nodes: *id002
+  glance_nodes: *id001
   heat_hash: 
     db_password: GqzWSxBW
     user_password: uMxK47eJ
@@ -196,13 +203,13 @@
     auth_encryption_key: "9431f2b16d26488b896e64d236953521"
     rabbit_password: jnXk99nV
   heat_nodes: 
-    node-1: *id001
+    node-1: *id002
     node-3: *id003
     node-2: *id004
   heat_roles: 
     - primary-controller
     - controller
-  horizon_nodes: *id002
+  horizon_nodes: *id001
   custom_theme_path: themes/vendor
   node_name: node-5
   idle_timeout: "3600"
@@ -210,7 +217,7 @@
     service_token_off: false
     db_password: H4N630IH
     admin_token: cKHHVACg
-  keystone_nodes: *id002
+  keystone_nodes: *id001
   manage_volumes: false
   management_network_range: "10.122.7.0/24"
   master_ip: "10.122.5.2"
@@ -283,6 +290,7 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      aodh/api: br-mgmt
     interfaces: 
       eth4: 
         vendor_specific: 
@@ -371,7 +379,7 @@
       metadata_proxy_shared_secret: orn88mVY
   neutron_db_password: bnQfjm1A
   neutron_metadata_proxy_secret: orn88mVY
-  neutron_nodes: *id002
+  neutron_nodes: *id001
   neutron_user_password: glXcjTAY
   node_hash: 
     swift_zone: "5"
@@ -383,6 +391,7 @@
       mgmt/database: "10.122.7.3"
       sahara/api: "10.122.7.3"
       ceilometer/api: "10.122.7.3"
+      aodh/api: "10.122.7.3"
       ceph/public: "10.122.7.3"
       mgmt/messaging: "10.122.7.3"
       management: "10.122.7.3"
@@ -440,7 +449,7 @@
     user_password: jYjxogYn
     enabled: false
   sahara_nodes: 
-    node-1: *id001
+    node-1: *id002
     node-3: *id003
     node-2: *id004
   sahara_roles: 
@@ -500,6 +509,7 @@
     routes.middleware: WARN
     stevedore: WARN
     taskflow: WARN
+  "aodh::logging::default_log_levels": *id006
   "ceilometer::logging::default_log_levels": *id006
   "cinder::logging::default_log_levels": *id006
   "glance::api::logging::default_log_levels": *id006
@@ -509,6 +519,7 @@
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
   "ironic::logging::default_log_levels": *id006
+  syslog_log_facility_aodh: LOG_LOCAL0
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
@@ -520,6 +531,7 @@
   syslog_log_facility_sahara: LOG_LOCAL0
   syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
+  use_aodh: false
   use_ceilometer: false
   use_monit: false
   use_neutron: true
@@ -543,16 +555,16 @@
     - "10.122.7.5"
   swift_master_role: primary-controller
   swift_nodes: 
-    node-1: *id001
+    node-1: *id002
     node-3: *id003
     node-2: *id004
   swift_proxies: 
-    node-1: *id001
+    node-1: *id002
     node-3: *id003
     node-2: *id004
   is_primary_swift_proxy: false
-  nova_api_nodes: *id002
-  ironic_api_nodes: *id002
+  nova_api_nodes: *id001
+  ironic_api_nodes: *id001
   workers_max: "17"
   external_lb: false
   node_name_prefix_for_messaging: messaging-
