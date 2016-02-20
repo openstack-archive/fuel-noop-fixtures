@@ -250,6 +250,12 @@ nova:
   db_password: of31Rxsy
   user_password: n0KfayKg
   state_path: "/var/lib/nova"
+  enable_hugepages: true
+  cpu_pinning: [0, 1, 18, 19]
+  enable_cpu_pinning: true
+hugepages:
+- {count: 512, numa_id: 0, size: 2M}
+- {count: 8, numa_id: 1, size: 1G}
 master_ip: 10.122.5.2
 priority: 300
 external_dns:

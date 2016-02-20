@@ -660,6 +660,8 @@ nova:
   db_password: VXcP6cIR
   state_path: /var/lib/nova
   user_password: fuhtZH6v
+  enable_hugepages: true
+  enable_cpu_pinning: true
 nova_quota: false
 online: true
 openstack_version: 2014.2-6.1
