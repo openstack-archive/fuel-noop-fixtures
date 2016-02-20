@@ -292,6 +292,8 @@
     version: "1.1"
   network_size: 
   neutron_config: 
+    supported_pci_vendor_devs: 
+      - "8086:1515"
     L2: 
       base_mac: "fa:16:3e:00:00:00"
       phys_nets: 

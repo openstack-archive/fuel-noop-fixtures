@@ -145,6 +145,8 @@ cobbler:
 mongo:
   enabled: false
 quantum_settings:
+  supported_pci_vendor_devs:
+    - 8086:1515
   database:
     passwd: bnQfjm1A
   keystone:
@@ -250,6 +252,12 @@ nova:
   db_password: of31Rxsy
   user_password: n0KfayKg
   state_path: "/var/lib/nova"
+  enable_hugepages: true
+  cpu_pinning: [0, 1, 18, 19]
+  enable_cpu_pinning: true
+hugepages:
+- {count: 512, numa_id: 0, size: 2M}
+- {count: 8, numa_id: 1, size: 1G}
 master_ip: 10.122.5.2
 priority: 300
 external_dns:
@@ -630,6 +638,12 @@ network_scheme:
   - action: add-port
     bridge: br-storage
     name: eth0.102
+  - action: add-port
+    name: eth1
+    provider: sriov
+    vendor_specific:
+      sriov_numvfs: 7
+      physnet: physnet2
   roles:
     keystone/api: br-mgmt
     neutron/api: br-mgmt
@@ -811,3 +825,5 @@ external_ntp:
     weight: 100
     label: Host OS NTP Servers
 openstack_version_prev:
+dpdk:
+  enabled: true

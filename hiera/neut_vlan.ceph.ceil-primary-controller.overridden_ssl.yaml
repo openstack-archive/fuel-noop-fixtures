@@ -660,6 +660,8 @@ nova:
   db_password: VXcP6cIR
   state_path: /var/lib/nova
   user_password: fuhtZH6v
+  enable_hugepages: true
+  enable_cpu_pinning: true
 nova_quota: false
 online: true
 openstack_version: 2014.2-6.1
@@ -699,6 +701,8 @@ puppet:
 puppet_debug: true
 quantum: true
 quantum_settings:
+  supported_pci_vendor_devs:
+    - 8086:1515
   L2:
     base_mac: fa:16:3e:00:00:00
     phys_nets:
@@ -1188,3 +1192,5 @@ workloads_collector:
   password: v6vMAe7Q
   tenant: services
   username: workloads_collector
+dpdk:
+  enabled: true

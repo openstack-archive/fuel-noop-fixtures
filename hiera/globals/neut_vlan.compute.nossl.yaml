@@ -256,6 +256,12 @@
       - action: add-port
         bridge: br-storage
         name: eth0.102
+      - action: add-port
+        name: eth1
+        provider: sriov
+        vendor_specific: 
+          sriov_numvfs: 7
+          physnet: physnet2
     roles: 
       keystone/api: br-mgmt
       neutron/api: br-mgmt
@@ -321,6 +327,8 @@
         IP: none
   network_size: 
   neutron_config: 
+    supported_pci_vendor_devs: 
+      - "8086:1515"
     database: 
       passwd: bnQfjm1A
     keystone: 
