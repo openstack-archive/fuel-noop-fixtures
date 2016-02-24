@@ -19,3 +19,8 @@
 :l23_os: 'centos6'
 :os_package_type: 'rpm'
 :os_service_default: '<SERVICE DEFAULT>'
+:interfaces: docker0,eth0,lo
+:ipaddress: 172.17.42.1
+:ipaddress_docker0: 172.17.42.1
+:ipaddress_eth0: 10.20.0.2
+:ipaddress_lo: 127.0.0.1
