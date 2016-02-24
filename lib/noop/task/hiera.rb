@@ -9,6 +9,7 @@ module Noop
       @file_name_hiera
     end
 
+    # @return [Pathname]
     def file_name_hiera=(value)
       return if value.nil?
       @file_name_hiera = Noop::Utils.convert_to_path value
@@ -141,6 +142,7 @@ module Noop
       data = hiera key, nil, resolution_type
       path_lookup.call data, path, default
     end
+    alias :hiera_dir :hiera_structure
 
   end
 end

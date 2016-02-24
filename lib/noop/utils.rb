@@ -57,7 +57,7 @@ module Noop
     end
 
     def self.run(*args)
-      debug "CMD: #{args.inspect} PWD: #{Dir.pwd}"
+      # debug "CMD: #{args.inspect} PWD: #{Dir.pwd}"
       system *args
     end
 
@@ -75,7 +75,19 @@ module Noop
 
     def self.error(message)
       Noop::Config.log.fatal message
-      exit(1)
+      fail message
+    end
+
+    def self.output(message)
+      puts message
+    end
+
+    def self.separator(title=nil)
+      if title
+        "=< #{title} >=".ljust 70, '='
+      else
+        '=' * 70
+      end
     end
   end
 end

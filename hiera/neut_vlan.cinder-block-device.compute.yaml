@@ -121,7 +121,7 @@ access:
   user: admin
   tenant: admin
   email: admin@localhost
-storage_hash:
+storage:
   iser: false
   volumes_ceph: false
   per_pool_pg_nums:

@@ -389,10 +389,31 @@
     - controller
   sql_connection: "mysql://nova:wPFuGzlctG0bWM5i94Xsu1ub@192.168.0.2/nova?charset=utf8&read_timeout=60"
   storage_hash: 
+    iser: false
+    volumes_ceph: false
+    per_pool_pg_nums: 
+      compute: 128
+      default_pg_num: 128
+      volumes: 128
+      images: 128
+      backups: 128
+      ".rgw": 128
+    objects_ceph: false
+    ephemeral_ceph: false
+    volumes_lvm: true
+    volumes_block_device: true
+    images_vcenter: false
+    osd_pool_size: "2"
+    pg_num: 128
+    images_ceph: false
+    metadata: 
+      group: storage
+      weight: 60
+      label: Storage
     volume_backend_names: 
       volumes_ceph: false
-      volumes_lvm: false
-      volumes_block_device: false
+      volumes_lvm: LVM-backend
+      volumes_block_device: BDD-backend
   swift_hash: 
     user_password: zGlRsQYt0T5Cg8Mmw5bEhtvg
   syslog_hash: 
