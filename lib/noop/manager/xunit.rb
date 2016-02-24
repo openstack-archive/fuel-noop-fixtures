@@ -1,8 +1,60 @@
+require 'rexml/document'
+
 module Noop
   class Manager
-    def xunit_report(tasks)
-      tasks_report = tasks_report_structure tasks
-      return unless tasks_report.is_a? Array
+
+    # Generate a data structure that will be used to create the xUnit report
+    # @return [Array]
+    def tasks_report_structure
+      tasks_report = []
+
+      task_list.each do |task|
+        task_hash = {}
+        task_hash[:status] = task.status
+        task_hash[:name] = task.to_s
+        task_hash[:description] = task.description
+        task_hash[:spec] = task.file_name_spec.to_s
+        task_hash[:hiera] = task.file_name_hiera.to_s
+        task_hash[:facts] = task.file_name_facts.to_s
+        task_hash[:task] = task.file_name_manifest.to_s
+        task_hash[:examples] = []
+
+        if task.report.is_a? Hash
+          examples = task.report['examples']
+          next unless examples.is_a? Array
+          examples.each do |example|
+            example_hash = {}
+            example_hash[:file_path] = example['file_path']
+            example_hash[:line_number] = example['line_number']
+            example_hash[:description] = example['description']
+            example_hash[:status] = example['status']
+            example_hash[:run_time] = example['run_time']
+            example_hash[:pending_message] = example['pending_message']
+            exception_class = example.fetch('exception', {}).fetch('class', nil)
+            exception_message = example.fetch('exception', {}).fetch('message', nil)
+            next unless example_hash[:description] and example_hash[:status]
+            if exception_class and exception_message
+              example_hash[:exception_class] = exception_class
+              example_hash[:exception_message] = exception_message
+            end
+            task_hash[:examples] << example_hash
+          end
+
+          summary = task.report['summary']
+          task_hash[:example_count] = summary['example_count']
+          task_hash[:failure_count] = summary['failure_count']
+          task_hash[:pending_count] = summary['pending_count']
+          task_hash[:duration] = summary['duration']
+        end
+
+        tasks_report << task_hash
+      end
+      tasks_report
+    end
+
+    # Generate xUnit XML report text
+    # @return [String]
+    def xunit_report
       document = REXML::Document.new
       declaration = REXML::XMLDecl.new
       declaration.encoding = 'UTF-8'
@@ -13,7 +65,7 @@ module Noop
       failures = 0
       task_id = 0
 
-      tasks_report.each do |task|
+      tasks_report_structure.each do |task|
         testsuite = testsuites.add_element 'testsuite'
         testsuite.add_attribute 'id', task_id
         task_id += 1
@@ -67,19 +119,25 @@ module Noop
       document.to_s
     end
 
+    # xUnit report file name
+    # @return [Pathname]
     def file_name_xunit_report
       Pathname.new 'report.xml'
     end
 
+    # Full path to the xUnit report file
+    # @return [Pathname]
     def file_path_xunit_report
       Noop::Config.dir_path_reports + file_name_xunit_report
     end
 
+    # Write the xUnit report to the file
+    # @return [void]
     def save_xunit_report
+      debug "Saving xUnit XML report file to: #{file_path_xunit_report.to_s}"
       File.open(file_path_xunit_report.to_s, 'w') do |file|
-        file.puts xunit_report task_list
+        file.puts xunit_report
       end
-      Noop::Utils.debug "xUnit XML report was saved to: #{file_path_xunit_report.to_s}"
     end
 
   end

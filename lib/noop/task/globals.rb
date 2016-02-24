@@ -13,10 +13,10 @@ module Noop
     end
 
     def write_file_globals(content)
+      debug "Saving Globals YAML file to: '#{file_path_globals.to_s}'"
       File.open(file_path_globals.to_s, 'w') do |file|
         file.write content
       end
-      Noop::Utils.debug "Globals YAML saved to: '#{file_path_globals.to_s}'"
     end
 
     # @return [Pathname]

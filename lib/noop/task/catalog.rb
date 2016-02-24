@@ -2,35 +2,8 @@ require 'erb'
 
 module Noop
   class Task
-    # @return [String]
-    def status_report(context)
-      task = context.task
-      template = <<-'eof'
-Facts:    <%= task.file_path_facts %>
-Hiera:    <%= task.file_path_hiera %>
-Spec:     <%= task.file_path_spec %>
-Manifest: <%= task.file_path_manifest %>
 
-Node:     <%= task.hiera_lookup 'fqdn' or '?' %>
-Role:     <%= task.hiera_lookup 'role' or '?' %>
-
-Puppet:   <%= Puppet.version %>
-Ruby:     <%= RUBY_VERSION %>
-
-Hiera hierarchy:
-<% task.hiera_hierarchy.each do |element| -%>
-* <%= element %>
-<% end -%>
-
-Facts hierarchy:
-<% task.facts_hierarchy.reverse.each do |element| -%>
-* <%= element %>
-<% end -%>
-      eof
-      ERB.new(template, nil, '-').result(binding)
-    end
-
-    # dumps the entire catalog structure to the text
+    # Dumps the entire catalog structure to the text
     # representation in the Puppet language
     # @param context [Object] the context from the rspec test
     # @param resources_filter [Array] the list of resources to dump. Dump all resources if not given
@@ -56,7 +29,7 @@ Facts hierarchy:
       text
     end
 
-    # takes a parameter value and formats it to the literal value
+    # Takes a parameter value and formats it to the literal value
     # that could be placed in the Puppet manifest
     # @param value [String, Array, Hash, true, false, nil]
     # @return [String]
@@ -88,7 +61,7 @@ Facts hierarchy:
       end
     end
 
-    # take a resource object and generate a manifest representation of it
+    # Take a resource object and generate a manifest representation of it
     # in the Puppet language. Replaces "to_manifest" Puppet function which
     # is not working correctly.
     # @param resource [Puppet::Resource]
@@ -131,7 +104,7 @@ Facts hierarchy:
       clear_data.join "\n"
     end
 
-    # check if two resources have same type and title
+    # Check if two resources have same type and title
     # @param res1 [Puppet::Resource]
     # @param res2 [Puppet::Resource]
     # @return [TrueClass, False,Class]
@@ -139,6 +112,53 @@ Facts hierarchy:
       res1 = res1.to_s.downcase.gsub %r|'"|, ''
       res2 = res2.to_s.downcase.gsub %r|'"|, ''
       res1 == res2
+    end
+
+    # @return [Pathname]
+    def dir_name_catalogs
+      Pathname.new 'catalogs'
+    end
+
+    # @return [Pathname]
+    def dir_path_catalogs
+      Noop::Config.dir_path_root + dir_name_catalogs
+    end
+
+    # @return [Pathname]
+    def file_name_task_catalog
+      Noop::Utils.convert_to_path "#{file_name_base_task_report}.pp"
+    end
+
+    # @return [Pathname]
+    def file_path_task_catalog
+      dir_path_catalogs + file_name_task_catalog
+    end
+
+    # Write the catalog file of this task
+    # using the data from RSpec context
+    # @param context [Object] the context from the rspec test
+    # @return [void]
+    def file_write_task_catalog(context)
+      dir_path_catalogs.mkpath
+      error "Catalog directory '#{dir_path_catalogs}' doesn't exist!" unless dir_path_catalogs.directory?
+      debug "Writing catalog file: #{file_path_task_catalog}"
+      File.open(file_path_task_catalog.to_s, 'w') do |file|
+        file.puts catalog_dump context
+      end
+    end
+
+    # Check if the catalog file exists for this task
+    # @return [true,false]
+    def file_present_task_catalog?
+      file_path_task_catalog.file?
+    end
+
+    # Read the catalog file of this task
+    # @return [String]
+    def file_read_task_catalog
+      return unless file_present_task_catalog?
+      debug "Reading catalog file: #{file_path_task_catalog}"
+      file_path_task_catalog.read
     end
 
   end
