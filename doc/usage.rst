@@ -89,7 +89,20 @@ their own.::
 
   tests/noop/noop_tests.sh -y neut_vlan.compute.ssl,neut_vlan.compute.nossl -s firewall/firewall,netconfig/netconfig -p
 
-Filters can use used with a list of elements like this.
+Filters can use used with a list of elements or can be given as a regular
+expression or a list of regular expressions::
+
+  ./noop_tests.sh -p -s 'master/.*'
+
+Will filter all tasks in the *master* group.::
+
+  ./noop_tests.sh -p -s '^ceph.*,^heat.*,glance/db_spec'
+
+Will filter all *ceph*, *heat* tasks and glance/db_spec task individually.::
+
+  ./noop_tests.sh -p -s '^ceph.*' -y ceph
+
+All *ceph* related tasks only on Hiera files which have Ceph enabled.
 
 Recreating globals yaml files
 -----------------------------
@@ -222,6 +235,49 @@ out what resources and classes are there or to see what values the parameters
 and properties actually have after all the catalog logic is processed. It's
 very helpful when you are debugging a strange task behaviour or writing a spec
 file.
+
+The framework can also gather and report information about *File* resources
+that are being installed by Puppet. Using *--save_file_resources* options
+will dave the list of files that would be installed by the catalog and
+description about their source or template. Using *--puppet_binary_files*
+option will enable additional RSpec matcher that will fail if there are
+files and, especially, binary files being installed. These ones should be
+delivered by fuel packages.
+
+Data-driven catalog tests
+-------------------------
+
+Usually the spec files try to repeat the logic found in the tested manifests,
+receive the same set of resources and their parameters and compare them to
+the set of resources found in the compiled catalog. Then the matchers are used
+to check if the catalog contains what is expected from it to contain.
+
+While this method works well in most cases it requires a lot of work and
+extensive expertise in the tasks' domain to write a correct and comprehensive
+set of spec for a task catalog. Specs also cannot detect if there are several
+new resources or properties that have not been described in the spec file.
+
+Data-driven tests can offer an alternative way to ensure that there are
+no unwanted changes in the tasks catalogs. The idea behind them is building
+catalogs in human-readable format before and after the changes are made. Then
+these files can be compared and everything that have been changes will become
+visible.
+
+Using the **-V** options will save the current catalog to the *catalogs*
+folder. These generated catalogs can either be commited to the repository
+or be used as a temporary files that you can make before doing some changes
+to the modules or manifests and removed later. Saved catalog files can be
+very useful for a developer to just review the catalog contents and check
+that every resource or class are receiving the correct property values.
+
+You can also use **-v** option to enable automatic catalog checks. It should be
+done after you have generated the initial versions and made some changes.
+Running the tests with this option enabled will generate the catalogs again and
+compare them to the saved version. If there are differences the test will be
+failed and you will be able to locate the failed tasks. If you have catalogs
+commited to the repository you can use the *diff* command to review what
+changes to the catalog files have been introduced and commit the modified
+catalogs if the changes are expected.
 
 Using external environment variables and custom paths
 -----------------------------------------------------

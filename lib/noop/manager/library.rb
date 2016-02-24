@@ -4,67 +4,80 @@ require 'set'
 module Noop
   class Manager
 
+    # Recursively find file in the folder
+    # @param root [String,Pathname]
+    # @return [Array<Pathname>]
+    def find_files(root, path_from=nil, &block)
+      root = Noop::Utils.convert_to_path root
+      files = []
+      begin
+        root.children.each do |path|
+          if path.file?
+            if block_given?
+              next unless block.call path
+            end
+            path = path.relative_path_from path_from if path_from
+            files << path
+          else
+            files << find_files(path, path_from, &block)
+          end
+        end
+      rescue
+        []
+      end
+      files.flatten
+    end
+
+    # Scan the spec directory and gather the list of spec files
     # @return [Array<Pathname>]
     def spec_file_names
       return @spec_file_names if @spec_file_names
-      @spec_file_names = []
-      Noop::Utils.error "No #{Noop::Config.dir_path_task_spec} directory!" unless Noop::Config.dir_path_task_spec.directory?
-      Noop::Config.dir_path_task_spec.find do |spec_file|
-        next unless spec_file.file?
-        next unless spec_file.to_s.end_with? '_spec.rb'
-        @spec_file_names << spec_file.relative_path_from(Noop::Config.dir_path_task_spec)
+      error "No #{Noop::Config.dir_path_task_spec} directory!" unless Noop::Config.dir_path_task_spec.directory?
+      @spec_file_names = find_files(Noop::Config.dir_path_task_spec, Noop::Config.dir_path_task_spec) do |file|
+        file.to_s.end_with? '_spec.rb'
       end
-      @spec_file_names
     end
 
+    # Scan the Hiera directory and gather the list of Hiera files
     # @return [Array<Pathname>]
     def hiera_file_names
       return @hiera_file_names if @hiera_file_names
-      @hiera_file_names = []
-      Noop::Utils.error "No #{Noop::Config.dir_path_hiera} directory!" unless Noop::Config.dir_path_hiera.directory?
-      Noop::Config.dir_path_hiera.find do |hiera_name|
-        next unless hiera_name.file?
-        next unless hiera_name.to_s.end_with? '.yaml'
-        base_dir = hiera_name.dirname.basename
-        next if base_dir == Noop::Config.dir_name_hiera_override
-        next if base_dir == Noop::Config.dir_name_globals
-        @hiera_file_names << hiera_name.relative_path_from(Noop::Config.dir_path_hiera)
+      error "No #{Noop::Config.dir_path_hiera} directory!" unless Noop::Config.dir_path_hiera.directory?
+      @hiera_file_names = find_files(Noop::Config.dir_path_hiera, Noop::Config.dir_path_hiera) do |file|
+        file.to_s.end_with? '.yaml'
       end
-      @hiera_file_names
     end
 
+    # Scan the facts directory and gather the list of facts files
     # @return [Array<Pathname>]
     def facts_file_names
       return @facts_file_names if @facts_file_names
-      @facts_file_names = []
-      Noop::Utils.error "No #{Noop::Config.dir_path_facts} directory!" unless Noop::Config.dir_path_facts.directory?
-      Noop::Config.dir_path_facts.find do |facts_name|
-        next unless facts_name.file?
-        next unless facts_name.to_s.end_with? '.yaml'
-        next if facts_name.dirname.basename == Noop::Config.dir_name_facts_override
-        @facts_file_names << facts_name.relative_path_from(Noop::Config.dir_path_facts)
+      error "No #{Noop::Config.dir_path_facts} directory!" unless Noop::Config.dir_path_facts.directory?
+      @facts_file_names = find_files(Noop::Config.dir_path_facts, Noop::Config.dir_path_facts) do |file|
+        file.to_s.end_with? '.yaml'
       end
-      @facts_file_names
     end
 
+    # Scan the tasks directory and gather the list of task files
     # @return [Array<Pathname>]
     def task_file_names
       return @task_file_names if @task_file_names
-      @task_file_names = []
-      Noop::Utils.error "No #{Noop::Config.dir_path_tasks_local} directory!" unless Noop::Config.dir_path_tasks_local.directory?
-      Noop::Config.dir_path_tasks_local.find do |task_name|
-        next unless task_name.file?
-        next unless task_name.to_s.end_with? '.pp'
-        @task_file_names << task_name.relative_path_from(Noop::Config.dir_path_tasks_local)
+      error "No #{Noop::Config.dir_path_tasks_local} directory!" unless Noop::Config.dir_path_tasks_local.directory?
+      @task_file_names = find_files(Noop::Config.dir_path_tasks_local, Noop::Config.dir_path_tasks_local) do |file|
+        file.to_s.end_with? '.pp'
       end
-      @task_file_names
     end
 
+    # Read the task deployment graph metadata files in the library:
+    # Find all 'tasks.yaml' files in the puppet directory.
+    # Read them all to a Hash by their ids.
+    # Find all 'groups' records and resolve their 'tasks' reference
+    # by pointing referenced tasks to this group instead.
     # @return [Hash<String => Hash>]
     def task_graph_metadata
       return @task_graph_metadata if @task_graph_metadata
       @task_graph_metadata = {}
-      Noop::Utils.error "No #{Noop::Config.dir_path_modules_local} directory!" unless Noop::Config.dir_path_modules_local.directory?
+      error "No #{Noop::Config.dir_path_modules_local} directory!" unless Noop::Config.dir_path_modules_local.directory?
       Noop::Config.dir_path_modules_local.find do |task_file|
         next unless task_file.file?
         next unless task_file.to_s.end_with? 'tasks.yaml'
@@ -91,6 +104,9 @@ module Noop
       @task_graph_metadata
     end
 
+    # Try to determine the roles each spec should be run in using
+    # the deployment graph metadata. Take a list of groups or roles
+    # and form a set of them.
     # @return [Hash<Pathname => Set>]
     def assign_spec_to_roles
       return @assign_spec_to_roles if @assign_spec_to_roles
@@ -110,6 +126,9 @@ module Noop
       @assign_spec_to_roles
     end
 
+    # Try to determine the roles of each Hiera file.
+    # Take 'nodes' structure and find 'node_roles' of the current node their.
+    # Form a set of found values and add root 'role' value if found.
     # @return [Hash<Pathname => Set>]
     def assign_hiera_to_roles
       return @assign_hiera_to_roles if @assign_hiera_to_roles
@@ -138,19 +157,29 @@ module Noop
       @assign_hiera_to_roles
     end
 
+    # Determine Hiera files for each spec file by calculating
+    # the intersection between their roles sets.
+    # If the spec file contains '*' role it should be counted
+    # as all possible roles.
+    # @return [Hash<Pathname => Pathname]
     def assign_spec_to_hiera
       return @assign_spec_to_hiera if @assign_spec_to_hiera
       @assign_spec_to_hiera = {}
-      assign_spec_to_roles.each do |file_name_spec, spec_roles|
-        hiera_files = assign_hiera_to_roles.select do |file_name_hiera, hiera_roles|
-          roles_intersection = hiera_roles & spec_roles
-          roles_intersection.any?
-        end.keys
+      assign_spec_to_roles.each do |file_name_spec, spec_roles_set|
+        if spec_roles_set.include? '*'
+          hiera_files = assign_hiera_to_roles.keys
+        else
+          hiera_files = assign_hiera_to_roles.select do |file_name_hiera, hiera_roles_set|
+            roles_intersection = hiera_roles_set & spec_roles_set
+            roles_intersection.any?
+          end.keys
+        end
         @assign_spec_to_hiera[file_name_spec] = hiera_files if hiera_files.any?
       end
       @assign_spec_to_hiera
     end
 
+    # Read all spec annotations metadata.
     # @return [Hash<Pathname => Array>]
     def spec_run_metadata
       return @spec_run_metadata if @spec_run_metadata
@@ -165,7 +194,9 @@ module Noop
       @spec_run_metadata
     end
 
+    # Parse a spec file to find annotation entries.
     # @param [Pathname] task_spec
+    # @return [Hash]
     def parse_spec_file(task_spec)
       task_spec_metadata = {}
 
@@ -212,6 +243,8 @@ module Noop
       task_spec_metadata
     end
 
+    # Split a space or comma separated list of yaml files
+    # and form an Array of the yaml file names.
     # @return [Array<Pathname>]
     def get_list_of_yamls(line)
       line = line.split /\s*,\s*|\s+/
@@ -222,6 +255,15 @@ module Noop
       end
     end
 
+    # Determine the list of run records for a spec file:
+    # Take a list of explicitly defined runs if present.
+    # Make product of allowed Hiera and facts yaml files to
+    # form more run records.
+    # Use the default facts file name if there is none
+    # is given in the annotation.
+    # Use the list of Hiera files determined by the intersection of
+    # deployment graph metadata and Hiera yaml contents using roles
+    # as a common data.
     def get_spec_runs(file_name_spec)
       file_name_spec = Noop::Utils.convert_to_path file_name_spec
       metadata = spec_run_metadata.fetch file_name_spec, {}
@@ -242,38 +284,55 @@ module Noop
       runs
     end
 
+    # Check if the given element matches this filter
+    # @param [Array<String>]
+    def filter_is_matched?(filter, element)
+      return true unless filter
+      filter = [filter] unless filter.is_a? Array
+      filter.any? do |expression|
+        expression = Regexp.new expression.to_s
+        expression =~ element.to_s
+      end
+    end
+
+    # Use filters to check if this spec file is included
+    # @return [true,false]
     def spec_included?(spec)
-      filter = options[:filter_specs]
-      return true unless filter
-      filter = [filter] unless filter.is_a? Array
-      filter.include? spec
+      filter_is_matched? options[:filter_specs], spec
     end
 
+    # Use filters to check if this facts file is included
+    # @return [true,false]
     def facts_included?(facts)
-      filter = options[:filter_facts]
-      return true unless filter
-      filter = [filter] unless filter.is_a? Array
-      filter.include? facts
+      filter_is_matched? options[:filter_facts], facts
     end
 
+    # Use filters to check if this Hiera file is included
+    # @return [true,false]
     def hiera_included?(hiera)
-      filter = options[:filter_hiera]
-      return true unless filter
-      filter = [filter] unless filter.is_a? Array
-      filter.include? hiera
+      filter_is_matched? options[:filter_hiera], hiera
     end
 
+    # Check if the globals spec should be skipped.
+    # It should not be skipped only if it's explicitly enabled in the filter.
+    # @return [true,false]
     def skip_globals?(file_name_spec)
       return false unless file_name_spec == Noop::Config.spec_name_globals
       return true unless options[:filter_specs]
       not spec_included? file_name_spec
     end
 
+    # Check if the spec is disabled using the annotation
+    # @return [true,false]
     def spec_is_disabled?(file_name_spec)
       file_name_spec = Noop::Utils.convert_to_path file_name_spec
       spec_run_metadata.fetch(file_name_spec, {}).fetch(:disable, false)
     end
 
+    # Form the final list of Task objects that should be running.
+    # Take all discovered spec files, get run records for them,
+    # apply filters to exclude filtered records.
+    # @return [Array<Noop::Task>]
     def task_list
       return @task_list if @task_list
       @task_list = []
@@ -291,6 +350,26 @@ module Noop
         end
       end
       @task_list
+    end
+
+    # Loop through all task files and find those that
+    # do not have a corresponding spec file present
+    # @return [Array<Pathname>]
+    def find_tasks_without_specs
+      task_file_names.reject do |manifest|
+        spec = Noop::Utils.convert_to_spec manifest
+        spec_file_names.include? spec
+      end
+    end
+
+    # Loop through all spec files and find those that
+    # do not have a corresponding task file present
+    # @return [Array<Pathname>]
+    def find_specs_without_tasks
+      spec_file_names.reject do |spec|
+        manifest = Noop::Utils.convert_to_manifest spec
+        task_file_names.include? manifest
+      end
     end
 
   end
