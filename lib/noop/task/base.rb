@@ -8,24 +8,59 @@ module Noop
       self.pid = Process.pid
       self.thread = Thread.current.object_id
       @parallel = false
-      Noop::Utils.warning "#{self}: Validation is failed!" unless valid?
     end
 
     attr_accessor :parallel
     attr_accessor :pid
     attr_accessor :thread
     attr_accessor :status
+    attr_accessor :valid
 
+    # Check if this task's configuration is valid
+    # @return [true,false]
+    def valid?
+      validate unless valid.is_a? TrueClass or valid.is_a? FalseClass
+      valid
+    end
+
+    # @return [true,false]
     def success?
       status == :success
     end
 
+    # @return [true,false]
     def failed?
       status == :failed
     end
 
+    # @return [true,false]
     def pending?
       status == :pending
+    end
+
+    # Write a debug message to the logger
+    # @return [void]
+    def debug(message)
+      Noop::Config.log.debug message
+    end
+
+    # Output a message to the console
+    # @return [void]
+    def output(message)
+      Noop::Utils.output message
+    end
+
+    # Write an error message to the log
+    # and raise the exception
+    # @return [void]
+    def error(message)
+      Noop::Utils.error message
+    end
+
+    # Write a warning message to the log
+    # @return [void]
+    def warning(message)
+      Noop::Utils.warning message
     end
 
     # @return [true,false]
@@ -34,24 +69,35 @@ module Noop
     end
 
     # @return [true,false]
-    def valid?
-      unless file_path_spec.exist?
-        Noop::Utils.warning "No spec file: #{file_path_spec}!"
-        return false
+    def validate
+      if file_name_spec_set?
+        unless file_present_spec?
+          warning "No spec file: #{file_path_spec}!"
+          self.valid = false
+          return valid
+        end
+      else
+        warning 'Spec file is not set for this task!'
+        self.valid = false
+        return valid
       end
-      unless file_path_manifest.exist?
-        Noop::Utils.warning "No task file: #{file_path_manifest}!"
-        return false
+
+      unless file_present_manifest?
+        warning "No task file: #{file_path_manifest}!"
+        self.valid = false
+        return valid
       end
-      unless file_path_hiera.exist?
-        Noop::Utils.warning "No hiera file: #{file_path_hiera}!"
-        return false
+      unless file_present_hiera?
+        warning "No hiera file: #{file_path_hiera}!"
+        self.valid = false
+        return valid
       end
-      unless file_path_facts.exist?
-        Noop::Utils.error "No facts file: #{file_path_hiera}!"
-        return false
+      unless file_present_facts?
+        warning "No facts file: #{file_path_hiera}!"
+        self.valid = false
+        return valid
       end
-      true
+      self.valid = true
     end
 
     # @return [String]
@@ -59,9 +105,10 @@ module Noop
       "Task[#{file_base_spec}]"
     end
 
+    # @return [String]
     def description
       message = ''
-      message += "Task: #{file_name_manifest}"
+      message += "Manifest: #{file_name_manifest}"
       message += " Spec: #{file_name_spec}"
       message += " Hiera: #{file_name_hiera}"
       message += " Facts: #{file_name_facts}"
@@ -69,6 +116,7 @@ module Noop
       message
     end
 
+    # @return [String]
     def process_info
       message = ''
       message + "Object: #{object_id}"
@@ -81,5 +129,6 @@ module Noop
     def inspect
       "Task[#{description}]"
     end
+
   end
 end
