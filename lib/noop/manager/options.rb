@@ -3,6 +3,8 @@ require 'optparse'
 module Noop
   class Manager
 
+    # Parse the CLI options
+    # @return [Hash]
     def options
       return @options if @options
       @options = {}
@@ -41,9 +43,6 @@ module Noop
         opts.on('-R', '--run_failed_tasks', 'Run the task that have previously failed again') do
           @options[:run_failed_tasks] = true
         end
-        opts.on('-M', '--list_missing', 'List all task manifests without a spec file') do
-          @options[:list_missing] = true
-        end
         opts.on('-x', '--xunit_report', 'Save report in xUnit format to a file') do
           @options[:xunit_report] = true
         end
@@ -80,7 +79,7 @@ module Noop
         opts.on('-c', '--task_console', 'Run PRY console') do
           ENV['SPEC_TASK_CONSOLE'] = 'YES'
         end
-        opts.on('-C', '--rspec_console', 'Run PRY console in the ') do
+        opts.on('-C', '--rspec_console', 'Run PRY console in the RSpec process') do
           ENV['SPEC_RSPEC_CONSOLE'] = 'YES'
         end
         opts.on('-d', '--task_debug', 'Show framework debug messages') do
@@ -126,12 +125,12 @@ module Noop
         opts.on('-A', '--catalog_show', 'Show catalog content debug output') do
           ENV['SPEC_CATALOG_SHOW'] = 'YES'
         end
-        # opts.on('--catalog_save', 'Save catalog to the files instead of comparing them with the current catalogs') do
-        #   ENV['SPEC_CATALOG_CHECK'] = 'save'
-        # end
-        # opts.on('--catalog_check', 'Check the saved catalog against the current one') do
-        #   ENV['SPEC_CATALOG_CHECK'] = 'check'
-        # end
+        opts.on('-V', '--catalog_save', 'Save catalog to the files instead of comparing them with the current catalogs') do
+          ENV['SPEC_CATALOG_CHECK'] = 'save'
+        end
+        opts.on('-v', '--catalog_check', 'Check the saved catalog against the current one') do
+          ENV['SPEC_CATALOG_CHECK'] = 'check'
+        end
         # opts.on('--spec_generate', 'Generate specs for catalogs') do
         #   ENV['SPEC_SPEC_GENERATE'] = 'YES'
         # end
@@ -141,30 +140,35 @@ module Noop
         # opts.on('--spec_coverage', 'Show spec coverage statistics') do
         #   ENV['SPEC_COVERAGE'] = 'YES'
         # end
-        # opts.on('--puppet_binary_files', 'Check if Puppet installs binary files') do
-        #   ENV['SPEC_PUPPET_BINARY_FILES'] = 'YES'
-        # end
-        # opts.on('--file_resources DIR', 'Save file resources to this dir') do |dir|
-        #   ENV['SPEC_SAVE_FILE_RESOURCES'] = dir
-        # end
+        opts.on('--puppet_binary_files', 'Check if Puppet installs binary files') do
+          ENV['SPEC_PUPPET_BINARY_FILES'] = 'YES'
+        end
+        opts.on('--save_file_resources', 'Save file resources list to a report file') do
+          ENV['SPEC_SAVE_FILE_RESOURCES'] = 'YES'
+        end
 
       end
       optparse.parse!
       @options
     end
 
+    # Import a list of spec files form the option
+    # @return [Array<Pathname>]
     def import_specs_list(specs)
       specs.map do |spec|
         Noop::Utils.convert_to_spec spec
       end
     end
 
+    # Import a list of Hiera or facts files form the option
+    # @return [Array<Pathname>]
     def import_yamls_list(yamls)
       yamls.map do |yaml|
         Noop::Utils.convert_to_yaml yaml
       end
     end
 
+    # Any default options values can be set here
     def options_defaults(options)
       options[:parallel_run] = 0
     end
