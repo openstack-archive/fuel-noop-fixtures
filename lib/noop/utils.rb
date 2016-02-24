@@ -75,7 +75,19 @@ module Noop
 
     def self.error(message)
       Noop::Config.log.fatal message
-      exit(1)
+      fail message
+    end
+
+    def self.output(message)
+      puts message
+    end
+
+    def self.separator(title=nil)
+      if title
+        "=< #{title} >=".ljust 70, '='
+      else
+        '=' * 70
+      end
     end
   end
 end

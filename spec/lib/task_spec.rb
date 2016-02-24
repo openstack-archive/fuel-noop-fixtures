@@ -47,7 +47,7 @@ describe Noop::Task do
     end
 
     it 'should have valid?' do
-      is_expected.not_to be_valid
+      is_expected.to respond_to(:valid?)
     end
 
     it 'should have to_s' do
@@ -55,7 +55,7 @@ describe Noop::Task do
     end
 
     it 'should have inspect' do
-      expect(subject.inspect).to eq 'Task[Task: my/test.pp Spec: my/test_spec.rb Hiera: novanet-primary-controller.yaml Facts: ubuntu.yaml Status: pending]'
+      expect(subject.inspect).to eq 'Task[Manifest: my/test.pp Spec: my/test_spec.rb Hiera: novanet-primary-controller.yaml Facts: ubuntu.yaml Status: pending]'
     end
   end
 
@@ -197,6 +197,55 @@ describe Noop::Task do
       expect(subject.element_globals).to be_a Pathname
       expect(subject.element_globals.to_s).to eq 'globals/novanet-primary-controller'
     end
+  end
+
+  context 'validation' do
+    context 'valid task' do
+      before(:each) do
+        allow(subject).to receive(:file_present_spec?).and_return true
+        allow(subject).to receive(:file_present_manifest?).and_return true
+        allow(subject).to receive(:file_present_hiera?).and_return true
+        allow(subject).to receive(:file_present_facts?).and_return true
+      end
+
+      it 'should be valid' do
+        subject.validate
+        is_expected.to be_valid
+      end
+
+    end
+
+    context 'spec is not set' do
+      subject do
+        Noop::Task.new
+      end
+
+      before(:each) do
+        allow(Noop::Utils).to receive(:warning)
+      end
+
+      it 'should report unset spec' do
+        is_expected.not_to be_file_name_spec_set
+      end
+
+      it 'should not be valid' do
+        subject.validate
+        is_expected.not_to be_valid
+      end
+    end
+
+    context 'spec is set but missing' do
+
+      it 'should NOT report unset spec' do
+        is_expected.to be_file_name_spec_set
+      end
+
+      it 'should not be valid' do
+        subject.validate
+        is_expected.not_to be_valid
+      end
+    end
+
   end
 
 end
