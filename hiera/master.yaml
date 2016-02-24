@@ -1,25 +1,4 @@
-# fqdn is needed for tests internals
-fqdn: "fuel.domain.tld"
-role: "master"
-
-# run only these tasks with the master node manifest
-test_tasks:
-- master/astute-only
-- master/cobbler-only
-- master/dhcp-default-range
-- master/hiera-for-container
-- master/host-only
-- master/host-upgrade
-- master/keystone-only
-- master/nailgun-only
-- master/nginx-only
-- master/ostf-only
-- master/postgres-only
-- master/puppetsync-only
-- master/rabbitmq-only
-- master/rsyslog-only
-
-# Full astute.yaml for new-style manifests that load it via Hiera
+---
 "HOSTNAME": "nailgun"
 "DNS_DOMAIN": "test.domain.local"
 "DNS_SEARCH": "test.domain.local"
