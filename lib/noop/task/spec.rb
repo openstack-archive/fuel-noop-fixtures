@@ -4,7 +4,22 @@ module Noop
     def file_name_spec
       return @file_name_spec if @file_name_spec
       self.file_name_spec = Noop::Utils.path_from_env 'SPEC_FILE_NAME'
+      error 'The spec file name is not set for this task!' unless file_name_spec_set?
       @file_name_spec
+    end
+
+    # Check if the spec name for this spec is set
+    # @return [true,false]
+    def file_name_spec_set?
+      not @file_name_spec.nil?
+    end
+
+    # Check if the currently running spec is the same as the given one
+    # @return [true,false]
+    def current_spec_is?(spec)
+      return false unless file_name_spec_set?
+      spec = Noop::Utils.convert_to_spec spec
+      file_name_spec == spec
     end
 
     # @return [Pathname]
@@ -35,13 +50,23 @@ module Noop
     end
 
     # @return [true,false]
-    def file_present_spec
+    def file_present_spec?
       file_path_spec.readable?
+    end
+
+    # @return [true,false]
+    def file_present_manifest?
+      file_path_manifest.readable?
     end
 
     # @return [Pathname]
     def file_name_task_extension
       Noop::Utils.convert_to_path(file_base_spec.to_s.gsub('/', '-') + '.yaml')
+    end
+
+    # @return [Pathname]
+    def file_name_base_task_report
+      Noop::Utils.convert_to_path("#{file_name_task_extension.sub_ext ''}_#{file_base_hiera}_#{file_base_facts}")
     end
 
   end
