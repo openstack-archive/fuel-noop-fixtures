@@ -27,7 +27,6 @@ Output:::
         -O, --report_only_tasks          Show only tasks, skip individual examples
         -r, --load_saved_reports         Read saved report JSON files from the previous run and show tasks report
         -R, --run_failed_tasks           Run the task that have previously failed again
-        -M, --list_missing               List all task manifests without a spec file
         -x, --xunit_report               Save report in xUnit format to a file
     List options:
         -Y, --list_hiera                 List all hiera yaml files
@@ -40,7 +39,7 @@ Output:::
         -f, --facts FACTS1,FACTS2        Run only these facts yamls. Example: "ubuntu.yaml,centos.yaml"
     Debug options:
         -c, --task_console               Run PRY console
-        -C, --rspec_console              Run PRY console in the
+        -C, --rspec_console              Run PRY console in the RSpec process
         -d, --task_debug                 Show framework debug messages
         -D, --puppet_debug               Show Puppet debug messages
             --debug_log FILE             Write all debug messages to this files
@@ -56,7 +55,11 @@ Output:::
             --dir_puppet_modules DIR     Path to the puppet modules
     Spec options:
         -A, --catalog_show               Show catalog content debug output
+        -V, --catalog_save               Save catalog to the files instead of comparing them with the current catalogs
+        -v, --catalog_check              Check the saved catalog against the current one
         -a, --spec_status                Show spec status blocks
+            --puppet_binary_files        Check if Puppet installs binary files
+            --save_file_resources        Save file resources list to a report file
 
 Shortcut scripts
 ----------------
@@ -78,5 +81,6 @@ can be used to perform some common actions.
   the numbers of tasks in the library.
 - **run_failed_tasks.sh** This wrapper will load the saved reports files from
   the previous run and will try to run all the failed tasks again.
-- **purge_reports.sh** Removes all report files.
-- **purge_globals.sh** Removes all globals files.
+- **purge_reports.sh** Removes all task report files.
+- **purge_globals.sh** Removes all saved globals files.
+- **purge_catalogs.sh** Removes all saves catalog files.

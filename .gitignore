@@ -12,7 +12,7 @@
 .project
 
 # Doc
-doc/build
+doc/_build
 
 # Editors
 *.swp
