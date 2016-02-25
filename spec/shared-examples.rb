@@ -1,3 +1,5 @@
+require_relative 'hosts/common.rb'
+
 shared_examples 'compile' do
   it { is_expected.to compile }
 end
@@ -71,6 +73,12 @@ def run_test(manifest_file, *args)
 
   begin
     include_examples 'catalog'
+  rescue ArgumentError
+    true
+  end
+
+  begin
+    include_examples 'common'
   rescue ArgumentError
     true
   end
