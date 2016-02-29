@@ -12,6 +12,7 @@
 .project
 
 # Doc
+doc/_build
 doc/build
 
 # Editors
