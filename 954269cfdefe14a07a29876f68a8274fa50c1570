@@ -1,0 +1,11 @@
+Code-Review+2: Aleksandr Didenko <adidenko@mirantis.com>
+Code-Review+1: Alex Schultz <aschultz@mirantis.com>
+Code-Review+2: Dmitry Ilyin <dilyin@mirantis.com>
+Code-Review+1: Maksim Malchuk <mmalchuk@mirantis.com>
+Workflow+1: Dmitry Ilyin <dilyin@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 29 Feb 2016 18:28:55 +0000
+Reviewed-on: https://review.openstack.org/282418
+Project: openstack/fuel-noop-fixtures
+Branch: refs/heads/master
