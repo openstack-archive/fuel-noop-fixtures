@@ -1,60 +1,12 @@
 require 'erb'
-require 'colorize'
-require 'rexml/document'
-
-# TODO: cli report should use data from tasks_report_structure instead of reimplementing it
 
 module Noop
   class Manager
-    STATUS_STRING_LENGTH = 8
+    COLUMN_WIDTH = 8
 
-    def tasks_report_structure(tasks)
-      tasks_report = []
-
-      tasks.each do |task|
-        task_hash = {}
-        task_hash[:status] = task.status
-        task_hash[:name] = task.to_s
-        task_hash[:description] = task.description
-        task_hash[:spec] = task.file_name_spec.to_s
-        task_hash[:hiera] = task.file_name_hiera.to_s
-        task_hash[:facts] = task.file_name_facts.to_s
-        task_hash[:task] = task.file_name_manifest.to_s
-        task_hash[:examples] = []
-
-        if task.report.is_a? Hash
-          examples = task.report['examples']
-          next unless examples.is_a? Array
-          examples.each do |example|
-            example_hash = {}
-            example_hash[:file_path] = example['file_path']
-            example_hash[:line_number] = example['line_number']
-            example_hash[:description] = example['description']
-            example_hash[:status] = example['status']
-            example_hash[:run_time] = example['run_time']
-            example_hash[:pending_message] = example['pending_message']
-            exception_class = example.fetch('exception', {}).fetch('class', nil)
-            exception_message = example.fetch('exception', {}).fetch('message', nil)
-            next unless example_hash[:description] and example_hash[:status]
-            if exception_class and exception_message
-              example_hash[:exception_class] = exception_class
-              example_hash[:exception_message] = exception_message
-            end
-            task_hash[:examples] << example_hash
-          end
-
-          summary = task.report['summary']
-          task_hash[:example_count] = summary['example_count']
-          task_hash[:failure_count] = summary['failure_count']
-          task_hash[:pending_count] = summary['pending_count']
-          task_hash[:duration] = summary['duration']
-        end
-
-        tasks_report << task_hash
-      end
-      tasks_report
-    end
-
+    # Output a status string for this task.
+    # Output examples to unless disables.
+    # @param task [Noop::Task]
     def output_task_status(task)
       return if options[:report_only_failed] and task.success?
       line = task_status_string task
@@ -65,6 +17,8 @@ module Noop
       output_task_examples task unless options[:report_only_tasks]
     end
 
+    # Output examples report for this task
+    # @param task [Noop::Task]
     def output_task_examples(task)
       return unless task.report.is_a? Hash
       examples = task.report['examples']
@@ -81,36 +35,47 @@ module Noop
       end
     end
 
+    # Get a colored string with status of this task
+    # @param task [Noop::Task]
+    # @return [String]
     def task_status_string(task)
       if task.pending?
-        'PENDING'.ljust(STATUS_STRING_LENGTH).colorize :blue
+        'PENDING'.ljust(COLUMN_WIDTH).colorize :blue
       elsif task.success?
-        'SUCCESS'.ljust(STATUS_STRING_LENGTH).colorize :green
+        'SUCCESS'.ljust(COLUMN_WIDTH).colorize :green
       elsif task.failed?
-        'FAILED'.ljust(STATUS_STRING_LENGTH).colorize :red
+        'FAILED'.ljust(COLUMN_WIDTH).colorize :red
       else
         task.status
       end
     end
 
+    # Colorize the example status string
+    # @param status [String]
+    # @return [String]
     def example_status_string(status)
       if status == 'passed'
-        status.ljust(STATUS_STRING_LENGTH).colorize :green
+        status.ljust(COLUMN_WIDTH).colorize :green
       elsif status == 'failed'
-        status.ljust(STATUS_STRING_LENGTH).colorize :red
+        status.ljust(COLUMN_WIDTH).colorize :red
       else
-        status.ljust(STATUS_STRING_LENGTH).colorize :blue
+        status.ljust(COLUMN_WIDTH).colorize :blue
       end
     end
 
+    # Return a string showing if the directory is present.
+    # @param directory [Pathname]
+    # @return [String]
     def directory_check_status_string(directory)
       if directory.directory?
-        'SUCCESS'.ljust(STATUS_STRING_LENGTH).colorize :green
+        'SUCCESS'.ljust(COLUMN_WIDTH).colorize :green
       else
-        'FAILED'.ljust(STATUS_STRING_LENGTH).colorize :red
+        'FAILED'.ljust(COLUMN_WIDTH).colorize :red
       end
     end
 
+    # Find the length of the longest spec file name
+    # @return [Integer]
     def max_length_spec
       return @max_length_spec if @max_length_spec
       @max_length_spec = task_list.map do |task|
@@ -118,6 +83,8 @@ module Noop
       end.max
     end
 
+    # Find the length of the longest Hiera file name
+    # @return [Integer]
     def max_length_hiera
       return @max_length_hiera if @max_length_hiera
       @max_length_hiera = task_list.map do |task|
@@ -125,6 +92,8 @@ module Noop
       end.max
     end
 
+    # Find the length of the longest facts file name
+    # @return [Integer]
     def max_length_facts
       return @max_length_facts if @max_length_facts
       @max_length_facts = task_list.map do |task|
@@ -132,6 +101,7 @@ module Noop
       end.max
     end
 
+    # Output a status string with tasks count
     def output_task_totals
       count = {
           :total => 0,
@@ -139,24 +109,25 @@ module Noop
           :pending => 0,
       }
       task_list.each do |task|
+        next unless task.is_a? Noop::Task
         count[:pending] += 1 if task.pending?
         count[:failed] += 1 if task.failed?
         count[:total] += 1
       end
-      output "Tasks: #{count[:total]} Failed: #{count[:failed]} Pending: #{count[:pending]}"
+      output_stats_string 'Tasks', count[:total], count[:failed], count[:pending]
     end
 
+    # Output a status string with examples count
     def output_examples_total
       count = {
           :total => 0,
           :failed => 0,
           :pending => 0,
       }
-
       task_list.each do |task|
-        examples = task.report['examples']
-        next unless examples.is_a? Array
-        examples.each do |example|
+        next unless task.is_a? Noop::Task
+        next unless task.has_report?
+        task.report['examples'].each do |example|
           count[:total] += 1
           if example['status'] == 'failed'
             count[:failed] += 1
@@ -165,50 +136,71 @@ module Noop
           end
         end
       end
-      output "Examples: #{count[:total]} Failed: #{count[:failed]} Pending: #{count[:pending]}"
+      output_stats_string 'Examples', count[:total], count[:failed], count[:pending]
     end
 
-    def task_report
+    # Format a status string of examples or tasks
+    def output_stats_string(name, total, failed, pending)
+      line = "#{name.to_s.ljust(COLUMN_WIDTH).colorize :yellow}"
+      line += " Total: #{total.to_s.ljust(COLUMN_WIDTH).colorize :green}"
+      line += " Failed: #{failed.to_s.ljust(COLUMN_WIDTH).colorize :red}"
+      line += " Pending: #{pending.to_s.ljust(COLUMN_WIDTH).colorize :blue}"
+      output line
+    end
+
+    # Show the main tasks report
+    def tasks_report
+      output Noop::Utils.separator
       task_list.each do |task|
         output_task_status task
       end
+      output Noop::Utils.separator
+      tasks_stats
+      output Noop::Utils.separator
+    end
+
+    # Show the tasks and examples stats
+    def tasks_stats
       output_examples_total unless options[:report_only_tasks]
       output_task_totals
     end
 
+    # Show report with all defined filters content
     def show_filters
       if options[:filter_specs]
         options[:filter_specs] = [options[:filter_specs]] unless options[:filter_specs].is_a? Array
-        output "Spec filter: #{options[:filter_specs].join ', '}"
+        output "Spec filter: #{options[:filter_specs].join(', ').colorize :green}"
       end
       if options[:filter_facts]
         options[:filter_facts] = [options[:filter_facts]] unless options[:filter_facts].is_a? Array
-        output "Facts filter: #{options[:filter_facts].join ', '}"
+        output "Facts filter: #{options[:filter_facts].join(', ').colorize :green}"
       end
       if options[:filter_hiera]
         options[:filter_hiera] = [options[:filter_hiera]] unless options[:filter_hiera].is_a? Array
-        output "Hiera filter: #{options[:filter_hiera].join ', '}"
+        output "Hiera filter: #{options[:filter_hiera].join(', ').colorize :green}"
       end
       if options[:filter_examples]
         options[:filter_examples] = [options[:filter_examples]] unless options[:filter_examples].is_a? Array
-        output "Examples filter: #{options[:filter_examples].join ', '}"
+        output "Examples filter: #{options[:filter_examples].join(', ').colorize :green}"
       end
     end
 
+    # Show the stats of discovered library objects
     def show_library
       template = <<-'eof'
-<%= '=' * 80 %>
-Tasks discovered: <%= task_file_names.length %>
-Specs discovered: <%= spec_file_names.length %>
-Hiera discovered: <%= hiera_file_names.length %>
-Facts discovered: <%= facts_file_names.length %>
-Tasks in graph metadata:  <%= task_graph_metadata.length %>
-Tasks with spec metadata: <%= spec_run_metadata.length %>
-Total tasks to run: <%= task_list.count %>
+Tasks discovered: <%= task_file_names.length.to_s.colorize :green %>
+Specs discovered: <%= spec_file_names.length.to_s.colorize :green %>
+Hiera discovered: <%= hiera_file_names.length.to_s.colorize :green %>
+Facts discovered: <%= facts_file_names.length.to_s.colorize :green %>
+
+Tasks in graph metadata:  <%= task_graph_metadata.length.to_s.colorize :yellow %>
+Tasks with spec metadata: <%= spec_run_metadata.length.to_s.colorize :yellow %>
+Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
       eof
       output ERB.new(template, nil, '-').result(binding)
     end
 
+    # Check the existence of main directories
     def check_paths
       paths = [
           :dir_path_config,
@@ -226,10 +218,45 @@ Total tasks to run: <%= task_list.count %>
           :dir_path_reports,
       ]
       max_length = paths.map { |p| p.to_s.length }.max
+
       paths.each do |path|
         directory = Noop::Config.send path
         output "#{directory_check_status_string directory} #{path.to_s.ljust max_length} #{directory}"
       end
+    end
+
+    # Output a list of tasks without a spec file
+    # and a list of specs without a task file.
+    def list_missing_tasks_and_specs
+      tasks_without_specs = find_tasks_without_specs.to_a
+      specs_without_tasks = find_specs_without_tasks.to_a
+      if tasks_without_specs.any?
+        Noop::Utils.output 'There are tasks without specs:'.colorize :red
+        tasks_without_specs.each do |task|
+          Noop::Utils.output "#{'*'.colorize :yellow} #{task}"
+        end
+      end
+      if specs_without_tasks.any?
+        Noop::Utils.output 'There are specs without tasks:'.colorize :red
+        specs_without_tasks.each do |spec|
+          Noop::Utils.output "#{'*'.colorize :yellow} #{spec}"
+        end
+      end
+    end
+
+    # Run all diagnostic procedures
+    def self_check
+      output Noop::Utils.separator 'Paths'
+      check_paths
+      if has_filters?
+        output Noop::Utils.separator 'Filters'
+        show_filters
+      end
+      output Noop::Utils.separator 'Missing'
+      list_missing_tasks_and_specs
+      output Noop::Utils.separator 'Library'
+      show_library
+      output Noop::Utils.separator 'End'
     end
 
   end
