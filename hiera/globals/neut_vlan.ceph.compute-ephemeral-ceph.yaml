@@ -36,6 +36,7 @@
         sahara/api: "10.122.12.3"
         heat/api: "10.122.12.3"
         ceilometer/api: "10.122.12.3"
+        aodh/api: "10.122.12.3"
         ex: "10.122.11.4"
         ceph/public: "10.122.12.3"
         mgmt/messaging: "10.122.12.3"
@@ -54,6 +55,7 @@
         fw-admin: "10.122.10.6"
         glance/api: "10.122.12.3"
         mgmt/vip: "10.122.12.3"
+        murano/api: "10.122.12.3"
         nova/api: "10.122.12.3"
         horizon: "10.122.12.3"
         nova/migration: "10.122.12.3"
@@ -199,6 +201,8 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      murano/api: br-mgmt
+      aodh/api: br-mgmt
     interfaces: 
       eth4: 
         vendor_specific: 
@@ -294,11 +298,13 @@
     uid: "2"
     fqdn: node-2.domain.local
     network_roles: 
+      murano/api: "10.122.12.6"
       keystone/api: "10.122.12.6"
       neutron/api: "10.122.12.6"
       mgmt/database: "10.122.12.6"
       sahara/api: "10.122.12.6"
       ceilometer/api: "10.122.12.6"
+      aodh/api: "10.122.12.6"
       ceph/public: "10.122.12.6"
       mgmt/messaging: "10.122.12.6"
       management: "10.122.12.6"

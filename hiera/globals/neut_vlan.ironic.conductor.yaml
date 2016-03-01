@@ -36,6 +36,7 @@
         sahara/api: "192.168.0.3"
         heat/api: "192.168.0.3"
         ceilometer/api: "192.168.0.3"
+        aodh/api: "192.168.0.3"
         ex: "172.16.51.117"
         ceph/public: "192.168.0.3"
         mgmt/messaging: "192.168.0.3"
@@ -55,6 +56,7 @@
         fw-admin: "10.109.37.4"
         glance/api: "192.168.0.3"
         mgmt/vip: "192.168.0.3"
+        murano/api: "192.168.0.3"
         ironic/api: "192.168.0.3"
         nova/api: "192.168.0.3"
         horizon: "192.168.0.3"
@@ -215,6 +217,8 @@
       mgmt/memcache: br-mgmt
       ironic/api: br-mgmt
       ceph/replication: br-storage
+      murano/api: br-mgmt
+      aodh/api: br-mgmt
     interfaces: 
       eth5: 
         vendor_specific: 
@@ -341,6 +345,7 @@
       mgmt/database: "192.168.0.4"
       sahara/api: "192.168.0.4"
       ceilometer/api: "192.168.0.4"
+      aodh/api: "192.168.0.4"
       mgmt/vip: "192.168.0.4"
       ceph/public: "192.168.0.4"
       mgmt/messaging: "192.168.0.4"
@@ -358,6 +363,7 @@
       fw-admin: "10.109.37.3"
       glance/api: "192.168.0.4"
       heat/api: "192.168.0.4"
+      murano/api: "192.168.0.4"
       ironic/api: "192.168.0.4"
       nova/api: "192.168.0.4"
       horizon: "192.168.0.4"
