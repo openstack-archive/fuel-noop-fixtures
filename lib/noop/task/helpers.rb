@@ -65,7 +65,11 @@ module Noop
     # @param class_name [String]
     def puppet_class_include(class_name)
       class_name = class_name.to_s
-      puppet_scope.function_include [class_name] unless Noop.puppet_scope.catalog.classes.include? class_name
+      unless puppet_scope.catalog.classes.include? class_name
+        debug "Dynamicly loading class: '#{class_name}'"
+        class_names = puppet_scope.transform_and_assert_classnames [class_name]
+        puppet_scope.compiler.evaluate_classes class_names, puppet_scope, false
+      end
     end
 
     # Convert resource catalog to a RAL catalog
