@@ -36,6 +36,7 @@
         sahara/api: "10.122.7.1"
         heat/api: "10.122.7.1"
         ceilometer/api: "10.122.7.1"
+        aodh/api: "10.122.7.1"
         ex: "10.122.6.2"
         ceph/public: "10.122.7.1"
         mgmt/messaging: "10.122.7.1"
@@ -54,6 +55,7 @@
         fw-admin: "10.122.5.3"
         glance/api: "10.122.7.1"
         mgmt/vip: "10.122.7.1"
+        murano/api: "10.122.7.1"
         nova/api: "10.122.7.1"
         horizon: "10.122.7.1"
         nova/migration: "10.122.7.1"
@@ -77,6 +79,7 @@
         sahara/api: "10.122.7.5"
         heat/api: "10.122.7.5"
         ceilometer/api: "10.122.7.5"
+        aodh/api: "10.122.7.5"
         ex: "10.122.6.3"
         ceph/public: "10.122.7.5"
         mgmt/messaging: "10.122.7.5"
@@ -95,6 +98,7 @@
         fw-admin: "10.122.5.6"
         glance/api: "10.122.7.5"
         mgmt/vip: "10.122.7.5"
+        murano/api: "10.122.7.5"
         nova/api: "10.122.7.5"
         horizon: "10.122.7.5"
         nova/migration: "10.122.7.5"
@@ -118,6 +122,7 @@
         sahara/api: "10.122.7.4"
         heat/api: "10.122.7.4"
         ceilometer/api: "10.122.7.4"
+        aodh/api: "10.122.7.4"
         ex: "10.122.6.4"
         ceph/public: "10.122.7.4"
         mgmt/messaging: "10.122.7.4"
@@ -136,6 +141,7 @@
         fw-admin: "10.122.5.7"
         glance/api: "10.122.7.4"
         mgmt/vip: "10.122.7.4"
+        murano/api: "10.122.7.4"
         nova/api: "10.122.7.4"
         horizon: "10.122.7.4"
         nova/migration: "10.122.7.4"
@@ -283,6 +289,8 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      murano/api: br-mgmt
+      aodh/api: br-mgmt
     interfaces: 
       eth4: 
         vendor_specific: 
@@ -378,11 +386,13 @@
     uid: "5"
     fqdn: node-5.domain.local
     network_roles: 
+      murano/api: "10.122.7.3"
       keystone/api: "10.122.7.3"
       neutron/api: "10.122.7.3"
       mgmt/database: "10.122.7.3"
       sahara/api: "10.122.7.3"
       ceilometer/api: "10.122.7.3"
+      aodh/api: "10.122.7.3"
       ceph/public: "10.122.7.3"
       mgmt/messaging: "10.122.7.3"
       management: "10.122.7.3"

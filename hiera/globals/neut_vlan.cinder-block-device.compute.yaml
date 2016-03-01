@@ -31,11 +31,13 @@
       uid: "1"
       fqdn: node-1.domain.tld
       network_roles: 
+        murano/api: "192.168.0.3"
         keystone/api: "192.168.0.3"
         neutron/api: "192.168.0.3"
         mgmt/database: "192.168.0.3"
         sahara/api: "192.168.0.3"
         ceilometer/api: "192.168.0.3"
+        aodh/api: "192.168.0.3"
         ex: "172.18.79.164"
         ceph/public: "192.168.0.3"
         mgmt/messaging: "192.168.0.3"
@@ -72,11 +74,13 @@
       uid: "3"
       fqdn: node-3.domain.tld
       network_roles: 
+        murano/api: "192.168.0.6"
         keystone/api: "192.168.0.6"
         neutron/api: "192.168.0.6"
         mgmt/database: "192.168.0.6"
         sahara/api: "192.168.0.6"
         ceilometer/api: "192.168.0.6"
+        aodh/api: "192.168.0.6"
         ex: "172.18.79.163"
         ceph/public: "192.168.0.6"
         mgmt/messaging: "192.168.0.6"
@@ -238,6 +242,8 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      murano/api: br-mgmt
+      aodh/api: br-mgmt
     interfaces: 
       eth1: {}
       eth0: {}
@@ -318,11 +324,13 @@
     uid: "2"
     fqdn: node-2.domain.tld
     network_roles: 
+      murano/api: "192.168.0.7"
       keystone/api: "192.168.0.7"
       neutron/api: "192.168.0.7"
       mgmt/database: "192.168.0.7"
       sahara/api: "192.168.0.7"
       ceilometer/api: "192.168.0.7"
+      aodh/api: "192.168.0.7"
       ceph/public: "192.168.0.7"
       mgmt/messaging: "192.168.0.7"
       management: "192.168.0.7"

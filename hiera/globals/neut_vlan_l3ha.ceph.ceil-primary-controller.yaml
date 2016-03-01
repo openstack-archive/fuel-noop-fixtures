@@ -52,6 +52,7 @@
         sahara/api: "192.168.0.3"
         heat/api: "192.168.0.3"
         ceilometer/api: "192.168.0.3"
+        aodh/api: "192.168.0.3"
         ex: "172.16.0.2"
         ceph/public: "192.168.0.3"
         ceph/radosgw: "172.16.0.2"
@@ -72,6 +73,7 @@
         fw-admin: "10.109.0.9"
         glance/api: "192.168.0.3"
         mgmt/vip: "192.168.0.3"
+        murano/api: "192.168.0.3"
         nova/api: "192.168.0.3"
         horizon: "192.168.0.3"
         mgmt/memcache: "192.168.0.3"
@@ -94,6 +96,7 @@
         sahara/api: "192.168.0.8"
         heat/api: "192.168.0.8"
         ceilometer/api: "192.168.0.8"
+        aodh/api: "192.168.0.8"
         ex: "172.16.0.8"
         ceph/public: "192.168.0.8"
         ceph/radosgw: "172.16.0.8"
@@ -114,6 +117,7 @@
         fw-admin: "10.109.0.9"
         glance/api: "192.168.0.8"
         mgmt/vip: "192.168.0.8"
+        murano/api: "192.168.0.8"
         nova/api: "192.168.0.8"
         horizon: "192.168.0.8"
         mgmt/memcache: "192.168.0.8"
@@ -294,6 +298,8 @@
       mgmt/memcache: br-mgmt
       cinder/iscsi: br-storage
       ceph/replication: br-storage
+      aodh/api: br-mgmt
+      murano/api: br-mgmt
     transformations: 
       - action: add-br
         name: br-fw-admin
