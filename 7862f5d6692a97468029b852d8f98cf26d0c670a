@@ -1,0 +1,8 @@
+Code-Review+2: Dmitry Ilyin <dilyin@mirantis.com>
+Workflow+1: Dmitry Ilyin <dilyin@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 01 Mar 2016 12:18:05 +0000
+Reviewed-on: https://review.openstack.org/286249
+Project: openstack/fuel-noop-fixtures
+Branch: refs/heads/master
