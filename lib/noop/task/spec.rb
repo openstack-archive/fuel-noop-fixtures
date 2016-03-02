@@ -14,14 +14,6 @@ module Noop
       not @file_name_spec.nil?
     end
 
-    # Check if the currently running spec is the same as the given one
-    # @return [true,false]
-    def current_spec_is?(spec)
-      return false unless file_name_spec_set?
-      spec = Noop::Utils.convert_to_spec spec
-      file_name_spec == spec
-    end
-
     # @return [Pathname]
     def file_base_spec
       Noop::Utils.convert_to_path(file_name_spec.to_s.gsub /_spec\.rb$/, '')

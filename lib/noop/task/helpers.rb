@@ -98,5 +98,21 @@ module Noop
       lambda { ral_catalog }
     end
 
+    # Check if the currently running spec is the given one
+    # or one of the given ones if an array is provided
+    # @param spec [String, Array<String>]
+    # @return [true,false]
+    def current_spec_is?(spec)
+      return false unless file_name_spec_set?
+      spec = [spec] unless spec.is_a? Array
+      spec = spec.flatten
+      spec = spec.map do |spec|
+        Noop::Utils.convert_to_spec spec
+      end
+      spec.any? do |spec|
+        file_name_spec == spec
+      end
+    end
+
   end
 end
