@@ -24,3 +24,4 @@
 :ipaddress_docker0: 172.17.42.1
 :ipaddress_eth0: 10.20.0.2
 :ipaddress_lo: 127.0.0.1
+:rsyslog_version: 5.8.10
