@@ -34,6 +34,9 @@ module Noop
           def map(data, *args, &block)
             data.map &block
           end
+          def processor_count
+            0
+          end
         end
       end
     end
@@ -57,10 +60,23 @@ module Noop
       Noop::Utils.error message
     end
 
-    # Check if parallel run option is enabled
+    # Get the parallel run count value from the options
+    # or from the processor count if "auto" is set
+    # @return [Integer]
+    def parallel_run
+      return @parallel_run if @parallel_run
+      if options[:parallel_run] = 'auto'
+        @parallel_run = Parallel.processor_count
+        debug "Using parallel run count: #{@parallel_run}"
+        return @parallel_run
+      end
+      @parallel_run = options[:parallel_run].to_i
+    end
+
+    # Check if the parallel run option is enabled
     # @return [true,false]
     def parallel_run?
-      options[:parallel_run] and options[:parallel_run] > 0
+      parallel_run > 0
     end
 
     # Check if there are some filters defined
@@ -113,7 +129,7 @@ module Noop
     # Does not run tasks if :pretend option is given
     # return [Array<Noop::Task>]
     def run_all_tasks
-      Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
+      Parallel.map(task_list, :in_threads => parallel_run) do |task|
         task.run unless options[:pretend]
         task
       end
@@ -124,7 +140,7 @@ module Noop
     # Does not run tasks if :pretend option is given
     # return [Array<Noop::Task>]
     def run_failed_tasks
-      Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
+      Parallel.map(task_list, :in_threads => parallel_run) do |task|
         next if task.success?
         task.status = :pending
         task.run unless options[:pretend]
@@ -136,7 +152,7 @@ module Noop
     # from the previous run attempt
     # return [Array<Noop::Task>]
     def load_task_reports
-      Parallel.map(task_list, :in_threads => options[:parallel_run]) do |task|
+      Parallel.map(task_list, :in_threads => parallel_run) do |task|
         task.file_load_report_json
         task.determine_task_status
         task
