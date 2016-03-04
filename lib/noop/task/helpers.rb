@@ -67,8 +67,7 @@ module Noop
       class_name = class_name.to_s
       unless puppet_scope.catalog.classes.include? class_name
         debug "Dynamicly loading class: '#{class_name}'"
-        class_names = puppet_scope.transform_and_assert_classnames [class_name]
-        puppet_scope.compiler.evaluate_classes class_names, puppet_scope, false
+        puppet_scope.compiler.evaluate_classes [class_name], puppet_scope, false
       end
     end
 
