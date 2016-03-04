@@ -13,7 +13,7 @@ module Noop
       optparse = OptionParser.new do |opts|
         opts.separator 'Main options:'
         opts.on('-j', '--jobs JOBS', 'Parallel run RSpec jobs') do |jobs|
-          @options[:parallel_run] = jobs.to_i
+          @options[:parallel_run] = jobs
         end
         opts.on('-g', '--globals', 'Run all globals tasks and update saved globals YAML files') do |jobs|
           ENV['SPEC_UPDATE_GLOBALS'] = 'YES'
