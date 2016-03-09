@@ -784,3 +784,6 @@ workloads_collector:
   password: v6vMAe7Q
   tenant: services
   username: workloads_collector
+hugepages:
+- {count: 512, numa_id: 0, size: 2048}
+- {count: 8, numa_id: 1, size: 1048576}
