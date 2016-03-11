@@ -65,7 +65,7 @@ module Noop
     # @return [Integer]
     def parallel_run
       return @parallel_run if @parallel_run
-      if options[:parallel_run] = 'auto'
+      if options[:parallel_run] == 'auto'
         @parallel_run = Parallel.processor_count
         debug "Using parallel run count: #{@parallel_run}"
         return @parallel_run
