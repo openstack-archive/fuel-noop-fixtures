@@ -9,6 +9,7 @@
   "mac": "64:85:8e:4f:7c:2e"
   "netmask": "255.255.255.0"
   "size": "256"
+  "ssh_network": "10.20.0.0/24"
 "BOOTSTRAP":
   "flavor": "ubuntu"
   "http_proxy": ""
