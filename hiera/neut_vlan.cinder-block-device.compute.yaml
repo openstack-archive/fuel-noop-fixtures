@@ -797,3 +797,6 @@ kernel_params:
 openstack_version_prev:
 quantum: true
 use_neutron: true
+hugepages:
+- {count: 512, numa_id: 0, size: 2048}
+- {count: 8, numa_id: 1, size: 1048576}

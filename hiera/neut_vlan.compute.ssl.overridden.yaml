@@ -1005,3 +1005,6 @@ external_ntp:
     weight: 100
     label: Host OS NTP Servers
 openstack_version_prev:
+hugepages:
+- {count: 512, numa_id: 0, size: 2048}
+- {count: 8, numa_id: 1, size: 1048576}
