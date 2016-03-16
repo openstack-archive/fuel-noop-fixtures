@@ -439,7 +439,7 @@
   openstack_version: liberty-9.0
   primary_controller: false
   private_int:
-  queue_provider: rabbitmq
+  queue_provider: rabbit
   rabbit_ha_queues: true
   rabbit:
     password: WYcvKQyZ
