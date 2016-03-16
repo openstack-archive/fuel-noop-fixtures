@@ -417,7 +417,7 @@
   openstack_version: "2014.2-6.1"
   primary_controller: false
   private_int:
-  queue_provider: rabbitmq
+  queue_provider: rabbit
   rabbit_ha_queues: true
   rabbit:
     password: c7fQJeSe
