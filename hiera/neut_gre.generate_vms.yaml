@@ -15,9 +15,12 @@ vms_conf:
 - id: 1
   cpu: 2
   ram: 3
+  created: true
 - id: 2
   cpu: 4
+  created: true
 - id: 3
+  created: true
 ceilometer:
   db_password: ZcffCIm5
   enabled: false
