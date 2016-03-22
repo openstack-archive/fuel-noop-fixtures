@@ -561,7 +561,7 @@ nova:
   db_password: VXcP6cIR
   state_path: /var/lib/nova
   user_password: fuhtZH6v
-nova_quota: false
+nova_quota: true
 online: true
 openstack_version: 2014.2-6.1
 openstack_version_prev: null
