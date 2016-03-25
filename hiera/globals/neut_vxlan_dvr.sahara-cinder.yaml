@@ -526,7 +526,6 @@
   syslog_log_facility_ironic: LOG_LOCAL0
   token_provider: keystone.token.providers.fernet.Provider
   use_ceilometer: false
-  use_monit: false
   use_neutron: true
   use_ovs: true
   use_syslog: true
