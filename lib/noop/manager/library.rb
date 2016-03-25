@@ -6,12 +6,15 @@ module Noop
 
     # Recursively find file in the folder
     # @param root [String,Pathname]
+    # @param exclude [Array<Pathname>]
     # @return [Array<Pathname>]
-    def find_files(root, path_from=nil, &block)
+    def find_files(root, path_from=nil, exclude=[], &block)
+      exclude = [exclude] unless exclude.is_a? Array
       root = Noop::Utils.convert_to_path root
       files = []
       begin
         root.children.each do |path|
+          next if exclude.include? path.basename
           if path.file?
             if block_given?
               next unless block.call path
@@ -19,7 +22,7 @@ module Noop
             path = path.relative_path_from path_from if path_from
             files << path
           else
-            files << find_files(path, path_from, &block)
+            files << find_files(path, path_from, exclude, &block)
           end
         end
       rescue
@@ -43,7 +46,8 @@ module Noop
     def hiera_file_names
       return @hiera_file_names if @hiera_file_names
       error "No #{Noop::Config.dir_path_hiera} directory!" unless Noop::Config.dir_path_hiera.directory?
-      @hiera_file_names = find_files(Noop::Config.dir_path_hiera, Noop::Config.dir_path_hiera) do |file|
+      exclude = [ Noop::Config.dir_name_hiera_override, Noop::Config.dir_name_globals ]
+      @hiera_file_names = find_files(Noop::Config.dir_path_hiera, Noop::Config.dir_path_hiera, exclude) do |file|
         file.to_s.end_with? '.yaml'
       end
     end
@@ -53,7 +57,8 @@ module Noop
     def facts_file_names
       return @facts_file_names if @facts_file_names
       error "No #{Noop::Config.dir_path_facts} directory!" unless Noop::Config.dir_path_facts.directory?
-      @facts_file_names = find_files(Noop::Config.dir_path_facts, Noop::Config.dir_path_facts) do |file|
+      exclude = [ Noop::Config.dir_name_facts_override ]
+      @facts_file_names = find_files(Noop::Config.dir_path_facts, Noop::Config.dir_path_facts, exclude) do |file|
         file.to_s.end_with? '.yaml'
       end
     end
@@ -207,19 +212,23 @@ module Noop
           line = line.downcase
 
           if line =~ /^\s*#\s*(?:yamls|hiera):\s*(.*)/
-            task_spec_metadata[:hiera] = get_list_of_yamls $1
+            task_spec_metadata[:hiera] = [] unless task_spec_metadata[:hiera].is_a? Array
+            task_spec_metadata[:hiera] += get_list_of_yamls $1
           end
 
           if line =~ /^\s*#\s*facts:\s*(.*)/
-            task_spec_metadata[:facts] = get_list_of_yamls $1
+            task_spec_metadata[:facts] = [] unless task_spec_metadata[:facts].is_a? Array
+            task_spec_metadata[:facts] += get_list_of_yamls $1
           end
 
           if line =~ /^\s*#\s*(?:skip_yamls|skip_hiera):\s(.*)/
-            task_spec_metadata[:skip_hiera] = get_list_of_yamls $1
+            task_spec_metadata[:skip_hiera] = [] unless task_spec_metadata[:skip_hiera].is_a? Array
+            task_spec_metadata[:skip_hiera] += get_list_of_yamls $1
           end
 
           if line =~ /^\s*#\s*skip_facts:\s(.*)/
-            task_spec_metadata[:skip_facts] = get_list_of_yamls $1
+            task_spec_metadata[:skip_facts] = [] unless task_spec_metadata[:skip_facts].is_a? Array
+            task_spec_metadata[:skip_facts] += get_list_of_yamls $1
           end
 
           if line =~ /disable_spec/
@@ -370,6 +379,18 @@ module Noop
       spec_file_names.reject do |spec|
         manifest = Noop::Utils.convert_to_manifest spec
         task_file_names.include? manifest
+      end
+    end
+
+    # Loop through all spec files and find those
+    # which have not been matched to any task
+    # @return [Array<Pathname>]
+    def find_unmatched_specs
+      spec_file_names.reject do |spec|
+        next true if spec == Noop::Config.spec_name_globals
+        task_list.any? do |task|
+          task.file_name_spec == spec
+        end
       end
     end
 

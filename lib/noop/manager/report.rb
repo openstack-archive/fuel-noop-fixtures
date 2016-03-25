@@ -225,6 +225,18 @@ Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
       end
     end
 
+    # Output a list of specs that have not been matched to any Hiera files
+    # and will never run
+    def list_unmatched_specs
+      unmatched_specs = find_unmatched_specs.to_a
+      if unmatched_specs.any?
+        Noop::Utils.output 'There are specs which have not been matched to a YAML and will never run:'.colorize :red
+        unmatched_specs.each do |spec|
+          Noop::Utils.output "#{'*'.colorize :yellow} #{spec}"
+        end
+      end
+    end
+
     # Output a list of tasks without a spec file
     # and a list of specs without a task file.
     def list_missing_tasks_and_specs
@@ -254,6 +266,8 @@ Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
       end
       output Noop::Utils.separator 'Missing'
       list_missing_tasks_and_specs
+      output Noop::Utils.separator 'Unmatched'
+      list_unmatched_specs
       output Noop::Utils.separator 'Library'
       show_library
       output Noop::Utils.separator 'End'

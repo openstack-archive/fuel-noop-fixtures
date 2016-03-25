@@ -46,7 +46,7 @@ module Noop
       result
     end
 
-    # Run the code block inside the deployment driectory
+    # Run the code block inside the deployment directory
     # and then return back
     def self.inside_deployment_directory
       current_directory = Dir.pwd
