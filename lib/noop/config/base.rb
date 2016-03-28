@@ -97,6 +97,23 @@ module Noop
       @dir_path_workspace
     end
 
+    # The name of the gem home directory
+    # @return [Pathname]
+    def self.dir_name_gem_home
+      Pathname.new 'bundled_gems'
+    end
+
+    # Get a GEM_HOME either from the environment (using RVM)
+    # or from the default value (using bundle)
+    # @return [Pathname]
+    def self.dir_path_gem_home
+      return @dir_path_gem_home if @dir_path_gem_home
+      @dir_path_gem_home = Noop::Utils.path_from_env 'GEM_HOME'
+      return @dir_path_gem_home if @dir_path_gem_home
+      @dir_path_gem_home = dir_path_workspace + dir_name_gem_home
+      @dir_path_gem_home
+    end
+
     # @return [Pathname]
     def self.dir_path_reports
       return @dir_path_reports if @dir_path_reports

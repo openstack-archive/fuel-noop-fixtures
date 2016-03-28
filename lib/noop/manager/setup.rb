@@ -1,15 +1,6 @@
 module Noop
   class Manager
 
-    # Get a GEM_HOME either from the environment (using RVM)
-    # or from the default value (using bundle)
-    # @return [Pathname]
-    def dir_path_gem_home
-      return Pathname.new ENV['GEM_HOME'] if ENV['GEM_HOME']
-      dir_name_bundle = Pathname.new 'bundled_gems'
-      Noop::Config.dir_path_workspace + dir_name_bundle
-    end
-
     # Check if bundle command is installed
     # @return [true,false]
     def bundle_installed?
@@ -18,15 +9,17 @@ module Noop
     end
 
     # Check if librarian-puppet command is installed
+    # If we are using bundle there is no need to check it
     # @return [true,false]
     def librarian_installed?
+      return true if ENV['SPEC_BUNDLE_EXEC']
       `librarian-puppet version`
       $?.exitstatus == 0
     end
 
     # Setup bundle in the fixtures repo and bundle for puppet librarian
     def setup_bundle
-      ENV['GEM_HOME'] = dir_path_gem_home.to_s
+      ENV['GEM_HOME'] = Noop::Config.dir_path_gem_home.to_s
       bundle_install_and_update Noop::Config.dir_path_root
       bundle_install_and_update Noop::Config.dir_path_deployment
       Dir.chdir Noop::Config.dir_path_root
@@ -34,7 +27,7 @@ module Noop
 
     # Run update script to setup external Puppet modules
     def setup_library
-      ENV['GEM_HOME'] = dir_path_gem_home.to_s
+      ENV['GEM_HOME'] = Noop::Config.dir_path_gem_home.to_s
       update_puppet_modules Noop::Config.dir_path_deployment
       Dir.chdir Noop::Config.dir_path_root
     end
@@ -78,7 +71,7 @@ module Noop
       root = Noop::Utils.convert_to_path root
       Dir.chdir root or error "Could not chdir to: #{root}"
       command = './update_modules.sh -v'
-      command = command + ' -b' if options[:bundle_exec]
+      command = command + ' -b' if ENV['SPEC_BUNDLE_EXEC']
       command = command + ' -r' if options[:reset_librarian_puppet]
 
       debug 'Starting update_modules script'
