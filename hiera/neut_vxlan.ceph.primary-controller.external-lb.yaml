@@ -71,6 +71,8 @@ glance:
   db_password: V2vSizKfj7FhJ8Udsej5JgpP
   image_cache_max_size: '0'
   user_password: BStrSmB4E32MG50FUwmLTlg5
+glance_glare:
+  user_password: 23dfhbWd
 heat:
   auth_encryption_key: a19ba308b92c67311f28d1c1b862b19a
   db_password: 1os6n2hAHSgBNKAqNVqk9MZN
@@ -148,6 +150,7 @@ network_metadata:
         ex: 10.146.1.10
         fw-admin: 10.146.0.10
         glance/api: 10.146.2.12
+        glance/glare: 10.146.2.12
         heat/api: 10.146.2.12
         horizon: 10.146.2.12
         ironic/api: 10.146.2.12
@@ -191,6 +194,7 @@ network_metadata:
         ex: 10.144.1.10
         fw-admin: 10.144.0.11
         glance/api: 10.144.2.10
+        glance/glare: 10.146.2.10
         heat/api: 10.144.2.10
         horizon: 10.144.2.10
         ironic/api: 10.144.2.10
@@ -234,6 +238,7 @@ network_metadata:
         ex: 10.145.1.12
         fw-admin: 10.145.0.8
         glance/api: 10.145.2.13
+        glance/glare: 10.146.2.13
         heat/api: 10.145.2.13
         horizon: 10.145.2.13
         ironic/api: 10.145.2.13
@@ -275,6 +280,7 @@ network_metadata:
         cinder/iscsi: 10.145.3.16
         fw-admin: 10.146.0.13
         glance/api: 10.146.2.10
+        glance/glare: 10.146.2.10
         heat/api: 10.146.2.10
         horizon: 10.146.2.10
         ironic/api: 10.146.2.10
@@ -315,6 +321,7 @@ network_metadata:
         cinder/iscsi: 10.145.3.13
         fw-admin: 10.144.0.12
         glance/api: 10.144.2.11
+        glance/glare: 10.146.2.11
         heat/api: 10.144.2.11
         horizon: 10.144.2.11
         ironic/api: 10.144.2.11
@@ -355,6 +362,7 @@ network_metadata:
         cinder/iscsi: 10.145.3.10
         fw-admin: 10.145.0.9
         glance/api: 10.145.2.12
+        glance/glare: 10.146.2.12
         heat/api: 10.145.2.12
         horizon: 10.145.2.12
         ironic/api: 10.145.2.12
@@ -395,6 +403,7 @@ network_metadata:
         cinder/iscsi: 10.145.3.14
         fw-admin: 10.146.0.12
         glance/api: 10.146.2.11
+        glance/glare: 10.146.2.11
         heat/api: 10.146.2.11
         horizon: 10.146.2.11
         ironic/api: 10.146.2.11
@@ -535,6 +544,7 @@ network_scheme:
     ex: br-ex
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     heat/api: br-mgmt
     horizon: br-mgmt
     ironic/api: br-mgmt

@@ -572,6 +572,8 @@ glance:
   image_cache_max_size: '5368709120'
   user_password: J3jcjTzv
   db_password: vZsiQ0A3
+glance_glare:
+  user_password: 23dfhbWd
 ceilometer:
   db_password: ALNBMs7i
   user_password: 5fXkIlEW
@@ -856,6 +858,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.122.10.4
         glance/api: 10.122.12.5
+        glance/glare: 10.122.12.5
         heat/api: 10.122.12.5
         mgmt/vip: 10.122.12.5
         nova/api: 10.122.12.5
@@ -897,6 +900,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.122.10.6
         glance/api: 10.122.12.3
+        glance/glare: 10.122.12.3
         mgmt/vip: 10.122.12.3
         murano/api: 10.122.12.3
         nova/api: 10.122.12.3
@@ -936,6 +940,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.122.10.3
         glance/api: 10.122.12.4
+        glance/glare: 10.122.12.4
         heat/api: 10.122.12.4
         mgmt/vip: 10.122.12.4
         nova/api: 10.122.12.4
@@ -974,6 +979,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.122.10.7
         glance/api: 10.122.12.6
+        glance/glare: 10.122.12.6
         heat/api: 10.122.12.6
         mgmt/vip: 10.122.12.6
         nova/api: 10.122.12.6
@@ -1080,6 +1086,7 @@ network_scheme:
     neutron/floating: br-floating
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     mgmt/vip: br-mgmt
     heat/api: br-mgmt
     nova/api: br-mgmt

@@ -138,6 +138,22 @@ use_ssl:
   glance_admin_usercert: true
   glance_admin_certdata:
     content: 'somethinglikeacertificateforglance'
+  glance_glare: true
+  glance_glare_public: true
+  glance_glare_public_hostname: 'glare.public.fuel.local'
+  glance_glare_public_usercert: true
+  glance_glare_public_certdata:
+    content: 'somethinglikeacertificateforglare'
+  glance_glare_internal: true
+  glance_glare_internal_hostname: 'glare.internal.fuel.local'
+  glance_glare_internal_usercert: true
+  glance_glare_internal_certdata:
+    content: 'somethinglikeacertificateforglare'
+  glance_glare_admin: true
+  glance_glare_admin_hostname: 'glare.admin.fuel.local'
+  glance_glare_admin_usercert: true
+  glance_glare_admin_certdata:
+    content: 'somethinglikeacertificateforglare'
   cinder: true
   cinder_public: true
   cinder_public_hostname: 'cinder.public.fuel.local'
@@ -257,6 +273,8 @@ glance:
   db_password: 0UYCFNfc
   image_cache_max_size: '13868466176'
   user_password: 94lWbeNn
+glance_glare:
+  user_password: 23dfhbWd
 heat:
   auth_encryption_key: 8edb899a7e81e56abe51639880aa32dd
   db_password: AuaPc3Yq
@@ -341,6 +359,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.0.9
         glance/api: 192.168.0.1
+        glance/glare: 192.168.0.1
         mgmt/vip: 192.168.0.1
         murano/api: 192.168.0.1
         murano/cfapi: 192.168.0.1
@@ -384,6 +403,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.3
         glance/api: 192.168.0.2
+        glance/glare: 192.168.0.2
         mgmt/vip: 192.168.0.2
         murano/api: 192.168.0.2
         murano/cfapi: 192.168.0.2
@@ -427,6 +447,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.6
         glance/api: 192.168.0.3
+        glance/glare: 192.168.0.3
         mgmt/vip: 192.168.0.3
         murano/api: 192.168.0.3
         murano/cfapi: 192.168.0.3
@@ -470,6 +491,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.0.9
         glance/api: 192.168.0.4
+        glance/glare: 192.168.0.4
         mgmt/vip: 192.168.0.4
         murano/api: 192.168.0.4
         murano/cfapi: 192.168.0.4
@@ -513,6 +535,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.4
         glance/api: 192.168.0.5
+        glance/glare: 192.168.0.5
         mgmt/vip: 192.168.0.5
         murano/api: 192.168.0.5
         murano/cfapi: 192.168.0.5
@@ -640,6 +663,7 @@ network_scheme:
     neutron/private: br-prv
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     heat/api: br-mgmt
     murano/api: br-mgmt
     murano/cfapi: br-mgmt
