@@ -632,6 +632,8 @@ glance:
   image_cache_max_size: '10714349568'
   user_password: lDOkW0TlkoMY4CmPy8PiW80E
   db_password: nNVZnNgNLYYIolcKRcWb2c3J
+glance_glare:
+  user_password: 23dfhbWd
 cobbler:
   profile: ubuntu_1404_x86_64
 mongo:
@@ -925,6 +927,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.37.4
         glance/api: 192.168.0.3
+        glance/glare: 192.168.0.3
         mgmt/vip: 192.168.0.3
         murano/api: 192.168.0.3
         ironic/api: 192.168.0.3
@@ -965,6 +968,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.37.3
         glance/api: 192.168.0.4
+        glance/glare: 192.168.0.4
         heat/api: 192.168.0.4
         murano/api: 192.168.0.4
         ironic/api: 192.168.0.4
@@ -1093,6 +1097,7 @@ network_scheme:
     neutron/floating: br-floating
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     mgmt/vip: br-mgmt
     heat/api: br-mgmt
     cinder/iscsi: br-storage
