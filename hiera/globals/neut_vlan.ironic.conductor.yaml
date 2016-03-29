@@ -68,7 +68,7 @@
       node_roles:
         - primary-controller
       name: node-1
-  ceph_primary_monitor_node_hash:
+  ceph_primary_monitor_node:
     node-1: *id001
   ceph_rgw_nodes: *id002
   ceilometer:

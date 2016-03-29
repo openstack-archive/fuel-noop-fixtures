@@ -110,7 +110,7 @@
       node_roles:
         - controller
       name: node-131
-  ceph_primary_monitor_node_hash: {}
+  ceph_primary_monitor_node: {}
   ceph_rgw_nodes: *id001
   ceilometer:
     alarm_history_time_to_live: "604800"
