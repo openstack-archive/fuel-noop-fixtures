@@ -289,10 +289,16 @@ mp:
 - point: '2'
   weight: '2'
 murano:
+  rabbit:
+    - user: foo
+    - password: bar
+    - vhost: '/'
+    - port: 1234
   db_password: R3SuvZbh
   enabled: true
   rabbit_password: ZNdTAgF3
   user_password: xP8WtHQw
+syslog_log_facility_murano: LOG_LOCAL0
 murano-cfapi:
   enabled: true
 murano_glance_artifacts_plugin:
