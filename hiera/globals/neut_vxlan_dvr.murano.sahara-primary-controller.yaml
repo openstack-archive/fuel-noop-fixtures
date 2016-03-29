@@ -508,6 +508,7 @@
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
   "ironic::logging::default_log_levels": *id006
+  "murano::logging::default_log_levels": *id006
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
