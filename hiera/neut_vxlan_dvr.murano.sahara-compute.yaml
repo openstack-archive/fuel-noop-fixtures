@@ -114,10 +114,16 @@ mp:
 - point: '2'
   weight: '2'
 murano:
+  rabbit:
+    user: foo
+    password: bar
+    vhost: '/'
+    port: 55572
   db_password: R3SuvZbh
   enabled: true
   rabbit_password: ZNdTAgF3
   user_password: xP8WtHQw
+syslog_log_facility_murano: LOG_LOCAL0
 murano_settings:
   metadata:
     label: Murano Settings
