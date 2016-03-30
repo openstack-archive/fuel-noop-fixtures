@@ -250,21 +250,6 @@
     node-128: *id001
     node-129: *id003
     node-131: *id004
-  murano:
-    rabbit:
-      vhost: /
-      port: "55572"
-    db_password: R3SuvZbh
-    enabled: true
-    rabbit_password: ZNdTAgF3
-    user_password: xP8WtHQw
-    plugins:
-      glance_artifacts_plugin:
-        enabled: true
-  murano_nodes:
-    node-128: *id001
-    node-129: *id003
-    node-131: *id004
   mysql:
     root_password: Lz18BpbQ
     wsrep_password: JrlrVOHu
