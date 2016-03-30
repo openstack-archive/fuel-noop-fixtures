@@ -111,7 +111,7 @@
       node_roles:
         - controller
       name: node-3
-  ceph_primary_monitor_node_hash:
+  ceph_primary_monitor_node:
     node-1: *id001
   ceph_rgw_nodes: *id002
   ceilometer:

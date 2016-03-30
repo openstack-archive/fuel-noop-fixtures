@@ -158,7 +158,7 @@
     syslog_server: "10.108.0.2"
   ceph_tuning_settings: {}
   ceph_monitor_nodes: *id001
-  ceph_primary_monitor_node_hash:
+  ceph_primary_monitor_node:
     node-128: *id002
   ceph_rgw_nodes: *id001
   ceilometer:
