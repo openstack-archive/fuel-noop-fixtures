@@ -116,6 +116,14 @@ def run_test(manifest_file, *args)
     true
   end
 
+  at_exit do
+    Noop.dir_path_coverage.mktree unless Noop.dir_path_coverage.directory?
+    Noop::Utils.debug "Saving coverage report to: '#{Noop.file_path_coverage_report}'"
+    File.open(Noop.file_path_coverage_report, 'w') do |file|
+      file.puts YAML.dump RSpec::Puppet::Coverage.report!
+    end
+  end if ENV['SPEC_COVERAGE']
+
   yield self if block_given?
 
 end

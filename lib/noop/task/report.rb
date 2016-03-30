@@ -70,6 +70,21 @@ Facts hierarchy:
       Noop::Config.dir_path_reports + file_name_report_json
     end
 
+    # @return [Pathname]
+    def dir_name_coverage
+      Pathname.new 'coverage'
+    end
+
+    # @return [Pathname]
+    def dir_path_coverage
+      Noop::Config.dir_path_reports + dir_name_coverage
+    end
+
+    # @return [Pathname]
+    def file_path_coverage_report
+      dir_path_coverage + Noop::Utils.convert_to_path("#{file_name_base_task_report}.yaml")
+    end
+
     # @return [Hash]
     def file_data_report_json
       return unless file_present_report_json?

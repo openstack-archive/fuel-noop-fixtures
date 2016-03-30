@@ -5,6 +5,7 @@ module Noop
       puppet_default_settings
       puppet_debug_override if ENV['SPEC_PUPPET_DEBUG']
       puppet_resource_scope_override
+      rspec_coverage_add_override
       return unless file_name_spec_set?
       hiera_config_override
       setup_manifest
@@ -90,6 +91,29 @@ module Noop
               :hiera_config => '/dev/null',
           }
       )
+    end
+
+    def rspec_coverage_add_override
+      RSpec::Puppet::Coverage.class_eval do
+        def add_from_catalog(catalog, test_module)
+          catalog.to_a.each do |resource|
+            next if @filters.include?(resource.to_s)
+            add(resource)
+          end
+        end
+        
+        def report!
+          report = {}
+          report[:total] = @collection.size
+          report[:touched] = @collection.count { |_, resource| resource.touched? }
+          report[:untouched] = report[:total] - report[:touched]
+          report[:coverage] = "%5.2f" % ((report[:touched].to_f / report[:total].to_f) * 100)
+          report[:resources] = Hash[*@collection.map do |name, wrapper|
+            [name, wrapper.to_hash]
+          end.flatten]
+          report
+        end
+      end
     end
 
   end
