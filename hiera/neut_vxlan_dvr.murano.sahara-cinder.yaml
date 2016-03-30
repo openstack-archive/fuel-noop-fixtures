@@ -81,6 +81,8 @@ glance:
   db_password: 0UYCFNfc
   image_cache_max_size: '5368709120'
   user_password: 94lWbeNn
+glance_glare:
+  user_password: 23dfhbWd
 heat:
   auth_encryption_key: 8edb899a7e81e56abe51639880aa32dd
   db_password: AuaPc3Yq
@@ -169,6 +171,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.0.9
         glance/api: 192.168.0.1
+        glance/glare: 192.168.0.1
         mgmt/vip: 192.168.0.1
         murano/api: 192.168.0.1
         nova/api: 192.168.0.1
@@ -211,6 +214,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.3
         glance/api: 192.168.0.2
+        glance/glare: 192.168.0.2
         mgmt/vip: 192.168.0.2
         murano/api: 192.168.0.2
         nova/api: 192.168.0.2
@@ -253,6 +257,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.6
         glance/api: 192.168.0.3
+        glance/glare: 192.168.0.3
         mgmt/vip: 192.168.0.3
         murano/api: 192.168.0.3
         nova/api: 192.168.0.3
@@ -295,6 +300,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.109.0.9
         glance/api: 192.168.0.4
+        glance/glare: 192.168.0.4
         mgmt/vip: 192.168.0.4
         murano/api: 192.168.0.4
         nova/api: 192.168.0.4
@@ -337,6 +343,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.108.0.4
         glance/api: 192.168.0.5
+        glance/glare: 192.168.0.5
         mgmt/vip: 192.168.0.5
         murano/api: 192.168.0.5
         nova/api: 192.168.0.5
@@ -455,6 +462,7 @@ network_scheme:
     neutron/private: br-prv
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     heat/api: br-mgmt
     murano/api: br-mgmt
     nova/api: br-mgmt

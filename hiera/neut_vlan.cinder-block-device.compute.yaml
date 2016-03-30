@@ -29,6 +29,8 @@ glance:
   image_cache_max_size: '5368709120'
   user_password: oi0k3mANXsp1vTkMpa07oyBx
   db_password: GwBmC3yOp9oo63o4mLdxSLRC
+glance_glare:
+  user_password: 23dfhbWd
 cobbler:
   profile: ubuntu_1404_x86_64
 mongo:
@@ -311,6 +313,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.20.0.9
         glance/api: 192.168.0.4
+        glance/glare: 192.168.0.4
         heat/api: 192.168.0.4
         mgmt/vip: 192.168.0.4
         nova/api: 192.168.0.4
@@ -354,6 +357,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.20.0.4
         glance/api: 192.168.0.3
+        glance/glare: 192.168.0.3
         heat/api: 192.168.0.3
         mgmt/vip: 192.168.0.3
         nova/api: 192.168.0.3
@@ -393,6 +397,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.20.0.8
         glance/api: 192.168.0.5
+        glance/glare: 192.168.0.5
         heat/api: 192.168.0.5
         mgmt/vip: 192.168.0.5
         nova/api: 192.168.0.5
@@ -436,6 +441,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.20.0.7
         glance/api: 192.168.0.6
+        glance/glare: 192.168.0.6
         heat/api: 192.168.0.6
         mgmt/vip: 192.168.0.6
         nova/api: 192.168.0.6
@@ -475,6 +481,7 @@ network_metadata:
         neutron/floating:
         fw-admin: 10.20.0.10
         glance/api: 192.168.0.7
+        glance/glare: 192.168.0.7
         heat/api: 192.168.0.7
         mgmt/vip: 192.168.0.7
         nova/api: 192.168.0.7
@@ -560,6 +567,7 @@ network_scheme:
     mongo/db: br-mgmt
     fw-admin: br-fw-admin
     glance/api: br-mgmt
+    glance/glare: br-mgmt
     heat/api: br-mgmt
     mgmt/vip: br-mgmt
     nova/api: br-mgmt
