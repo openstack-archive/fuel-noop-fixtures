@@ -235,6 +235,21 @@
     - primary-mongo
     - mongo
   multi_host: true
+  murano:
+    rabbit:
+      vhost: /
+      port: "55572"
+    db_password: R3SuvZbh
+    enabled: true
+    rabbit_password: ZNdTAgF3
+    user_password: xP8WtHQw
+    plugins:
+      glance_artifacts_plugin:
+        enabled: true
+  murano_nodes:
+    node-128: *id001
+    node-129: *id003
+    node-131: *id004
   mysql:
     root_password: Lz18BpbQ
     wsrep_password: JrlrVOHu
@@ -508,6 +523,7 @@
   "nova::logging::default_log_levels": *id006
   "sahara::logging::default_log_levels": *id006
   "ironic::logging::default_log_levels": *id006
+  "murano::logging::default_log_levels": *id006
   syslog_log_facility_ceilometer: LOG_LOCAL0
   syslog_log_facility_ceph: LOG_LOCAL0
   syslog_log_facility_cinder: LOG_LOCAL3
