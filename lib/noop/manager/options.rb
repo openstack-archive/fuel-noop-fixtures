@@ -137,9 +137,9 @@ module Noop
         opts.on('-a', '--spec_status', 'Show spec status blocks') do
           ENV['SPEC_SHOW_STATUS'] = 'YES'
         end
-        # opts.on('--spec_coverage', 'Show spec coverage statistics') do
-        #   ENV['SPEC_COVERAGE'] = 'YES'
-        # end
+        opts.on('--spec_coverage', 'Show spec coverage statistics') do
+          ENV['SPEC_COVERAGE'] = 'YES'
+        end
         opts.on('--puppet_binary_files', 'Check if Puppet installs binary files') do
           ENV['SPEC_PUPPET_BINARY_FILES'] = 'YES'
         end
