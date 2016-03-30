@@ -116,6 +116,26 @@ def run_test(manifest_file, *args)
     true
   end
 
+  at_exit do
+    Noop.dir_path_coverage.mktree unless Noop.dir_path_coverage.directory?
+    report = RSpec::Puppet::Coverage.report!
+    Noop::Utils.output "Coverage:#{report[:coverage]}% (#{report[:touched]}/#{report[:total]})"
+    if report[:untouched] > 0
+      resources_report = "Untouched resources:\n"
+      resources = report[:resources]
+      if resources.is_a? Hash
+        resources.each do |resource, status|
+          resources_report += "* #{resource}\n" unless status['touched']
+        end
+      end
+      Noop::Utils.output resources_report
+    end
+    Noop::Utils.debug "Saving coverage report to: '#{Noop.file_path_coverage_report}'"
+    File.open(Noop.file_path_coverage_report, 'w') do |file|
+      file.puts YAML.dump report
+    end
+  end if ENV['SPEC_COVERAGE']
+
   yield self if block_given?
 
 end
