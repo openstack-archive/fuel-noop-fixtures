@@ -1,0 +1,632 @@
+
+--- 
+  access: 
+    email: "admin@localhost"
+    metadata: 
+      group: general
+      label: Access
+      weight: 10
+    password: admin
+    tenant: admin
+    user: admin
+  amqp_hosts: "10.146.2.12:5673, 10.144.2.10:5673, 10.145.2.13:5673"
+  amqp_port: "5673"
+  aodh_hash: 
+    user_password: Be0Oloop
+    db_password: Thu5ieY6
+  aodh_nodes: &id001
+    
+    node-1: &id002
+      
+      fqdn: node-1.domain.tld
+      name: node-1
+      network_roles: 
+        admin/pxe: "10.146.0.10"
+        ceilometer/api: "10.146.2.12"
+        ceph/public: "10.146.2.12"
+        ceph/radosgw: "10.146.1.10"
+        ceph/replication: "10.145.3.15"
+        cinder/api: "10.146.2.12"
+        cinder/iscsi: "10.145.3.15"
+        ex: "10.146.1.10"
+        fw-admin: "10.146.0.10"
+        glance/api: "10.146.2.12"
+        glance/glare: "10.146.2.12"
+        heat/api: "10.146.2.12"
+        horizon: "10.146.2.12"
+        ironic/api: "10.146.2.12"
+        keystone/api: "10.146.2.12"
+        management: "10.146.2.12"
+        mgmt/corosync: "10.146.2.12"
+        mgmt/database: "10.146.2.12"
+        mgmt/memcache: "10.146.2.12"
+        mgmt/messaging: "10.146.2.12"
+        mgmt/vip: "10.146.2.12"
+        mongo/db: "10.146.2.12"
+        murano/api: "10.146.2.12"
+        murano/cfapi: "10.146.2.12"
+        neutron/api: "10.146.2.12"
+        neutron/floating: 
+        neutron/mesh: "10.146.4.11"
+        neutron/private: 
+        nova/api: "10.146.2.12"
+        nova/migration: "10.146.2.12"
+        public/vip: "10.146.1.10"
+        sahara/api: "10.146.2.12"
+        storage: "10.145.3.15"
+        swift/api: "10.146.2.12"
+        swift/replication: "10.145.3.15"
+      node_roles: &id005
+        
+        - primary-controller
+      swift_zone: "1"
+      uid: "1"
+      user_node_name: "Untitled (51:42)"
+    node-2: &id003
+      
+      fqdn: node-2.domain.tld
+      name: node-2
+      network_roles: 
+        admin/pxe: "10.144.0.11"
+        ceilometer/api: "10.144.2.10"
+        ceph/public: "10.144.2.10"
+        ceph/radosgw: "10.144.1.10"
+        ceph/replication: "10.145.3.12"
+        cinder/api: "10.144.2.10"
+        cinder/iscsi: "10.145.3.12"
+        ex: "10.144.1.10"
+        fw-admin: "10.144.0.11"
+        glance/api: "10.144.2.10"
+        glance/glare: "10.146.2.10"
+        heat/api: "10.144.2.10"
+        horizon: "10.144.2.10"
+        ironic/api: "10.144.2.10"
+        keystone/api: "10.144.2.10"
+        management: "10.144.2.10"
+        mgmt/corosync: "10.144.2.10"
+        mgmt/database: "10.144.2.10"
+        mgmt/memcache: "10.144.2.10"
+        mgmt/messaging: "10.144.2.10"
+        mgmt/vip: "10.144.2.10"
+        mongo/db: "10.144.2.10"
+        murano/api: "10.144.2.10"
+        murano/cfapi: "10.144.2.10"
+        neutron/api: "10.144.2.10"
+        neutron/floating: 
+        neutron/mesh: "10.144.4.10"
+        neutron/private: 
+        nova/api: "10.144.2.10"
+        nova/migration: "10.144.2.10"
+        public/vip: "10.144.1.10"
+        sahara/api: "10.144.2.10"
+        storage: "10.145.3.12"
+        swift/api: "10.144.2.10"
+        swift/replication: "10.145.3.12"
+      node_roles: 
+        - controller
+      swift_zone: "2"
+      uid: "2"
+      user_node_name: "Untitled (ff:af)"
+    node-3: &id004
+      
+      fqdn: node-3.domain.tld
+      name: node-3
+      network_roles: 
+        admin/pxe: "10.145.0.8"
+        ceilometer/api: "10.145.2.13"
+        ceph/public: "10.145.2.13"
+        ceph/radosgw: "10.145.1.12"
+        ceph/replication: "10.145.3.11"
+        cinder/api: "10.145.2.13"
+        cinder/iscsi: "10.145.3.11"
+        ex: "10.145.1.12"
+        fw-admin: "10.145.0.8"
+        glance/api: "10.145.2.13"
+        glance/glare: "10.146.2.13"
+        heat/api: "10.145.2.13"
+        horizon: "10.145.2.13"
+        ironic/api: "10.145.2.13"
+        keystone/api: "10.145.2.13"
+        management: "10.145.2.13"
+        mgmt/corosync: "10.145.2.13"
+        mgmt/database: "10.145.2.13"
+        mgmt/memcache: "10.145.2.13"
+        mgmt/messaging: "10.145.2.13"
+        mgmt/vip: "10.145.2.13"
+        mongo/db: "10.145.2.13"
+        murano/api: "10.145.2.13"
+        murano/cfapi: "10.145.2.13"
+        neutron/api: "10.145.2.13"
+        neutron/floating: 
+        neutron/mesh: "10.145.4.11"
+        neutron/private: 
+        nova/api: "10.145.2.13"
+        nova/migration: "10.145.2.13"
+        public/vip: "10.145.1.12"
+        sahara/api: "10.145.2.13"
+        storage: "10.145.3.11"
+        swift/api: "10.145.2.13"
+        swift/replication: "10.145.3.11"
+      node_roles: 
+        - controller
+      swift_zone: "3"
+      uid: "3"
+      user_node_name: "Untitled (f9:37)"
+  apache_api_proxy_address: "10.146.0.10"
+  apache_ports: 
+    - "127.0.0.1:80"
+    - "10.146.2.12:80"
+    - "10.146.0.10:8888"
+    - "10.146.2.12:5000"
+    - "10.146.2.12:35357"
+  base_mac: "fa:16:3e:00:00:00"
+  base_syslog: 
+    syslog_port: "514"
+    syslog_server: "10.145.0.2"
+  ceph_tuning_settings: 
+    max_open_files: "131072"
+    osd_mkfs_type: xfs
+    osd_mount_options_xfs: "rw,relatime,inode64,logbsize=256k,delaylog,allocsize=4M"
+    osd_op_threads: "20"
+    filestore_queue_max_ops: "500"
+    filestore_queue_committing_max_ops: "5000"
+    journal_max_write_entries: "1000"
+    journal_queue_max_ops: "3000"
+    objecter_inflight_ops: "10240"
+    filestore_queue_max_bytes: "1048576000"
+    filestore_queue_committing_max_bytes: "1048576000"
+    journal_max_write_bytes: "1048576000"
+    journal_queue_max_bytes: "1048576000"
+    ms_dispatch_throttle_bytes: "1048576000"
+    objecter_infilght_op_bytes: "1048576000"
+    filestore_max_sync_interval: "10"
+  ceph_monitor_nodes: *id001
+  ceph_primary_monitor_node: 
+    node-1: *id002
+  ceph_rgw_nodes: *id001
+  ceilometer: 
+    alarm_history_time_to_live: "604800"
+    event_time_to_live: "604800"
+    metering_time_to_live: "604800"
+    http_timeout: "600"
+    notification_driver: "<SERVICE DEFAULT>"
+    db_password: p7iCE2KZKljrVVz0uMzvgYbv
+    enabled: false
+    metering_secret: t3v9FLxl145fuOnpKcnazDEM
+    user_password: J22PgmQIyjlgcwe2HryGRCv7
+  ceilometer_nodes: *id001
+  cinder: 
+    db_password: PTNv6TuwyGLWtO7D3pbbkxuN
+    fixed_key: "5953a5ee5ec4f035122ce41f165dc1cccf4c57c7266ed5e67d2c3694ed9c10ac"
+    user_password: YwEA4qhoHZDlOnaGBxGYbPYB
+  cinder_nodes: *id001
+  cinder_rate_limits: 
+    POST: "100000"
+    POST_SERVERS: "100000"
+    PUT: "100000"
+    GET: "100000"
+    DELETE: "100000"
+  corosync_roles: 
+    - primary-controller
+    - controller
+  custom_mysql_setup_class: galera
+  database_nodes: *id001
+  debug: false
+  default_gateway: 
+    - "10.146.1.1"
+  deployment_mode: ha_compact
+  dns_nameservers: []
+  glance_backend: ceph
+  glance: 
+    db_password: V2vSizKfj7FhJ8Udsej5JgpP
+    image_cache_max_size: "0"
+    user_password: BStrSmB4E32MG50FUwmLTlg5
+  glance_known_stores: 
+    - glance.store.rbd.Store
+    - glance.store.http.Store
+  glance_nodes: *id001
+  heat: 
+    auth_encryption_key: a19ba308b92c67311f28d1c1b862b19a
+    db_password: "1os6n2hAHSgBNKAqNVqk9MZN"
+    enabled: true
+    rabbit_password: Is8gNuzYLusDwHYsatpAGo5O
+    user_password: sGK76m9AaN0eKoBp2SS4uDzJ
+  heat_nodes: 
+    node-1: *id002
+    node-2: *id003
+    node-3: *id004
+  heat_roles: 
+    - primary-controller
+    - controller
+  horizon_nodes: *id001
+  custom_theme_path: themes/vendor
+  node_name: node-1
+  idle_timeout: "3600"
+  keystone: 
+    service_token_off: false
+    admin_token: OGyk2SvupPS4pbp9if6qjusy
+    db_password: tk8LwzqvQ4GsKgMMxyD26NXO
+  keystone_nodes: *id001
+  manage_volumes: ceph
+  management_network_range: "10.146.2.0/24"
+  master_ip: "10.145.0.2"
+  max_overflow: 20
+  max_pool_size: 20
+  max_retries: "-1"
+  mirror_type: external
+  mountpoints: 
+    - "1"
+    - "2"
+  mongo_roles: 
+    - primary-mongo
+    - mongo
+  multi_host: true
+  murano: 
+    rabbit: 
+      vhost: /
+      port: "55572"
+    db_password: TafLQgH1oHle3HZof4HWA8DJ
+    enabled: false
+    rabbit_password: XPnT1JUFwDq3azD6hZO8BP0r
+    user_password: qiLSuLKHHnuk20Ghv6Pn3dPt
+    plugins: 
+      glance_artifacts_plugin: 
+        enabled: false
+  murano_nodes: 
+    node-1: *id002
+    node-2: *id003
+    node-3: *id004
+  murano_roles: 
+    - primary-controller
+    - controller
+  mysql: 
+    root_password: xsyQO3pyE6839bMlBN8ssKHi
+    wsrep_password: Fs1szg9gr5Xu1YYC3spaVxew
+  network_config: 
+  network_scheme: 
+    endpoints: 
+      br-ex: 
+        IP: 
+          - "10.146.1.10/24"
+        gateway: "10.146.1.1"
+        routes: 
+          - net: "10.144.1.0/24"
+            via: "10.146.1.1"
+          - net: "10.145.1.0/24"
+            via: "10.146.1.1"
+      br-floating: 
+        IP: none
+      br-fw-admin: 
+        IP: 
+          - "10.146.0.10/24"
+        routes: 
+          - net: "10.144.0.0/24"
+            via: "10.146.0.1"
+          - net: "10.145.0.0/24"
+            via: "10.146.0.1"
+      br-mesh: 
+        IP: 
+          - "10.146.4.11/24"
+        routes: 
+          - net: "10.145.4.0/24"
+            via: "10.146.4.5"
+          - net: "10.144.4.0/24"
+            via: "10.146.4.5"
+      br-mgmt: 
+        IP: 
+          - "10.146.2.12/24"
+        routes: 
+          - net: "10.144.2.0/24"
+            via: "10.146.2.5"
+          - net: "10.145.2.0/24"
+            via: "10.146.2.5"
+      br-storage: 
+        IP: 
+          - "10.145.3.15/24"
+        routes: []
+    interfaces: 
+      enp0s3: 
+        vendor_specific: 
+          bus_info: "0000:00:03.0"
+          driver: e1000
+      enp0s4: 
+        vendor_specific: 
+          bus_info: "0000:00:04.0"
+          driver: e1000
+      enp0s5: 
+        vendor_specific: 
+          bus_info: "0000:00:05.0"
+          driver: e1000
+      enp0s6: 
+        vendor_specific: 
+          bus_info: "0000:00:06.0"
+          driver: e1000
+      enp0s7: 
+        vendor_specific: 
+          bus_info: "0000:00:07.0"
+          driver: e1000
+    provider: lnx
+    roles: 
+      admin/pxe: br-fw-admin
+      ceilometer/api: br-mgmt
+      ceph/public: br-mgmt
+      ceph/radosgw: br-ex
+      ceph/replication: br-storage
+      cinder/api: br-mgmt
+      cinder/iscsi: br-storage
+      ex: br-ex
+      fw-admin: br-fw-admin
+      glance/api: br-mgmt
+      glance/glare: br-mgmt
+      heat/api: br-mgmt
+      horizon: br-mgmt
+      ironic/api: br-mgmt
+      keystone/api: br-mgmt
+      management: br-mgmt
+      mgmt/corosync: br-mgmt
+      mgmt/database: br-mgmt
+      mgmt/memcache: br-mgmt
+      mgmt/messaging: br-mgmt
+      mgmt/vip: br-mgmt
+      mongo/db: br-mgmt
+      murano/api: br-mgmt
+      murano/cfapi: br-mgmt
+      neutron/api: br-mgmt
+      neutron/floating: br-floating
+      neutron/mesh: br-mesh
+      nova/api: br-mgmt
+      nova/migration: br-mgmt
+      public/vip: br-ex
+      sahara/api: br-mgmt
+      storage: br-storage
+      swift/api: br-mgmt
+      swift/replication: br-storage
+    transformations: 
+      - action: add-br
+        name: br-fw-admin
+      - action: add-br
+        name: br-mgmt
+      - action: add-br
+        name: br-storage
+      - action: add-br
+        name: br-ex
+      - action: add-br
+        name: br-floating
+        provider: ovs
+      - action: add-patch
+        bridges: 
+          - br-floating
+          - br-ex
+        mtu: 65000
+        provider: ovs
+      - action: add-br
+        name: br-mesh
+      - action: add-port
+        bridge: br-fw-admin
+        name: enp0s3
+      - action: add-port
+        bridge: br-ex
+        name: enp0s4
+      - action: add-port
+        bridge: br-mgmt
+        name: enp0s5
+      - action: add-port
+        bridge: br-mesh
+        name: enp0s6
+      - action: add-port
+        bridge: br-storage
+        name: enp0s7
+    version: "1.1"
+  neutron_config: 
+    L2: 
+      base_mac: "fa:16:3e:00:00:00"
+      phys_nets: 
+        physnet1: 
+          bridge: br-floating
+          vlan_range: 
+      segmentation_type: tun
+      tunnel_id_ranges: "2:65535"
+    L3: 
+      use_namespaces: true
+    database: 
+      passwd: rsuKYCs4oTrXfClMNxSUG6BI
+    default_floating_net: admin_floating_net
+    default_private_net: admin_internal_net
+    keystone: 
+      admin_password: "4MF6XuQjhmDuokIye9nEe8Un"
+    metadata: 
+      metadata_proxy_shared_secret: "1xqxGx1IUtAgmESyqebYrUw3"
+    predefined_networks: 
+      admin_floating_net: 
+        L2: 
+          network_type: flat
+          physnet: physnet1
+          router_ext: true
+          segment_id: 
+        L3: 
+          enable_dhcp: false
+          floating: 
+            - "10.144.1.130:10.144.1.254"
+          gateway: "10.144.1.1"
+          nameservers: []
+          subnet: "10.144.1.0/24"
+        shared: false
+        tenant: admin
+      admin_internal_net: 
+        L2: 
+          network_type: tun
+          physnet: 
+          router_ext: false
+          segment_id: 
+        L3: 
+          enable_dhcp: true
+          floating: 
+          gateway: "192.168.111.1"
+          nameservers: 
+            - "8.8.4.4"
+            - "8.8.8.8"
+          subnet: "192.168.111.0/24"
+        shared: false
+        tenant: admin
+  neutron_db_password: rsuKYCs4oTrXfClMNxSUG6BI
+  neutron_metadata_proxy_secret: "1xqxGx1IUtAgmESyqebYrUw3"
+  neutron_nodes: *id001
+  neutron_user_password: "4MF6XuQjhmDuokIye9nEe8Un"
+  node: *id002
+  nova_db_password: KqZwu12EYHuhbigtmiUSiYiy
+  nova: 
+    db_password: KqZwu12EYHuhbigtmiUSiYiy
+    state_path: /var/lib/nova
+    user_password: HLNnR0DHFkG3jTXed6yuLOSU
+    vncproxy_protocol: https
+    nova_rate_limits: 
+      POST: "100000"
+      POST_SERVERS: "100000"
+      PUT: "1000"
+      GET: "100000"
+      DELETE: "100000"
+    nova_report_interval: "60"
+    nova_service_down_time: "180"
+    num_networks: !ruby/sym undef
+    network_size: !ruby/sym undef
+    network_manager: !ruby/sym undef
+  novanetwork_params: {}
+  openstack_version: liberty-8.0
+  primary_controller: true
+  private_int: 
+  queue_provider: rabbitmq
+  rabbit_ha_queues: true
+  rabbit: 
+    password: StxrZ8EMHXzCjpgnrw3sRXgA
+    user: nova
+  roles: *id005
+  sahara: 
+    db_password: DsrcljbGqFssjiT3HaIKcHkY
+    enabled: false
+    user_password: Ca0CQ4ruHT9JJ3fXsh8ntfiP
+  sahara_nodes: 
+    node-1: *id002
+    node-2: *id003
+    node-3: *id004
+  sahara_roles: 
+    - primary-controller
+    - controller
+  sql_connection: "mysql://nova:KqZwu12EYHuhbigtmiUSiYiy@192.168.0.2/nova?charset=utf8&read_timeout=60"
+  storage: 
+    ephemeral_ceph: true
+    images_ceph: true
+    images_vcenter: false
+    iser: false
+    metadata: 
+      group: storage
+      label: "Storage Backends"
+      weight: 60
+    objects_ceph: true
+    osd_pool_size: "2"
+    per_pool_pg_nums: 
+      ".rgw": 64
+      backups: 64
+      compute: 64
+      default_pg_num: 64
+      images: 64
+      volumes: 128
+    pg_num: 64
+    volumes_block_device: false
+    volumes_ceph: true
+    volumes_lvm: false
+    volume_backend_names: 
+      volumes_ceph: RBD-backend
+      volumes_lvm: false
+      volumes_block_device: false
+  swift: 
+    user_password: NCdIEIv8qaJnoCQc8E2ZVWen
+  syslog: 
+    metadata: 
+      enabled: false
+      group: logging
+      label: Syslog
+      toggleable: true
+      weight: 50
+    syslog_port: "514"
+    syslog_server: ""
+    syslog_transport: tcp
+  default_log_levels: &id006
+    
+    amqp: WARN
+    amqplib: WARN
+    boto: WARN
+    qpid: WARN
+    sqlalchemy: WARN
+    suds: INFO
+    oslo_messaging: INFO
+    oslo.messaging: INFO
+    iso8601: WARN
+    requests.packages.urllib3.connectionpool: WARN
+    urllib3.connectionpool: WARN
+    websocket: WARN
+    requests.packages.urllib3.util.retry: WARN
+    urllib3.util.retry: WARN
+    keystonemiddleware: WARN
+    routes.middleware: WARN
+    stevedore: WARN
+    taskflow: WARN
+  "aodh::logging::default_log_levels": *id006
+  "ceilometer::logging::default_log_levels": *id006
+  "cinder::logging::default_log_levels": *id006
+  "glance::api::logging::default_log_levels": *id006
+  "glance::registry::logging::default_log_levels": *id006
+  "heat::logging::default_log_levels": *id006
+  "keystone::logging::default_log_levels": *id006
+  "murano::logging::default_log_levels": *id006
+  "nova::logging::default_log_levels": *id006
+  "sahara::logging::default_log_levels": *id006
+  "ironic::logging::default_log_levels": *id006
+  syslog_log_facility_aodh: LOG_LOCAL0
+  syslog_log_facility_ceilometer: LOG_LOCAL0
+  syslog_log_facility_ceph: LOG_LOCAL0
+  syslog_log_facility_cinder: LOG_LOCAL3
+  syslog_log_facility_glance: LOG_LOCAL2
+  syslog_log_facility_heat: LOG_LOCAL0
+  syslog_log_facility_keystone: LOG_LOCAL7
+  syslog_log_facility_murano: LOG_LOCAL0
+  syslog_log_facility_neutron: LOG_LOCAL4
+  syslog_log_facility_nova: LOG_LOCAL6
+  syslog_log_facility_sahara: LOG_LOCAL0
+  syslog_log_facility_ironic: LOG_LOCAL0
+  token_provider: keystone.token.providers.fernet.Provider
+  use_ceilometer: false
+  use_neutron: true
+  use_ovs: true
+  use_syslog: true
+  vcenter: {}
+  verbose: true
+  vlan_start: 
+  management_vip: "192.168.0.2"
+  database_vip: "192.168.0.2"
+  service_endpoint: "192.168.0.2"
+  public_vip: "10.109.1.2"
+  management_vrouter_vip: "192.168.0.3"
+  public_vrouter_vip: "10.109.1.3"
+  memcache_roles: 
+    - primary-controller
+    - controller
+  memcached_addresses: 
+    - "10.144.2.10"
+    - "10.145.2.13"
+    - "10.146.2.12"
+  swift_master_role: primary-controller
+  swift_nodes: 
+    node-1: *id002
+    node-2: *id003
+    node-3: *id004
+  swift_proxies: 
+    node-1: *id002
+    node-2: *id003
+    node-3: *id004
+  is_primary_swift_proxy: true
+  nova_api_nodes: *id001
+  ironic_api_nodes: *id001
+  workers_max: "17"
+  kombu_compression: ""
+  external_lb: true
+  node_name_prefix_for_messaging: messaging-
