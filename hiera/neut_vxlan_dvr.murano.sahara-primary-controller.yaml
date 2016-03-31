@@ -322,6 +322,8 @@ network_metadata:
       swift_zone: '1'
       uid: '132'
       fqdn: node-132.test.domain.local
+      nova_hugepages_enabled: true
+      nova_cpu_pinning_enabled: true
       network_roles:
         keystone/api: 192.168.0.5
         neutron/api: 192.168.0.5
@@ -568,6 +570,8 @@ puppet:
 puppet_debug: true
 quantum: true
 quantum_settings:
+  supported_pci_vendor_devs:
+    - "8086:1515"
   default_floating_net: net04custom_ext
   default_private_net:  net04custom
   default_router: router04custom
@@ -1060,3 +1064,5 @@ workloads_collector:
   password: 1r3ROjcQ
   tenant: services
   username: workloads_collector
+dpdk:
+  enabled: true
