@@ -264,20 +264,36 @@ these files can be compared and everything that have been changes will become
 visible.
 
 Using the **-V** options will save the current catalog to the *catalogs*
-folder. These generated catalogs can either be commited to the repository
-or be used as a temporary files that you can make before doing some changes
-to the modules or manifests and removed later. Saved catalog files can be
-very useful for a developer to just review the catalog contents and check
+folder. These generated catalogs can be useful when reviewing complex patches
+with major changes to the modules or manifests. A diff for data changes may
+help a developer/reviewer examine the catalog contents and check
 that every resource or class are receiving the correct property values.
 
 You can also use **-v** option to enable automatic catalog checks. It should be
 done after you have generated the initial versions and made some changes.
 Running the tests with this option enabled will generate the catalogs again and
 compare them to the saved version. If there are differences the test will be
-failed and you will be able to locate the failed tasks. If you have catalogs
-commited to the repository you can use the *diff* command to review what
-changes to the catalog files have been introduced and commit the modified
-catalogs if the changes are expected.
+failed and you will be able to locate the failed tasks. Here is an example
+workflow one may use to examine a complex patch for data layer changes (we
+assume she is a cool ruby developer and use the rvm manager and bundler):
+
+.. code-block:: console
+
+  $ git clone https://github.com/openstack/fuel-library
+  $ cd fuel-library
+  $ rvm use ruby-2.1.3
+  $ PUPPET_GEM_VERSION=3.4.0
+  $ PUPPET_VERSION=3.4.0
+  $ ./deployment/remove_modules.sh && ./deployment/update_modules.sh
+  $ ./tests/noop/setup_and_diagnostics.sh -B
+  $ ./tests/noop/noop_tests.sh -V -j10 -b -s swift
+  $ git review -d $swift_die_hard_patch_id
+  $ ./tests/noop/noop_tests.sh -v -j10 -b -s swift
+
+At this point, the reviewer will get the data diffs proposed to the swift
+modules and finish her thorough review. Note that the command
+`./tests/noop/setup_and_diagnostics.sh -B` gets a clean state and sets things
+up, while removing and updating_modules is required to make things go smooth.
 
 Using external environment variables and custom paths
 -----------------------------------------------------
