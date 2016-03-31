@@ -312,6 +312,8 @@ network_metadata:
         - controller
       name: node-131
     node-132:
+      nova_hugepages_enabled: true
+      nova_cpu_pinning_enabled: true
       swift_zone: '1'
       uid: '132'
       fqdn: node-132.test.domain.local
@@ -507,6 +509,12 @@ network_scheme:
   - action: add-port
     bridge: br-ex
     name: eth1
+  - action: add-port
+    name: eth2
+    provider: sriov
+    vendor_specific:
+      sriov_numvfs: 7
+      physnet: physnet2
   version: '1.1'
 neutron_mellanox:
   metadata:
@@ -517,6 +525,9 @@ neutron_mellanox:
   plugin: disabled
   vf_num: '16'
 nova:
+  enable_hugepages: true
+  cpu_pinning: [0, 1, 18, 19]
+  enable_cpu_pinning: true
   db_password: mqnsUMgC
   state_path: /var/lib/nova
   user_password: fj4wVCEs
@@ -551,6 +562,7 @@ public_network_assignment:
 neutron_advanced_configuration:
   neutron_dvr: true
   neutron_l2_pop: true
+  neutron_qos: true
 public_vip: 172.16.0.5
 public_vrouter_vip: 172.16.0.6
 puppet:
@@ -559,6 +571,8 @@ puppet:
 puppet_debug: true
 quantum: true
 quantum_settings:
+  supported_pci_vendor_devs:
+    - "8086:1515"
   default_floating_net: net04custom_ext
   default_private_net:  net04custom
   default_router: router04custom
@@ -824,3 +838,5 @@ workloads_collector:
   password: 1r3ROjcQ
   tenant: services
   username: workloads_collector
+dpdk:
+  enabled: true
