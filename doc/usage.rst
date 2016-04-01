@@ -159,6 +159,13 @@ possible run combinations you can use the **RUN:** annotation.::
 It can be specified many times an all entered combinations will be added to the
 list.
 
+You can use **ROLE** annotation to specify the list of node roles this
+spec should be running at. It will find the list of Hiera yaml files
+that have roles matching this list.::
+
+  # ROLE: controller
+  # ROLE: primary-controller
+
 There is also a way to use the reverse logic. You can specify the Hiera
 and facts yaml files that you want to exclude from the list instead of
 providing the list of included files.::

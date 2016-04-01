@@ -172,14 +172,7 @@ module Noop
       return @assign_spec_to_hiera if @assign_spec_to_hiera
       @assign_spec_to_hiera = {}
       assign_spec_to_roles.each do |file_name_spec, spec_roles_set|
-        if spec_roles_set.include? '*'
-          hiera_files = assign_hiera_to_roles.keys
-        else
-          hiera_files = assign_hiera_to_roles.select do |file_name_hiera, hiera_roles_set|
-            roles_intersection = hiera_roles_set & spec_roles_set
-            roles_intersection.any?
-          end.keys
-        end
+        hiera_files = get_hiera_for_roles spec_roles_set
         @assign_spec_to_hiera[file_name_spec] = hiera_files if hiera_files.any?
       end
       @assign_spec_to_hiera
@@ -231,8 +224,14 @@ module Noop
             task_spec_metadata[:skip_facts] += get_list_of_yamls $1
           end
 
-          if line =~ /disable_spec/
+          if line =~ /^\s*#\s*disable_spec/
             task_spec_metadata[:disable] = true
+          end
+
+          if line =~ /^\s*#\s*role:\s*(.*)/
+            task_spec_metadata[:roles] = [] unless task_spec_metadata[:roles].is_a? Array
+            roles = line.split /\s*,\s*|\s+/
+            task_spec_metadata[:roles] += roles
           end
 
           if line =~ /^\s*#\s*run:\s*(.*)/
@@ -278,7 +277,11 @@ module Noop
       file_name_spec = Noop::Utils.convert_to_path file_name_spec
       metadata = spec_run_metadata.fetch file_name_spec, {}
       metadata[:facts] = [Noop::Config.default_facts_file_name] unless metadata[:facts]
-      metadata[:hiera] = assign_spec_to_hiera.fetch file_name_spec, [] unless metadata[:hiera]
+      if metadata[:roles]
+        metadata[:hiera] = get_hiera_for_roles metadata[:roles]
+      else
+        metadata[:hiera] = assign_spec_to_hiera.fetch file_name_spec, [] unless metadata[:hiera]
+      end
 
       runs = []
       metadata[:facts].product metadata[:hiera] do |facts, hiera|
@@ -292,6 +295,29 @@ module Noop
       end
       runs += metadata[:runs] if metadata[:runs].is_a? Array
       runs
+    end
+
+    # Get a list of Hiera YAML files which roles
+    # include the given set of roles
+    # @param roles [Array,Set,String]
+    # @return [Array]
+    def get_hiera_for_roles(*roles)
+      all_roles = Set.new
+      roles.flatten.each do |role|
+        if role.is_a? Set
+          all_roles += role
+        else
+          all_roles.add role
+        end
+      end
+      if all_roles.include? '*'
+        assign_hiera_to_roles.keys
+      else
+        assign_hiera_to_roles.select do |_file_name_hiera, hiera_roles_set|
+          roles_intersection = hiera_roles_set & all_roles
+          roles_intersection.any?
+        end.keys
+      end
     end
 
     # Check if the given element matches this filter
