@@ -7,7 +7,6 @@ group :development, :test do
   gem 'rspec-puppet-utils', '~> 2.0.0'
   gem 'deep_merge'
   gem 'pry'
-  gem 'simplecov'
   gem 'puppet-spec'
   gem 'colorize'
   gem 'parallel'
