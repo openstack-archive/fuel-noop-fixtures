@@ -159,6 +159,13 @@ possible run combinations you can use the **RUN:** annotation.::
 It can be specified many times an all entered combinations will be added to the
 list.
 
+You can use **ROLE** annotation to specify the list of node roles this
+spec should be running at. It will find the list of Hiera yaml files
+that have roles matching this list.::
+
+  # ROLE: controller
+  # ROLE: primary-controller
+
 There is also a way to use the reverse logic. You can specify the Hiera
 and facts yaml files that you want to exclude from the list instead of
 providing the list of included files.::
@@ -170,6 +177,15 @@ These yaml files will be excluded from the list of possible yaml files. If
 you have used both include and exclude options, the exclude option will have
 the priority over the include option. If there are no included Hiera files
 the list of Hiera files will be generated from the node roles.
+
+Note, that all these options can be combined all together. It will mean
+to take all 'compute' yamls, add neut_vlan_l3ha.ceph.ceil-primary-controller
+and remove 'neut_vlan.compute.ssl' and then add master/master_centos7 run.::
+
+  # ROLE: compute
+  # HIERA: neut_vlan_l3ha.ceph.ceil-primary-controller.yaml
+  # RUN: master master_centos7
+  # SKIP_HIERA: neut_vlan.compute.ssl.yaml
 
 The final annotation **DISABLE_SPEC** allows you to temporarily disable the
 spec from being seen the framework. It can use useful if you want to turn off
