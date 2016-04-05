@@ -61,6 +61,29 @@ function enable_neutron_dvr {
   fuel env --attributes --env $1 --upload
 }
 
+function enable_nova_quota {
+  fuel env --attributes --env $1 --download
+  ruby -ryaml -e '
+  attr = YAML.load(File.read(ARGV[0]))
+  attr["editable"]["nova"]["quota_instances"] = 1000
+  attr["editable"]["nova"]["quota_cores"] = 1000
+  attr["editable"]["nova"]["quota_ram"] = 512000
+  attr["editable"]["nova"]["quota_floating_ips"] = 1000
+  attr["editable"]["nova"]["quota_metadata_items"] = 10240
+  attr["editable"]["nova"]["quota_injected_files"] = 500
+  attr["editable"]["nova"]["quota_injected_file_content_bytes"] = 1024000
+  attr["editable"]["nova"]["quota_injected_file_path_length"] = 4096
+  attr["editable"]["nova"]["quota_security_groups"] = 100
+  attr["editable"]["nova"]["quota_security_group_rules"] = 200
+  attr["editable"]["nova"]["quota_key_pairs"] = 100
+  attr["editable"]["nova"]["quota_server_groups"] = 100
+  attr["editable"]["nova"]["quota_server_group_members"] = 100
+  attr["editable"]["nova"]["reservation_expire"] = 864000
+  attr["editable"]["nova_quota"] = true
+  File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
+  fuel env --attributes --env $1 --upload
+}
+
 function list_free_nodes {
   fuel nodes 2>/dev/null | grep discover | grep None | awk '{print $1}'
 }
@@ -91,6 +114,7 @@ function generate_yamls {
   fi
   if [ "${name/murano.sahara.ceil}" != "$name" ] ; then
     enable_murano_sahara_ceilometer $env
+    enable_nova_quota $env
   fi
   if [ "${name/ironic}" != "$name" ] ; then
     enable_ironic $env
