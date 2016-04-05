@@ -366,5 +366,16 @@ Debug related:
 - **SPEC_TASK_DEBUG** Enable the debug output of the task and manager objects.
 - **SPEC_DEBUG_LOG** This variable can the the debug log destination file.
 
+Fixtures source related:
+
+- **NOOP_FIXTURES_REPO_URL** Fixtures repository. Defaults to
+  `https://github.com/openstack/fuel-noop-fixtures.git`
+- **NOOP_FIXTURES_BRANCH** Fixtures branch. Defaults to `origin/master`
+- **NOOP_FIXTURES_GERRIT_URL** Gerrit repository. Defaults to
+  `https://review.openstack.org/openstack/fuel-noop-fixtures`
+- **NOOP_FIXTURES_GERRIT_COMMIT** Gerrit commit ref that should be
+  cherry-picked. Could contain multiple refs, space separated. Defaults to
+  `none`
+
 Many of this variables can be set by the Noop manager CLI options, or you can
 always export them externally.
