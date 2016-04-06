@@ -70,6 +70,16 @@ function enable_nova_quota {
   fuel env --attributes --env $1 --upload
 }
 
+function enable_public_ssl {
+  fuel env --attributes --env $1 --download
+  ruby -ryaml -e '
+  attr = YAML.load(File.read(ARGV[0]))
+  attr["editable"]["public_ssl"]["services"]["value"] = true
+  attr["editable"]["public_ssl"]["horizon"]["value"] = true
+  File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
+  fuel env --attributes --env $1 --upload
+}
+
 function enable_vms_conf {
   virt_node_ids=`fuel nodes --env $1 2>/dev/null | grep virt | awk '{print $1}'`
   for id in $virt_node_ids ; do
@@ -119,6 +129,9 @@ function generate_yamls {
   fi
   if [ "${name/dvr}" != "$name" ] ; then
     enable_neutron_dvr $env
+  fi
+  if [ "${name/public_ssl}" != "$name" ] ; then
+    enable_public_ssl $env
   fi
 
   for id in `list_free_nodes` ; do
@@ -179,4 +192,9 @@ clean_env 'test_neutron_tun'
 # Neutron tun + vms_conf
 fuel env --create --name test_neutron_tun --rel 2 --net tun
 generate_yamls 'test_neutron_tun' 'neut_tun.vms_conf' 'virt compute' 'virt'
+clean_env 'test_neutron_tun'
+
+# Neutron tun, addons, ceph, public and hotizon ssl
+fuel env --create --name test_neutron_tun --rel 2 --net tun
+generate_yamls 'test_neutron_tun' 'neut_tun.murano.sahara.ceil.public_ssl' 'controller controller mongo mongo compute ceph-osd ceph-osd' 'primary-controller compute ceph-osd primary-mongo'
 clean_env 'test_neutron_tun'
