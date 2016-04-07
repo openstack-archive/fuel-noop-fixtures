@@ -61,6 +61,13 @@ function enable_neutron_dvr {
   fuel env --attributes --env $1 --upload
 }
 
+function enable_vms_conf {
+  virt_node_ids=`fuel nodes --env $1 2>/dev/null | grep virt | awk '{print $1}'`
+  for id in $virt_node_ids ; do
+    fuel2 node create-vms-conf $id --conf '{"id":3,"ram":2,"cpu":2}'
+  done
+}
+
 function list_free_nodes {
   fuel nodes 2>/dev/null | grep discover | grep None | awk '{print $1}'
 }
@@ -109,6 +116,12 @@ function generate_yamls {
       sleep 1
     fi
   done
+
+  #We need assigned "virt" role to enable vms_conf
+  if [ "${name/vms_conf}" != "$name" ] ; then
+    enable_vms_conf $env
+  fi
+
   save_yamls $env
   store_yamls $env $name "$4"
 }
@@ -149,4 +162,9 @@ clean_env 'test_neutron_tun'
 # Neutron-l3ha tun
 fuel env --create --name test_neutron_tun --rel 2 --net tun
 generate_yamls 'test_neutron_tun' 'neut_tun.l3ha' 'controller controller controller' 'primary-controller'
+clean_env 'test_neutron_tun'
+
+# Neutron tun + vms_conf
+fuel env --create --name test_neutron_tun --rel 2 --net tun
+generate_yamls 'test_neutron_tun' 'neut_tun.vms_conf' 'virt compute' 'virt'
 clean_env 'test_neutron_tun'
