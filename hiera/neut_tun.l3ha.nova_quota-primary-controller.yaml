@@ -682,7 +682,7 @@ nova:
   enable_hugepages: false
   state_path: /var/lib/nova
   user_password: M7B2W6VRtU0QB7Cv3RRXFYSH
-nova_quota: false
+nova_quota: true
 online: true
 openstack_version: mitaka-9.0
 operator_user:
