@@ -61,6 +61,15 @@ function enable_neutron_dvr {
   fuel env --attributes --env $1 --upload
 }
 
+function enable_nova_quota {
+  fuel env --attributes --env $1 --download
+  ruby -ryaml -e '
+  attr = YAML.load(File.read(ARGV[0]))
+  attr["editable"]["common"]["nova_quota"]["value"] = true
+  File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
+  fuel env --attributes --env $1 --upload
+}
+
 function list_free_nodes {
   fuel nodes 2>/dev/null | grep discover | grep None | awk '{print $1}'
 }
@@ -91,6 +100,9 @@ function generate_yamls {
   fi
   if [ "${name/murano.sahara.ceil}" != "$name" ] ; then
     enable_murano_sahara_ceilometer $env
+  fi
+  if [ "${name/nova_quota}" != "$name" ] ; then
+    enable_nova_quota $env
   fi
   if [ "${name/ironic}" != "$name" ] ; then
     enable_ironic $env
@@ -146,7 +158,7 @@ fuel env --create --name test_neutron_tun --rel 2 --net tun
 generate_yamls 'test_neutron_tun' 'neut_tun.ironic' 'controller ironic' 'primary-controller ironic'
 clean_env 'test_neutron_tun'
 
-# Neutron-l3ha tun
+# Neutron-l3ha tun + nova_quota
 fuel env --create --name test_neutron_tun --rel 2 --net tun
-generate_yamls 'test_neutron_tun' 'neut_tun.l3ha' 'controller controller controller' 'primary-controller'
+generate_yamls 'test_neutron_tun' 'neut_tun.l3ha.nova_quota' 'controller controller controller' 'primary-controller'
 clean_env 'test_neutron_tun'
