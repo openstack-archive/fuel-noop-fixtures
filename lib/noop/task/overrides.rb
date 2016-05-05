@@ -17,6 +17,10 @@ module Noop
       RSpec.configuration.manifest = file_path_manifest.to_s
       RSpec.configuration.module_path = Noop::Config.dir_path_modules_local.to_s
       RSpec.configuration.manifest_dir = Noop::Config.dir_path_tasks_local.to_s
+
+      # FIXME: kludge to support calling Puppet function outside of the test context
+      Puppet.settings[:modulepath] = RSpec.configuration.module_path
+      Puppet.settings[:manifest] = RSpec.configuration.manifest_dir
     end
 
     # Override Hiera configuration in the Puppet objects
@@ -82,15 +86,15 @@ module Noop
     # This results in an rspec failure so we need to initialize the basic
     # settings up front to prevent issues with test framework. See PUP-5601
     def puppet_default_settings
-      Puppet.settings.initialize_app_defaults(
-          {
-              :logdir => '/dev/null',
-              :confdir => '/dev/null',
-              :vardir => '/dev/null',
-              :rundir => '/dev/null',
-              :hiera_config => '/dev/null',
-          }
-      )
+      defaults = {
+          :logdir => '/dev/null',
+          :confdir => '/dev/null',
+          :vardir => '/dev/null',
+          :rundir => '/dev/null',
+          :hiera_config => '/dev/null',
+      }
+      defaults[:codedir] = '/dev/null' if puppet4?
+      Puppet.settings.initialize_app_defaults(defaults)
     end
 
     def rspec_coverage_add_override
