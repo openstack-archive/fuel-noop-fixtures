@@ -113,5 +113,11 @@ module Noop
       end
     end
 
+    # check if we're using Puppet4
+    # @return [true,false]
+    def puppet4?
+      Puppet.version.to_f >= 4.0
+    end
+
   end
 end

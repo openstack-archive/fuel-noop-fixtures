@@ -63,6 +63,8 @@ def run_test(manifest_file, *args)
 
   Noop::Config.log.progname = 'noop_spec'
   Noop::Utils.debug "RSPEC: #{Noop.task.inspect}"
+
+  # FIXME: kludge to support calling Puppet function outside of the test context
   Noop.setup_overrides
 
   include FuelRelationshipGraphMatchers
