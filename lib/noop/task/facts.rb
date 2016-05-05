@@ -67,6 +67,7 @@ module Noop
       facts_data[:hostname] = hostname if hostname
       facts_data[:l3_fqdn_hostname] = hostname if hostname
       facts_data[:fqdn] = fqdn if fqdn
+      facts_data[:puppetversion] = Puppet.version
     end
 
     # @return [Hash]
