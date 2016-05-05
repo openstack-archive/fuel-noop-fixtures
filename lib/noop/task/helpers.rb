@@ -43,8 +43,12 @@ module Noop
     def puppet_function(name, *args)
       name = name.to_sym unless name.is_a? Symbol
       puppet_function_load name
-      error "Could not load Puppet function '#{name}'!" unless puppet_scope.respond_to? "function_#{name}".to_sym
-      puppet_scope.send "function_#{name}".to_sym, args
+      if puppet4?
+        puppet_scope.call_function name, args
+      else
+        error "Could not load Puppet function '#{name}'!" unless puppet_scope.respond_to? "function_#{name}".to_sym
+        puppet_scope.send "function_#{name}".to_sym, args
+      end
     end
 
     # Take a variable value from the saved puppet scope
@@ -66,7 +70,7 @@ module Noop
     def puppet_class_include(class_name)
       class_name = class_name.to_s
       unless puppet_scope.catalog.classes.include? class_name
-        debug "Dynamicly loading class: '#{class_name}'"
+        debug "Dynamically loading class: '#{class_name}'"
         puppet_scope.compiler.evaluate_classes [class_name], puppet_scope, false
       end
     end
@@ -111,6 +115,33 @@ module Noop
       spec.any? do |spec|
         file_name_spec == spec
       end
+    end
+
+    # check if we're using Puppet4
+    # @return [true,false]
+    def puppet4?
+      Puppet.version.to_f >= 4.0
+    end
+
+    # convert the values in the nested data structure
+    # from nil to :undef as they are used in Puppet 4
+    # modifies the argument object and returns it
+    # @param data [Array, Hash]
+    # @return [Array, Hash]
+    def nil2undef(data)
+      return :undef if data.nil?
+      if data.is_a? Array
+        data.each_with_index do |value, index|
+          data[index] = nil2undef value
+        end
+        data
+      elsif data.is_a? Hash
+        data.keys.each do |key|
+          data[key] = nil2undef data[key]
+        end
+        data
+      end
+      data
     end
 
   end
