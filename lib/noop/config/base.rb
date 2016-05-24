@@ -117,7 +117,13 @@ module Noop
     # @return [Pathname]
     def self.dir_path_reports
       return @dir_path_reports if @dir_path_reports
-      @dir_path_reports = dir_path_root + 'reports'
+      @dir_path_reports = Noop::Utils.path_from_env 'SPEC_REPORTS_DIR'
+      @dir_path_reports = dir_path_root + 'reports' unless @dir_path_reports
+      begin
+        @dir_path_reports = @dir_path_reports.realpath
+      rescue
+        @dir_path_reports
+      end
     end
   end
 end

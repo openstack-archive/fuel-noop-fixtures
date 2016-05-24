@@ -59,6 +59,15 @@ module Noop
           'SPEC_FACTS_NAME' => file_name_facts.to_s,
           'SPEC_FILE_NAME' => file_name_spec.to_s,
           'GEM_HOME' => Noop::Config.dir_path_gem_home.to_s,
+
+          'SPEC_ROOT_DIR' => Noop::Config.dir_path_root.to_s,
+          'SPEC_DEPLOYMENT_DIR' => Noop::Config.dir_path_deployment.to_s,
+          'SPEC_HIERA_DIR' => Noop::Config.dir_path_hiera.to_s,
+          'SPEC_FACTS_DIR' => Noop::Config.dir_path_facts.to_s,
+          'SPEC_REPORTS_DIR' => Noop::Config.dir_path_reports.to_s,
+          'SPEC_SPEC_DIR' => Noop::Config.dir_path_task_spec.to_s,
+          'SPEC_TASK_DIR' => Noop::Config.dir_path_tasks_local.to_s,
+          'SPEC_MODULE_PATH' => Noop::Config.dir_path_modules_local.to_s,
       }
       command = "rspec #{file_path_spec.to_s} #{rspec_options} --format json --out #{file_path_report_json.to_s}"
       command = "bundle exec #{command}" if ENV['SPEC_BUNDLE_EXEC']
