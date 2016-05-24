@@ -176,7 +176,9 @@ module Noop
 
 #########################################
 
-    def main
+    def main(override_options = {})
+      options.merge! override_options
+
       if ENV['SPEC_TASK_CONSOLE']
         require 'pry'
         binding.pry

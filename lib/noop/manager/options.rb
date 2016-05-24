@@ -15,7 +15,7 @@ module Noop
         opts.on('-j', '--jobs JOBS', 'Parallel run RSpec jobs') do |jobs|
           @options[:parallel_run] = jobs
         end
-        opts.on('-g', '--globals', 'Run all globals tasks and update saved globals YAML files') do |jobs|
+        opts.on('-g', '--globals', 'Run all globals tasks and update saved globals YAML files') do
           ENV['SPEC_UPDATE_GLOBALS'] = 'YES'
           options[:filter_specs] = [Noop::Config.spec_name_globals]
         end

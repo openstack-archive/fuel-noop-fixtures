@@ -5,5 +5,7 @@ require_relative 'lib/noop/task'
 require_relative 'lib/noop/manager'
 require_relative 'lib/noop/utils'
 
-manager = Noop::Manager.new
-manager.main
+if $0 == __FILE__
+  manager = Noop::Manager.new
+  manager.main
+end
