@@ -77,24 +77,37 @@ module Noop
     # @param context [RSpec::ExampleGroup] The 'self' of the RSpec example group
     # @return <Lambda>
     def create_ral_catalog(context)
-      catalog = context.subject
+      catalog = context.catalog
       catalog = catalog.call if catalog.is_a? Proc
       ral_catalog = catalog.to_ral
-      generate_functions = [:generate, :eval_generate]
-
       ral_catalog.resources.each do |resource|
-        generate_functions.each do |function_name|
-          next unless resource.respond_to? function_name
-          generated = resource.send function_name
-          next unless generated.is_a? Array
-          generated.each do |generated_resource|
-            next unless generated_resource.is_a? Puppet::Type
-            ral_catalog.add_resource generated_resource
-          end
+        generate_additional_resources ral_catalog, resource
+      end
+      lambda { ral_catalog }
+    end
+
+    # If the resources has one of the generate function
+    # run it and add the generated resources to the catalog
+    # if they are not there already. Run generate functions
+    # recursively for the generated resources too.
+    # @param catalog [Puppet::Catalog]
+    # @param resource [Puppet::Type]
+    def generate_additional_resources(catalog, resource)
+      generate_functions = [:generate, :eval_generate]
+      generate_functions.each do |function_name|
+        next unless resource.respond_to? function_name
+        debug "Resource: #{resource} run: #{function_name}"
+        generated = resource.send function_name
+        next unless generated.is_a? Array
+        generated.each do |generated_resource|
+          next unless generated_resource.is_a? Puppet::Type
+          next if catalog.resource generated_resource.ref
+          debug "Add resource: #{generated_resource} to the catalog"
+          catalog.add_resource generated_resource
+          generate_additional_resources catalog, generated_resource
         end
       end
-
-      lambda { ral_catalog }
+      catalog
     end
 
     # Check if the currently running spec is the given one
