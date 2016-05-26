@@ -81,6 +81,7 @@
   "nailgun_user": "nailgun"
   "ostf_password": "MHt1M0rw1aYuOufDw2DJMwt7"
   "ostf_user": "ostf"
+  "service_token_off": "true"
 "mcollective":
   "password": "gtFlQ3XAtiq8V7rMRQZ9IbnJ"
   "user": "mcollective"
