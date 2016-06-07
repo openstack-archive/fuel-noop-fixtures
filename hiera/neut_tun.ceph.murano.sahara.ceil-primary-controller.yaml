@@ -1184,6 +1184,7 @@ quantum_settings:
         vlan_range: null
     segmentation_type: tun
     tunnel_id_ranges: 2:65535
+    path_mtu: 8000
   L3:
     use_namespaces: true
   database:
