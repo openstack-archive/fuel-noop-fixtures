@@ -1215,6 +1215,7 @@ quantum_settings:
       physnet2:
         bridge: br-prv
         vlan_range: 1000:1030
+    path_mtu: 8000
     segmentation_type: vlan
   L3:
     use_namespaces: true

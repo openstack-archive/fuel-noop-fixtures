@@ -1216,6 +1216,7 @@ quantum_settings:
         bridge: br-prv
         vlan_range: 1000:1030
     segmentation_type: vlan
+    path_mtu: 8000
   L3:
     use_namespaces: true
   database:
