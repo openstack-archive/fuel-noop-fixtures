@@ -5,8 +5,53 @@
 # and unused (not assigned to any env) nodes.
 #
 
-mkdir ./yamls
+mkdir -p ./yamls
 rm -f ./yamls/*
+
+function id_of_role {
+  env=$1
+  role=$2
+  yaml=`grep -rl node_roles: deployment_$env/*yaml | head -n1`
+  ruby -ryaml -e '
+  astute = YAML.load(File.read(ARGV[0]))
+  role = ARGV[1]
+  node = astute["network_metadata"]["nodes"].find{|key, hash| hash["node_roles"].include?("#{role}") }
+  puts node.last["uid"]
+  ' $yaml $role
+}
+
+function fix_node_names {
+  file=$1
+  ruby -ryaml -e '
+  astute = YAML.load(File.read(ARGV[0]))
+  astute["network_metadata"]["nodes"].each do |key, hash|
+    wrong = hash["name"]
+    puts "\"s/#{wrong}/#{key}/g\""
+  end
+  ' $file | xargs -I {} sed -e {} -i $file
+}
+
+function list_free_nodes {
+  fuel2 node list 2>/dev/null | grep discover | grep None | awk '{print $2}'
+}
+
+function save_yamls {
+  envid=`fuel env | grep $1 | awk '{print $1}'`
+  fuel deployment --default --env $envid 2>/dev/null
+}
+
+function envid {
+  fuel env 2>/dev/null | grep $1 | awk '{print $1}'
+}
+
+function store_yamls {
+  for role in $3 ; do
+    id=`id_of_role $1 $role`
+    src="deployment_$1/${id}.yaml"
+    cp $src ./yamls/$2-$role.yaml
+    fix_node_names ./yamls/$2-$role.yaml
+  done
+}
 
 function enable_ceph {
   fuel env --attributes --env $1 --download
@@ -20,7 +65,6 @@ function enable_ceph {
   attr["editable"]["storage"]["osd_pool_size"]["value"] = "2"
   File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
   fuel env --attributes --env $1 --upload
-  rm -rf "cluster_$1"
 }
 
 function enable_murano_sahara_ceilometer {
@@ -61,30 +105,78 @@ function enable_neutron_dvr {
   fuel env --attributes --env $1 --upload
 }
 
+function enable_vcenter {
+  fuel env --attributes --env $1 --download
+  ruby -ryaml -e '
+  attr = YAML.load(File.read(ARGV[0]))
+  attr["editable"]["common"]["use_vcenter"]["value"] = true
+  File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
+  fuel env --attributes --env $1 --upload
+}
+
+function enable_vcenter_glance {
+  fuel env --attributes --env $1 --download
+  ruby -ryaml -e '
+  attr = YAML.load(File.read(ARGV[0]))
+  attr["editable"]["storage"]["images_vcenter"]["value"] = true
+  File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
+  fuel env --attributes --env $1 --upload
+}
+
+function vmware_settings {
+  compute_vmware=$2
+  fuel --env $1 vmware-settings --download
+  ruby -ryaml -e '
+  vmware = YAML.load(File.read(ARGV[0]))
+  vcenter_cred = {
+    "vcenter_host"=>"172.16.0.254", "vcenter_password"=>"Qwer!1234",
+    "vcenter_username"=>"administrator@vsphere.local"
+  }
+  vmware["editable"]["value"]["availability_zones"][0].merge! vcenter_cred
+  File.open(ARGV[0], "w").write(vmware.to_yaml)' "vmware_settings_$1.yaml"
+  if [ "$compute_vmware" = "compute-vmware" ]; then
+    env_id=`envid $1`
+    node_id=$(list_free_nodes | sed -n '1p')
+    fuel --env $env_id node set --node $node_id --role compute-vmware
+    ruby -ryaml -e '
+    $compute_vmware_node = ARGV[1]
+    puts $compute_vmware_node
+    vmware = YAML.load(File.read(ARGV[0]))
+    vmware_computes = {
+      "datastore_regex"=>".*", "service_name"=>"vm_cluster1",
+      "target_node"=>{"current"=>{"id"=>$compute_vmware_node,
+      "label"=>$compute_vmware_node}, "options"=>[{"id"=>"controllers",
+      "label"=>"controllers"}, {"id"=>$compute_vmware_node,
+      "label"=>$compute_vmware_node}]}, "vsphere_cluster"=>"Cluster1"
+      }
+    vmware["editable"]["value"]["availability_zones"][0]["nova_computes"][0].merge! vmware_computes
+    File.open(ARGV[0], "w").write(vmware.to_yaml)' "vmware_settings_$1.yaml" "node-$node_id"
+  else
+    ruby -ryaml -e '
+    vmware = YAML.load(File.read(ARGV[0]))
+    vmware_computes = {
+      "datastore_regex"=>".*", "service_name"=>"vm_cluster1",
+      "target_node"=>{"current"=>{"id"=>"controllers",
+      "label"=>"controllers"}, "options"=>[{"id"=>"controllers",
+      "label"=>"controllers"}]}, "vsphere_cluster"=>"Cluster1"
+      }
+     vmware_glance = {
+      "ca_file"=>{"content"=>"RSA", "name"=>"vcenter-ca.pem"},
+      "datacenter"=>"Datacenter", "datastore"=>"nfs",
+      "vcenter_host"=>"172.16.0.254", "vcenter_password"=>"Qwer!1234",
+      "vcenter_username"=>"administrator@vsphere.local"
+      }
+    vmware["editable"]["value"]["availability_zones"][0]["nova_computes"][0].merge! vmware_computes
+    vmware["editable"]["value"]["glance"].merge! vmware_glance
+    File.open(ARGV[0], "w").write(vmware.to_yaml)' "vmware_settings_$1.yaml"
+  fi
+    fuel --env $1 vmware-settings --upload
+}
+
 function enable_vms_conf {
   virt_node_ids=`fuel nodes --env $1 2>/dev/null | grep virt | awk '{print $1}'`
   for id in $virt_node_ids ; do
     fuel2 node create-vms-conf $id --conf '{"id":3,"ram":2,"cpu":2}'
-  done
-}
-
-function list_free_nodes {
-  fuel nodes 2>/dev/null | grep discover | grep None | awk '{print $1}'
-}
-
-function save_yamls {
-  envid=`fuel env | grep $1 | awk '{print $1}'`
-  fuel deployment --default --env $envid 2>/dev/null
-}
-
-function envid {
-  fuel env 2>/dev/null | grep $1 | awk '{print $1}'
-}
-
-function store_yamls {
-  for role in $3 ; do
-    src=`ls deployment_$1/${role}_*.yaml | head -n1`
-    cp $src ./yamls/$2-$role.yaml
   done
 }
 
@@ -108,6 +200,15 @@ function generate_yamls {
   if [ "${name/dvr}" != "$name" ] ; then
     enable_neutron_dvr $env
   fi
+  if [ "${name/vmware.glance}" != "$name" ] ; then
+    enable_vcenter $env
+    enable_vcenter_glance $env
+    vmware_settings $env
+  fi
+  if [ "${name/vmware.cinder-vmware.compute-vmware}" != "$name" ] ; then
+    enable_vcenter $env
+    vmware_settings $env compute-vmware
+  fi
 
   for id in `list_free_nodes` ; do
     if ! [ -z "${roles[0]}" ] ; then
@@ -128,10 +229,13 @@ function generate_yamls {
 
 function clean_env {
   env=`envid $1`
-  fuel env --delete --env $env
-  rm -rf "cluster_$1"
-  rm -rf "deployment_$env"
-  sleep 80
+  if fuel env --env $env | grep $1 ; then
+    fuel env --delete --env $env
+    rm -rf "cluster_$env"
+    rm -rf "deployment_$env"
+    rm -rf "vmware_settings_$env.yaml"
+    sleep 60
+  fi
 }
 
 # Neutron vlan ceph
@@ -147,6 +251,16 @@ clean_env 'test_neutron_vlan'
 # Neutron-dvr vlan
 fuel env --create --name test_neutron_vlan --rel 2 --net vlan
 generate_yamls 'test_neutron_vlan' 'neut_vlan.dvr' 'controller controller controller' 'primary-controller'
+clean_env 'test_neutron_vlan'
+
+# Neutron vlan VMware vCenter + VMware Glance
+fuel env --create --name test_neutron_vlan --rel 2 --net vlan
+generate_yamls 'test_neutron_vlan' 'neut_vlan.vmware.glance' 'controller controller controller' 'primary-controller'
+clean_env 'test_neutron_vlan'
+
+# Neutron vlan VMware vCenter + cinder-vmware + compute-vmware
+fuel env --create --name test_neutron_vlan --rel 2 --net vlan
+generate_yamls 'test_neutron_vlan' 'neut_vlan.vmware.cinder-vmware.compute-vmware' 'controller controller controller cinder-vmware' 'primary-controller compute-vmware cinder-vmware'
 clean_env 'test_neutron_vlan'
 
 # Neutron tun addons + ceph
