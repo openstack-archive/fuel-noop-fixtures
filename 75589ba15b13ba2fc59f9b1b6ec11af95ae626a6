@@ -1,0 +1,10 @@
+Code-Review+1: Vladimir Kuklin <vkuklin@mirantis.com>
+Verified+1: Fuel CI <fuel-ci-bot@mirantis.com>
+Code-Review+2: Aleksandr Didenko <adidenko@mirantis.com>
+Workflow+1: Aleksandr Didenko <adidenko@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 27 Jun 2016 17:13:51 +0000
+Reviewed-on: https://review.openstack.org/334549
+Project: openstack/fuel-noop-fixtures
+Branch: refs/heads/master
