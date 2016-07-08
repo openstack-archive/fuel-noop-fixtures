@@ -22,9 +22,9 @@ describe Noop::Config do
       expect(subject.dir_path_task_spec.to_s).to eq "#{root}/spec/hosts"
     end
 
-    it 'dir_path_modules_local' do
-      expect(subject.dir_path_modules_local).to be_a Pathname
-      expect(subject.dir_path_modules_local.to_s).to eq "#{root}/modules"
+    it 'list_path_modules' do
+      expect(subject.list_path_modules).to be_a Array
+      expect(subject.list_path_modules.first.to_s).to eq "#{root}/modules"
     end
 
     it 'dir_path_tasks_local' do

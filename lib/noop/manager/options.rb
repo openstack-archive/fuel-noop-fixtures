@@ -117,7 +117,7 @@ module Noop
         opts.on('--dir_task_files DIR', 'Path to the folder with task manifest files') do |dir|
           ENV['SPEC_TASK_DIR'] = dir
         end
-        opts.on('--dir_puppet_modules DIR', 'Path to the puppet modules') do |dir|
+        opts.on('--module_path DIR', 'Path to the puppet modules. Can consist of several dirs separated by a colon.') do |dir|
           ENV['SPEC_MODULE_PATH'] = dir
         end
 

@@ -326,7 +326,9 @@ Paths related:
   it but it should be at the *spec/hosts* from the root folder or the
   rpsec-puppet will break.
 - **SPEC_MODULE_PATH** or **SPEC_MODULEPATH** Set the path to the modules
-  library.
+  library. It can be either a path to a single directory with Puppet
+  modules or a string with colon-separated paths to several module
+  directories.
 - **SPEC_TASK_DIR** Set the path to the task manifests folder.
 - **SPEC_DEPLOYMENT_DIR** Set the path to the *deployment* directory. It's
   actually use only to find the scripts to update and reset modules.

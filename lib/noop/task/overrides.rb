@@ -15,7 +15,7 @@ module Noop
     # to run in this RSpec session
     def setup_manifest
       RSpec.configuration.manifest = file_path_manifest.to_s
-      RSpec.configuration.module_path = Noop::Config.dir_path_modules_local.to_s
+      RSpec.configuration.module_path = Noop::Config.list_path_modules.join ':'
       RSpec.configuration.manifest_dir = Noop::Config.dir_path_tasks_local.to_s
 
       # FIXME: kludge to support calling Puppet function outside of the test context
