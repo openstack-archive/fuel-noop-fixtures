@@ -10,6 +10,7 @@ module Noop
 Facts:    <%= task.file_path_facts %>
 Hiera:    <%= task.file_path_hiera %>
 Spec:     <%= task.file_path_spec %>
+Modules:  <%= Noop::Config.list_path_modules.join(':') %>
 Manifest: <%= task.file_path_manifest %>
 
 Node:     <%= task.hiera_lookup 'fqdn' or '?' %>

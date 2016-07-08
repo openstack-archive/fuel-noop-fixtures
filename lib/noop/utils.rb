@@ -10,6 +10,21 @@ module Noop
       nil
     end
 
+    def self.path_list_from_env(*names)
+      paths = []
+      names.each do |name|
+        name = name.to_s
+        next unless ENV[name]
+        list = ENV[name].split(':')
+        list.each do |path|
+          path = convert_to_path path
+          path = path.realpath if path.exist?
+          paths << path
+        end
+      end
+      paths
+    end
+
     # @param [Object] value
     # @return [Pathname]
     def self.convert_to_path(value)

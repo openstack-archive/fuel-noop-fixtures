@@ -206,7 +206,6 @@ Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
           :dir_path_config,
           :dir_path_root,
           :dir_path_task_spec,
-          :dir_path_modules_local,
           :dir_path_tasks_local,
           :dir_path_deployment,
           :dir_path_workspace,
@@ -216,12 +215,17 @@ Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
           :dir_path_facts_override,
           :dir_path_globals,
           :dir_path_reports,
+
+          :list_path_modules,
       ]
       max_length = paths.map { |p| p.to_s.length }.max
 
       paths.each do |path|
         directory = Noop::Config.send path
-        output "#{directory_check_status_string directory} #{path.to_s.ljust max_length} #{directory}"
+        directory = [directory] unless directory.is_a? Array
+        directory.each do |element|
+          output "#{directory_check_status_string element} #{path.to_s.ljust max_length} #{element}"
+        end
       end
     end
 

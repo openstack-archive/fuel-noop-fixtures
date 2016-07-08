@@ -82,18 +82,20 @@ module Noop
     def task_graph_metadata
       return @task_graph_metadata if @task_graph_metadata
       @task_graph_metadata = {}
-      error "No #{Noop::Config.dir_path_modules_local} directory!" unless Noop::Config.dir_path_modules_local.directory?
-      Noop::Config.dir_path_modules_local.find do |task_file|
-        next unless task_file.file?
-        next unless task_file.to_s.end_with? 'tasks.yaml'
-        begin
-          tasks = YAML.load_file task_file
-        rescue
-          next
-        end
-        tasks.each do |task|
-          id = task['id']
-          @task_graph_metadata[id] = task
+      Noop::Config.list_path_modules.each do |path|
+        next unless path.directory?
+        path.find do |task_file|
+          next unless task_file.file?
+          next unless task_file.to_s.end_with? 'tasks.yaml'
+          begin
+            tasks = YAML.load_file task_file
+          rescue
+            next
+          end
+          tasks.each do |task|
+            id = task['id']
+            @task_graph_metadata[id] = task
+          end
         end
       end
 

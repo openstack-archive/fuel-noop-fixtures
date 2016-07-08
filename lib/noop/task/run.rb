@@ -67,7 +67,7 @@ module Noop
           'SPEC_REPORTS_DIR' => Noop::Config.dir_path_reports.to_s,
           'SPEC_SPEC_DIR' => Noop::Config.dir_path_task_spec.to_s,
           'SPEC_TASK_DIR' => Noop::Config.dir_path_tasks_local.to_s,
-          'SPEC_MODULE_PATH' => Noop::Config.dir_path_modules_local.to_s,
+          'SPEC_MODULE_PATH' => Noop::Config.list_path_modules.join(':'),
       }
       command = "rspec #{file_path_spec.to_s} #{rspec_options} --format json --out #{file_path_report_json.to_s}"
       command = "bundle exec #{command}" if ENV['SPEC_BUNDLE_EXEC']
