@@ -2873,6 +2873,7 @@ use_cow_images: true
 use_vcenter: false
 user_node_name: node-700
 vms_conf: []
+deleted_nodes: [node-705.domain.tld, node-706.domain.tld]
 workloads_collector:
   create_user: false
   enabled: true
