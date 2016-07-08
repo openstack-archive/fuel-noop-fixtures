@@ -50,16 +50,12 @@ module Noop
       end
     end
 
-    # @return [Pathname]
-    def self.dir_path_modules_local
-      return @dir_path_modules_local if @dir_path_modules_local
-      @dir_path_modules_local = Noop::Utils.path_from_env 'SPEC_MODULEPATH', 'SPEC_MODULE_PATH'
-      @dir_path_modules_local = dir_path_root + 'modules' unless @dir_path_modules_local
-      begin
-        @dir_path_modules_local = @dir_path_modules_local.realpath
-      rescue
-        @dir_path_modules_local
-      end
+    # @return [Array<Pathname>]
+    def self.list_path_modules
+      return @list_path_modules if @list_path_modules
+      @list_path_modules = Noop::Utils.path_list_from_env 'SPEC_MODULEPATH', 'SPEC_MODULE_PATH'
+      return @list_path_modules if @list_path_modules.any?
+      @list_path_modules = [dir_path_root + 'modules']
     end
 
     # @return [Pathname]
