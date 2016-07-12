@@ -2,12 +2,16 @@ require 'pathname'
 
 module Noop
   module Config
+    # The root directory of the config sub-module.
+    # It's being used as the root for the relative paths
+    # to the other directories.
     # @return [Pathname]
     def self.dir_path_config
       return @dirname if @dirname
       @dirname = Pathname.new(__FILE__).dirname.realpath
     end
 
+    # The root directory of the fixtures module.
     # @return [Pathname]
     def self.dir_path_root
       return @dir_path_root if @dir_path_root
@@ -17,6 +21,20 @@ module Noop
         @dir_path_root = @dir_path_root.realpath
       rescue
         @dir_path_root
+      end
+    end
+
+    # The directory where the task will chdir before being run.
+    # Equals to the root dir unless specified.
+    # @return [Pathname]
+    def self.dir_path_task_root
+      return @dir_path_task_root if @dir_path_task_root
+      @dir_path_task_root = Noop::Utils.path_from_env 'SPEC_TASK_ROOT_DIR'
+      @dir_path_task_root = dir_path_root unless @dir_path_task_root
+      begin
+        @dir_path_task_root = @dir_path_task_root.realpath
+      rescue
+        @dir_path_task_root
       end
     end
 

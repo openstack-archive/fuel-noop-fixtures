@@ -61,6 +61,7 @@ module Noop
           'GEM_HOME' => Noop::Config.dir_path_gem_home.to_s,
 
           'SPEC_ROOT_DIR' => Noop::Config.dir_path_root.to_s,
+          'SPEC_TASK_ROOT_DIR' => Noop::Config.dir_path_task_root.to_s,
           'SPEC_DEPLOYMENT_DIR' => Noop::Config.dir_path_deployment.to_s,
           'SPEC_HIERA_DIR' => Noop::Config.dir_path_hiera.to_s,
           'SPEC_FACTS_DIR' => Noop::Config.dir_path_facts.to_s,
@@ -71,7 +72,7 @@ module Noop
       }
       command = "rspec #{file_path_spec.to_s} #{rspec_options} --format json --out #{file_path_report_json.to_s}"
       command = "bundle exec #{command}" if ENV['SPEC_BUNDLE_EXEC']
-      Dir.chdir Noop::Config.dir_path_root
+      Dir.chdir Noop::Config.dir_path_task_root
       success = Noop::Utils.run environment, command
       if success.nil?
         debug 'RSpec command is not found!'

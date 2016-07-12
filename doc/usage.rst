@@ -330,6 +330,9 @@ Paths related:
 - **SPEC_TASK_DIR** Set the path to the task manifests folder.
 - **SPEC_DEPLOYMENT_DIR** Set the path to the *deployment* directory. It's
   actually use only to find the scripts to update and reset modules.
+- **SPEC_TASK_ROOT_DIR** Set the root path of the RSpec execution.
+  RSpec command will be run from this directory.
+  Usually it's the same dir as the **SPEC_ROOT_DIR**.
 - **WORKSPACE** This variable is passed by the Jenkins jobs or will default to
   the *workspece* folder. Currently used only to store the Ruby gems installed
   by the *bundler* if *RVM* is not used.
