@@ -205,6 +205,7 @@ Total tasks to run:       <%= task_list.count.to_s.colorize :yellow %>
       paths = [
           :dir_path_config,
           :dir_path_root,
+          :dir_path_task_root,
           :dir_path_task_spec,
           :dir_path_tasks_local,
           :dir_path_deployment,
