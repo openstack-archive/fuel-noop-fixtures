@@ -13,8 +13,8 @@ Spec:     <%= task.file_path_spec %>
 Modules:  <%= Noop::Config.list_path_modules.join(':') %>
 Manifest: <%= task.file_path_manifest %>
 
-Node:     <%= task.hiera_lookup 'fqdn' or '?' %>
-Role:     <%= task.hiera_lookup 'role' or '?' %>
+Node:     <%= task.hiera_lookup 'fqdn', '?' %>
+Roles:    <%= task.hiera_array('roles', ['?']).join(' ') %>
 
 Hiera hierarchy:
 <% task.hiera_hierarchy.each do |element| -%>
