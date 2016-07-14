@@ -32,5 +32,15 @@ module Noop
     def self.default_hiera_file_name
       Pathname.new 'novanet-primary-controller.yaml'
     end
+
+    # @return [Pathname]
+    def self.file_name_hiera_plugins
+      Pathname.new 'plugins'
+    end
+
+    # @return [Pathname]
+    def self.file_path_hiera_plugins
+      Noop::Config.dir_path_hiera + file_name_hiera_plugins
+    end
   end
 end
