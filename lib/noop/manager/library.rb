@@ -46,7 +46,7 @@ module Noop
     def hiera_file_names
       return @hiera_file_names if @hiera_file_names
       error "No #{Noop::Config.dir_path_hiera} directory!" unless Noop::Config.dir_path_hiera.directory?
-      exclude = [ Noop::Config.dir_name_hiera_override, Noop::Config.dir_name_globals ]
+      exclude = [ Noop::Config.dir_name_hiera_override, Noop::Config.dir_name_globals, Noop::Config.file_name_hiera_plugins ]
       @hiera_file_names = find_files(Noop::Config.dir_path_hiera, Noop::Config.dir_path_hiera, exclude) do |file|
         file.to_s.end_with? '.yaml'
       end
@@ -391,6 +391,27 @@ module Noop
         end
       end
       @task_list
+    end
+
+    # Collect all hiera plugins into a data structure.
+    # Used only for debugging purposes.
+    # @return [Hash<String => Pathname>]
+    def hiera_plugins
+      return @hiera_plugins if @hiera_plugins
+      @hiera_plugins = {}
+      return @hiera_plugins unless Noop::Config.file_path_hiera_plugins.directory?
+      Noop::Config.file_path_hiera_plugins.children.each do |hiera|
+        next unless hiera.directory?
+        hiera_name = hiera.basename.to_s
+        hiera.children.each do |file|
+          next unless file.file?
+          next unless file.to_s.end_with? '.yaml'
+          file = file.relative_path_from Noop::Config.dir_path_hiera
+          @hiera_plugins[hiera_name] = [] unless @hiera_plugins[hiera_name]
+          @hiera_plugins[hiera_name] << file
+        end
+      end
+      @hiera_plugins
     end
 
     # Loop through all task files and find those that
