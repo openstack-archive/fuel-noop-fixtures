@@ -60,6 +60,27 @@ module Noop
       Noop::Config.dir_name_hiera_override + override_file.sub_ext('')
     end
 
+    # @return [Pathname]
+    def dir_path_task_hiera_plugins
+      Noop::Config.file_path_hiera_plugins + file_base_hiera
+    end
+
+    # @return [Array<Pathname>]
+    def list_hiera_plugins
+      return @list_hiera_plugins if @list_hiera_plugins
+      @list_hiera_plugins = [] unless @list_hiera_plugins
+      return @list_hiera_plugins unless dir_path_task_hiera_plugins.directory?
+      dir_path_task_hiera_plugins.children.each do |file|
+        next unless file.file?
+        next unless file.to_s.end_with? '.yaml'
+        file = file.relative_path_from Noop::Config.dir_path_hiera
+        file = file.sub_ext('')
+        @list_hiera_plugins << file
+      end
+      @list_hiera_plugins.sort!
+      @list_hiera_plugins
+    end
+
     # @return [String]
     def hiera_logger
       if ENV['SPEC_PUPPET_DEBUG']
@@ -72,9 +93,10 @@ module Noop
     # @return [Array<String>]
     def hiera_hierarchy
       elements = []
+      elements += list_hiera_plugins.map(&:to_s) if list_hiera_plugins.any?
       elements << element_hiera_override.to_s if file_present_hiera_override?
-      elements << element_hiera.to_s if file_present_hiera?
       elements << element_globals.to_s if file_present_globals?
+      elements << element_hiera.to_s if file_present_hiera?
       elements
     end
 
