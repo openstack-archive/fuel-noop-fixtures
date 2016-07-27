@@ -2736,6 +2736,7 @@ storage:
     weight: 60
   mon_key: AQCAeEhXAAAAABAAwwdwDuGUXdIc1g2H69e14w==
   objects_ceph: true
+  auth_s3_keystone_ceph: true
   osd_pool_size: '2'
   per_pool_pg_nums:
     .rgw: 64

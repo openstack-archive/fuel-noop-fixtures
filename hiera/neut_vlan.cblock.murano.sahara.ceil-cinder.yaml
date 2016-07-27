@@ -2776,6 +2776,7 @@ storage:
   ephemeral_ceph: false
   fsid: a841a476-236b-434f-8393-274ad608cbd5
   images_ceph: false
+  auth_s3_keystone_ceph: false
   images_vcenter: false
   metadata:
     group: storage
