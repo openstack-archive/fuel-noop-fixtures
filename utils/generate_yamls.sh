@@ -21,12 +21,12 @@ function create_fake_nodes {
 }
 
 function clean_fake_nodes {
-  fuel nodes | grep -q 'discover | fnode-' &&
-    fuel nodes | awk '/discover \| fnode-/{ print $1 }' | xargs fuel node --delete-from-db --force --node
+  fuel2 node list | grep 'discover' | grep -q 'fnode-' &&
+    fuel2 node list | awk '/fnode-.* discover /{ print $2 }'
 }
 
 function admin_net_tpl {
-  fuel network-group list | awk '/^1 /{print $9}' | sed -e 's/\.[[:digit:]]\+$//'
+  ruby -rjson -e 'print JSON.parse(ARGV[0]).find{|i| i["id"] == 1}["cidr"]' "`fuel network-group list --json`"
 }
 
 function id_of_role {
@@ -124,7 +124,7 @@ function enable_public_ssl {
 }
 
 function enable_vms_conf {
-  virt_node_ids=`fuel nodes --env $1 2>/dev/null | grep virt | awk '{print $1}'`
+  virt_node_ids=`fuel2 node list --env $1 2>/dev/null | grep virt | awk '{print $2}'`
   for id in $virt_node_ids ; do
     fuel2 node create-vms-conf $id --conf '{"id":3,"ram":2,"cpu":2}'
   done
@@ -133,9 +133,9 @@ function enable_vms_conf {
 function list_free_nodes {
   # list unused nodes from the list of fake nodes
   if [ -n "$1" ] ; then
-    fuel nodes 2>/dev/null | grep discover | grep None | grep 'fnode-' | grep $1 | awk '{print $1}'
+    fuel2 node list 2>/dev/null | grep discover | grep None | grep 'fnode-' | grep $1 | awk '{print $2}'
   else
-    fuel nodes 2>/dev/null | grep discover | grep None | grep 'fnode-' | awk '{print $1}'
+    fuel2 node list 2>/dev/null | grep discover | grep None | grep 'fnode-' | awk '{print $2}'
   fi
 }
 
