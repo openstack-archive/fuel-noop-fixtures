@@ -30,7 +30,7 @@ module Noop
     end
 
     def self.default_facts_file_name
-      Pathname.new 'ubuntu.yaml'
+      Pathname.new 'ubuntu14.yaml'
     end
   end
 end

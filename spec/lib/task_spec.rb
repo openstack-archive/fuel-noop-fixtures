@@ -55,7 +55,7 @@ describe Noop::Task do
     end
 
     it 'should have inspect' do
-      expect(subject.inspect).to eq 'Task[Manifest: my/test.pp Spec: my/test_spec.rb Hiera: novanet-primary-controller.yaml Facts: ubuntu.yaml Status: pending]'
+      expect(subject.inspect).to eq 'Task[Manifest: my/test.pp Spec: my/test_spec.rb Hiera: novanet-primary-controller.yaml Facts: ubuntu14.yaml Status: pending]'
     end
   end
 
@@ -96,7 +96,7 @@ describe Noop::Task do
   context 'facts' do
     it 'has file_name_facts' do
       expect(subject.file_name_facts).to be_a Pathname
-      expect(subject.file_name_facts.to_s).to eq 'ubuntu.yaml'
+      expect(subject.file_name_facts.to_s).to eq 'ubuntu14.yaml'
     end
 
     it 'can set file_name_facts' do
@@ -113,7 +113,7 @@ describe Noop::Task do
 
     it 'has file_path_facts' do
       expect(subject.file_path_facts).to be_a Pathname
-      expect(subject.file_path_facts.to_s).to eq "#{root}/facts/ubuntu.yaml"
+      expect(subject.file_path_facts.to_s).to eq "#{root}/facts/ubuntu14.yaml"
     end
 
     it 'has file_name_facts_override' do

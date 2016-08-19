@@ -1,0 +1,299 @@
+--- 
+  partitions: 
+    sda1: 
+      size: "49152"
+      label: primary
+    sda2: 
+      size: "409600"
+      label: primary
+    sda3: 
+      uuid: ae0ac634-e27b-42f3-9153-d92a0068220d
+      size: "409600"
+      mount: /boot
+      label: primary
+      filesystem: ext2
+    sda4: 
+      size: "35782656"
+      label: primary
+      filesystem: LVM2_member
+    sda5: 
+      size: "21102592"
+      label: primary
+      filesystem: LVM2_member
+    sda6: 
+      size: "42074112"
+      label: primary
+      filesystem: LVM2_member
+    sda7: 
+      size: "23199744"
+      label: primary
+      filesystem: LVM2_member
+    sda8: 
+      size: "11032576"
+      label: primary
+      filesystem: LVM2_member
+    sda9: 
+      uuid: d1d1f9e8-0e6e-4687-9bb7-96c32f0df974
+      size: "40960"
+      label: config-2
+      filesystem: ext2
+    sdb1: 
+      size: "49152"
+      label: primary
+    sdb2: 
+      size: "409600"
+      label: primary
+    sdb3: 
+      size: "132667392"
+      label: primary
+      filesystem: LVM2_member
+    sdc1: 
+      size: "49152"
+      label: primary
+    sdc2: 
+      size: "409600"
+      label: primary
+    sdc3: 
+      size: "132667392"
+      label: primary
+      filesystem: LVM2_member
+  hardwaremodel: x86_64
+  netmask: "255.255.255.0"
+  ps: "ps -ef"
+  lsbdistdescription: "Ubuntu 16.04.1 LTS"
+  processors: 
+    models: 
+      - "Intel(R) Core(TM) i5-4670 CPU @ 3.40GHz"
+    count: 1
+    physicalcount: 1
+  hardwareisa: x86_64
+  kernel: Linux
+  os_package_type: debian
+  service_provider: systemd
+  operatingsystem: Ubuntu
+  sshdsakey: "AAAAB3NzaC1kc3MAAACBAO4GCoitokg7853i4il87AGQp+4IPKsqXRG0os5lXCg5DobISOPSmRp2PpSpiMkVv3jl5keceLb3nUz/FLeSrqEhsveYZT0qxqjtIerXrfc29S794B9T62zhIWQ2nWzpNQMYcOhovU5ov59ZSNWIA/llcDKbc3Gk9QEBsDgM5ezdAAAAFQC1AkJ5ok29hQ5QYKE0yikni/T2bQAAAIEApJZUPDJ+BXN459d7qE7Pxow+sIdKZ5Fe0lHPK9wybYunnNbo0GtjAU5SwwCdU3Eul9aGc5zgY2eT4JjZ5uZwymaJlHpL0LULbH+eQwwbWosQLw8Mw6piCjl8mn1ubC+xeqvvsM1denv3Xfs3CAQma4ZxTEO5qhqKGL3RSAllOwwAAACBAJNUP3Jcxbl28WZZfqnzC5YJQEZPp1A07uv4REN2UvPVK0nXdK2DbcHS7WCEx9ywF/qqf4fTTY+0lv3MPWS/c9kF+XETBB1dfepsK/omyZ53UxhPGTnaRh9xtRq80g+jJKItslg//eAogGip+7Ta7OhwVR6KlAbV36OhGow3p8U2"
+  sshfp_dsa: |-
+    SSHFP 2 1 7f2f5019ac51633b74237eae02ac43c242a6f778
+    SSHFP 2 2 b8bfabf1413f1d6ec99099522f5517b2edd4afb4245f1f30b0a62088425e469b
+  sshrsakey: "AAAAB3NzaC1yc2EAAAADAQABAAABAQCxwXqBS4gaX/1Wc0VGA5TcUCeWeSeuE7jtVzakRHmlI15ghrKmcsw3g1PXtWdDBbYIqeOwZO4+ya8ffyRzln+bMZF34OmpSq00HoyBazaZloC0ZMnk1Mw45lMntUwdSDftYz8OexY/y0wuEtLZd64Ul+UxRGphg7M+wJky7gdmR8Ow7so7HOxOXSwUz7dQPbvRiTR2JFdKGbIQLF6RX/YAc0TRU3ifRD1UM92CYXLPEBxP9Yy7F0dC4sN5aGPkdogArbq02TT4y2Wb272ScmXutCh5aBeVx4K5BNW/gbgbEecCzvLel4/7ZIplqeKP/CL75uSokn+Cs4YZ/j6hpyv/"
+  sshfp_rsa: |-
+    SSHFP 1 1 15cd6b8b3164701e01a3e4f1bc7d29e0d1b74078
+    SSHFP 1 2 96118cfb8744672ada34fec91b36be29a3f2a4395cc6e3b57319a257ccdf42ee
+  sshecdsakey: "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJUympV1vesrscbddEOEBNvAiYBezisSwLSo3RqdGBHOB1RN+L1geo8RHqinWh1V69CDMEd1ZP17VSCTj48+T3o="
+  sshfp_ecdsa: |-
+    SSHFP 3 1 b2ec93f3ad6e627f59dcaf595c14ba40636471bb
+    SSHFP 3 2 0024d215f0e46148b8c5cd90e7aa58cb2add1d73c6858c11d92a142ad14b431b
+  sshed25519key: AAAAC3NzaC1lZDI1NTE5AAAAIKNTc/YaVliwqJ0UH5DHwy4jeitxyiVS71wi/2R4hviN
+  sshfp_ed25519: |-
+    SSHFP 4 1 51aa4d868ea4b3bfeaa9b0141d1ad9eb945ec297
+    SSHFP 4 2 c07d50bdf2be408db24d11e2200a796ae8169f2a558d412289eb28f93e884be9
+  augeasversion: "1.4.0"
+  selinux: false
+  puppetversion: "3.8.5"
+  virtual: kvm
+  is_virtual: true
+  vlans: "101,102"
+  boardmanufacturer: "Oracle Corporation"
+  boardproductname: VirtualBox
+  boardserialnumber: "0"
+  bios_vendor: "innotek GmbH"
+  bios_version: VirtualBox
+  bios_release_date: "12/01/2006"
+  manufacturer: "innotek GmbH"
+  productname: VirtualBox
+  serialnumber: "0"
+  uuid: F98DAF54-7849-4D4C-9FA9-474080EBB4D9
+  type: Other
+  uptime: "3:04 hours"
+  uptime_hours: 3
+  blockdevice_sda_size: 68718428160
+  blockdevice_sda_vendor: ATA
+  blockdevice_sda_model: "VBOX HARDDISK"
+  blockdevice_sdb_size: 68718428160
+  blockdevice_sdb_vendor: ATA
+  blockdevice_sdb_model: "VBOX HARDDISK"
+  blockdevice_sdc_size: 68718428160
+  blockdevice_sdc_vendor: ATA
+  blockdevice_sdc_model: "VBOX HARDDISK"
+  blockdevices: "sda,sdb,sdc"
+  facterversion: "2.4.6"
+  memorysize: "1.95 GB"
+  memoryfree: "183.81 MB"
+  swapsize: "2.00 GB"
+  swapfree: "0.01 MB"
+  swapsize_mb: "2048.00"
+  swapfree_mb: "0.01"
+  memorysize_mb: "2000.45"
+  memoryfree_mb: "183.81"
+  uptime_days: 0
+  architecture: amd64
+  kernelmajversion: "4.4"
+  interfaces: "bond0,br_ex,br_floating,br_fw_admin,br_int,br_mgmt,br_prv,br_storage,enp0s3,enp0s8,enp0s9,enp0s3_101,enp0s3_102,hapr_host,lo,ovs_system,p_eeee51a2_0,p_ff798dba_0,v_management,v_public,vr_host_base"
+  macaddress_bond0: "92:d3:0e:75:f7:64"
+  mtu_bond0: 1500
+  ipaddress_br_ex: "172.16.0.5"
+  macaddress_br_ex: "08:00:27:bc:e2:66"
+  netmask_br_ex: "255.255.255.0"
+  mtu_br_ex: 1500
+  macaddress_br_floating: "22:fd:9f:51:aa:48"
+  mtu_br_floating: 1500
+  ipaddress_br_fw_admin: "10.20.0.4"
+  macaddress_br_fw_admin: "08:00:27:9a:28:24"
+  netmask_br_fw_admin: "255.255.255.0"
+  mtu_br_fw_admin: 1500
+  macaddress_br_int: "9e:78:0c:ef:c5:4f"
+  mtu_br_int: 1500
+  ipaddress_br_mgmt: "192.168.0.6"
+  macaddress_br_mgmt: "08:00:27:9a:28:24"
+  netmask_br_mgmt: "255.255.255.0"
+  mtu_br_mgmt: 1500
+  macaddress_br_prv: "12:fd:e9:d6:6d:4c"
+  mtu_br_prv: 1500
+  ipaddress_br_storage: "192.168.1.4"
+  macaddress_br_storage: "08:00:27:9a:28:24"
+  netmask_br_storage: "255.255.255.0"
+  mtu_br_storage: 1500
+  macaddress_enp0s3: "08:00:27:9a:28:24"
+  mtu_enp0s3: 1500
+  macaddress_enp0s8: "08:00:27:bc:e2:66"
+  mtu_enp0s8: 1500
+  macaddress_enp0s9: "08:00:27:2f:eb:50"
+  mtu_enp0s9: 1500
+  macaddress_enp0s3_101: "08:00:27:9a:28:24"
+  mtu_enp0s3_101: 1500
+  macaddress_enp0s3_102: "08:00:27:9a:28:24"
+  mtu_enp0s3_102: 1500
+  ipaddress_hapr_host: "240.0.0.1"
+  macaddress_hapr_host: "72:43:d1:27:6e:fa"
+  netmask_hapr_host: "255.255.255.252"
+  mtu_hapr_host: 1500
+  ipaddress_lo: "127.0.0.1"
+  netmask_lo: "255.0.0.0"
+  mtu_lo: 65536
+  macaddress_ovs_system: "4a:33:57:2f:f1:34"
+  mtu_ovs_system: 1500
+  macaddress_p_eeee51a2_0: "9e:66:67:d6:60:88"
+  mtu_p_eeee51a2_0: 65000
+  macaddress_p_ff798dba_0: "b6:56:6e:f8:66:1f"
+  mtu_p_ff798dba_0: 65000
+  macaddress_v_management: "6e:b3:0a:cf:24:43"
+  mtu_v_management: 1500
+  macaddress_v_public: "c6:ff:b4:07:8c:79"
+  mtu_v_public: 1500
+  ipaddress_vr_host_base: "240.0.0.5"
+  macaddress_vr_host_base: "46:91:25:77:2d:6e"
+  netmask_vr_host_base: "255.255.255.252"
+  mtu_vr_host_base: 1500
+  timezone: UTC
+  gid: root
+  path: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+  macaddress: "92:d3:0e:75:f7:64"
+  system_uptime: 
+    seconds: 11093
+    hours: 3
+    days: 0
+    uptime: "3:04 hours"
+  hostname: ctrl1
+  filesystems: "ext2,ext3,ext4,squashfs,vfat,xfs"
+  lsbmajdistrelease: "16.04"
+  os: 
+    name: Ubuntu
+    family: Debian
+    release: 
+      major: "16.04"
+      full: "16.04"
+    lsb: 
+      distcodename: xenial
+      distid: Ubuntu
+      distdescription: "Ubuntu 16.04.1 LTS"
+      distrelease: "16.04"
+      majdistrelease: "16.04"
+  fqdn: ctrl1.domain.tld
+  lsbdistid: Ubuntu
+  physicalprocessorcount: 1
+  rubyplatform: x86_64-linux-gnu
+  rubyversion: "2.3.1"
+  network_br_ex: "172.16.0.0"
+  network_br_fw_admin: "10.20.0.0"
+  network_br_mgmt: "192.168.0.0"
+  network_br_storage: "192.168.1.0"
+  network_hapr_host: "240.0.0.0"
+  network_lo: "127.0.0.0"
+  network_vr_host_base: "240.0.0.4"
+  operatingsystemrelease: "16.04"
+  kernelrelease: "4.4.0-34-generic"
+  rubysitedir: /usr/local/lib/site_ruby/2.3.0
+  osfamily: Debian
+  id: root
+  uptime_seconds: 11093
+  lsbdistcodename: xenial
+  processor0: "Intel(R) Core(TM) i5-4670 CPU @ 3.40GHz"
+  processorcount: 1
+  uniqueid: a8c00600
+  domain: domain.tld
+  operatingsystemmajrelease: "16.04"
+  kernelversion: "4.4.0"
+  lsbdistrelease: "16.04"
+  ipaddress: "172.16.0.5"
+  apache_version: "2.4.18"
+  mysql_server_id: 167011540
+  package_provider: apt
+  openssl_version: "1.0.2g-fips"
+  libvirt_package_version: "1.3.1-1ubuntu10.1"
+  apt_reboot_required: false
+  l23_os: ubuntu
+  ip6tables_version: "1.6.0"
+  acpid_version: "2"
+  iptables_persistent_version: "1.0.4"
+  l3_fqdn_hostname: ctrl1.domain.tld
+  root_home: /root
+  rabbitmq_version: "3.6.1"
+  netrings: 
+    enp0s3: 
+      maximums: 
+        RX: "4096"
+        TX: "4096"
+      current: 
+        RX: "4096"
+        TX: "4096"
+    enp0s8: 
+      maximums: 
+        RX: "4096"
+        TX: "4096"
+      current: 
+        RX: "4096"
+        TX: "4096"
+    enp0s9: 
+      maximums: 
+        RX: "4096"
+        TX: "4096"
+      current: 
+        RX: "256"
+        TX: "256"
+  rsyslog_version: "8.16.0-1ubuntu3"
+  iptables_version: "1.6.0"
+  pcmk_node_name: ctrl1.domain.tld
+  kern_module_ovs_loaded: false
+  kern_module_bridge_loaded: true
+  allocated_hugepages: "{\x221G\x22:false,\x222M\x22:false}"
+  osd_devices_list: ""
+  acpi_event: false
+  staging_http_get: curl
+  ssh_server_version_full: "7.2p2"
+  ssh_server_version_major: "7.2"
+  ssh_server_version_release: "7.2"
+  apt_update_last_success: 1471611612
+  haproxy_version: "1.6.3"
+  mysql_version: "5.6.30"
+  mounts: 
+    - /
+    - /boot
+    - /var/lib/mysql
+    - /var/log
+    - /var/lib/horizon
+    - /var/lib/glance
+  ssh_client_version_full: "7.2p2"
+  ssh_client_version_major: "7.2"
+  ssh_client_version_release: "7.2"
+  l2_ovs_vlan_splinters_need_for: ""
+  is_pe: false
