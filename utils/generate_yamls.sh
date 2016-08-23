@@ -63,6 +63,7 @@ function enable_ceph {
   attr["editable"]["storage"]["ephemeral_ceph"]["value"] = true
   attr["editable"]["storage"]["volumes_lvm"]["value"] = false
   attr["editable"]["storage"]["osd_pool_size"]["value"] = "2"
+  attr["editable"]["storage"]["auth_s3_keystone_ceph"]["value"] = true
   File.open(ARGV[0], "w").write(attr.to_yaml)' "cluster_$1/attributes.yaml"
   fuel env --attributes --env $1 --upload
 }
