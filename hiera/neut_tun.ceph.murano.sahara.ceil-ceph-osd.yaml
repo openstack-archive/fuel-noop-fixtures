@@ -1130,6 +1130,7 @@ storage:
   volumes_block_device: false
   volumes_ceph: true
   volumes_lvm: false
+  auth_s3_keystone_ceph: true
 storage_network_range: 192.168.1.0/24
 swift:
   user_password: wfwNKTJbcj2v22BnO3tC6VoW
