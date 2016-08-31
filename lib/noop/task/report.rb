@@ -35,7 +35,7 @@ Facts hierarchy:
       gem = gem.to_s
       return unless Object.const_defined? 'Gem'
       return unless Gem.loaded_specs.is_a? Hash
-      return unless Gem.loaded_specs[gem].is_a? Gem::Specification
+      return unless Gem.loaded_specs[gem].respond_to? :version
       Gem.loaded_specs[gem].version
     end
 

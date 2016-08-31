@@ -104,5 +104,16 @@ module Noop
         '=' * 70
       end
     end
+
+    # Convert the top level keys of the hash to Symbols
+    # @param input_hash [Hash]
+    # @return [Hash <Symbol => Object>]
+    def symbolize_hash_top_keys(input_hash)
+      symbolized_hash = {}
+      input_hash.each do |key, value|
+        symbolized_hash[key.to_sym] = value
+      end
+      symbolized_hash
+    end
   end
 end
