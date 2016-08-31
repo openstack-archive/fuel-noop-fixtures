@@ -1,4 +1,5 @@
 require 'yaml'
+require 'active_support/core_ext/hash/indifferent_access'
 
 module Noop
   class Task
@@ -70,9 +71,9 @@ module Noop
       facts_data[:puppetversion] = Puppet.version
     end
 
-    # @return [Hash]
+    # @return [ActiveSupport::HashWithIndifferentAccess]
     def facts_data
-      facts_data = {}
+      facts_data = ActiveSupport::HashWithIndifferentAccess.new
       facts_hierarchy.each do |file_path|
         begin
           file_data = YAML.load_file file_path
