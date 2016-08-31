@@ -11,6 +11,7 @@ group :development, :test do
   gem 'colorize'
   gem 'parallel'
   gem 'openstack'
+  gem 'activesupport'
 end
 
 if ENV['PUPPET_GEM_VERSION']
