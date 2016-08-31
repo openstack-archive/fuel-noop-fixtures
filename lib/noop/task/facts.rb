@@ -77,6 +77,7 @@ module Noop
         begin
           file_data = YAML.load_file file_path
           next unless file_data.is_a? Hash
+          file_data = Noop::Utils.symbolize_hash_top_keys file_data
           facts_data.merge! file_data
         rescue
           next
