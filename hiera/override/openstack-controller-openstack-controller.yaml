@@ -1,4 +1,6 @@
 ---
+nova:
+  workers: 4
 configuration:
   nova_config:
     DEFAULT/debug:
