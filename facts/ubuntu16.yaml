@@ -297,3 +297,5 @@
   ssh_client_version_release: "7.2"
   l2_ovs_vlan_splinters_need_for: ""
   is_pe: false
+  os_service_default: "<SERVICE DEFAULT>"
+
