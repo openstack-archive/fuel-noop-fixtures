@@ -1,3 +1,5 @@
+---
+workers_max: 4
 network_metadata:
   vips:
     management:

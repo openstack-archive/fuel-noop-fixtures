@@ -1,4 +1,5 @@
 ---
+workers_max: 4
 configuration:
   nova_config:
     DEFAULT/debug:
