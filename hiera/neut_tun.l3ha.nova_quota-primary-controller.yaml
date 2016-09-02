@@ -2434,7 +2434,7 @@ release:
         (HA). Controller services are prepared for HA by setting up a base MySQL/Galera,
         RabbitMQ and HAProxy so that additional controllers can be deployed NOW, or
         scaled out LATER. 3 or more controllers are required for a true HA environment.
-  name: Newton on Ubuntu 14.04
+  name: Newton on Ubuntu 16.04
   operating_system: Ubuntu
   roles_metadata:
     base-os:
