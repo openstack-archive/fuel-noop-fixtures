@@ -6,11 +6,12 @@ group :development, :test do
   gem 'rspec-puppet', '~> 2.4.0'
   gem 'rspec-puppet-utils', '~> 2.0.0'
   gem 'deep_merge'
-  gem 'pry'
+  gem 'pry-byebug'
   gem 'puppet-spec'
   gem 'colorize'
   gem 'parallel'
   gem 'openstack'
+  gem 'webmock'
 end
 
 if ENV['PUPPET_GEM_VERSION']
