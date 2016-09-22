@@ -78,13 +78,16 @@ module Noop
     # Read them all to a Hash by their ids.
     # Find all 'groups' records and resolve their 'tasks' reference
     # by pointing referenced tasks to this group instead.
+    # Using the SPEC_NO_GRAPH_METADATA environment variable
+    # disable the task graph processing.
     # @return [Hash<String => Hash>]
     def task_graph_metadata
+      return {} if ENV['SPEC_NO_GRAPH_METADATA']
       return @task_graph_metadata if @task_graph_metadata
       @task_graph_metadata = {}
       Noop::Config.list_path_modules.each do |path|
         next unless path.directory?
-        path.find do |task_file|
+        find_files(path) do |task_file|
           next unless task_file.file?
           next unless task_file.to_s.end_with? 'tasks.yaml'
           begin
@@ -96,6 +99,7 @@ module Noop
             id = task['id']
             @task_graph_metadata[id] = task
           end
+          false
         end
       end
 
@@ -185,12 +189,13 @@ module Noop
     def spec_run_metadata
       return @spec_run_metadata if @spec_run_metadata
       @spec_run_metadata = {}
-      Noop::Config.dir_path_task_spec.find do |spec_file|
+      find_files(Noop::Config.dir_path_task_spec) do |spec_file|
         next unless spec_file.file?
         next unless spec_file.to_s.end_with? '_spec.rb'
         spec_name = spec_file.relative_path_from(Noop::Config.dir_path_task_spec)
         spec_data = parse_spec_file spec_file
         @spec_run_metadata[spec_name] = spec_data if spec_data.any?
+        false
       end
       @spec_run_metadata
     end
