@@ -1,5 +1,6 @@
 ---
 configuration:
   neutron_metadata_agent_config:
-    DEFAULT/debug:
-      value: True
+    data:
+      DEFAULT/debug:
+        value: True
