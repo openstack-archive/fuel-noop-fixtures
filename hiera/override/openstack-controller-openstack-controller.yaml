@@ -2,16 +2,17 @@
 nova:
   workers: 4
 configuration:
-  nova_config:
-    DEFAULT/debug:
-      value: True
-    DEFAULT/verbose:
-      value: True
-    DEFAULT/notification_driver:
-      ensure: absent
-  nova_paste_api_ini:
-    DEFAULT/test:
-      value: True
+  data:
+    nova_config:
+      DEFAULT/debug:
+        value: True
+      DEFAULT/verbose:
+        value: True
+      DEFAULT/notification_driver:
+        ensure: absent
+    nova_paste_api_ini:
+      DEFAULT/test:
+        value: True
 network_metadata:
   vips:
     management:
