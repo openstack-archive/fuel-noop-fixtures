@@ -2,3 +2,8 @@ network_metadata:
   vips:
     management:
       namespace: 'haproxy'
+configuration:
+  package:
+    data:
+      mc:
+        ensure: present
