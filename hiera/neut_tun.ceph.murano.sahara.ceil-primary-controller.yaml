@@ -1034,12 +1034,12 @@ online: true
 openstack_version: newton-10.0
 operator_user:
   authkeys: ''
-  homedir: /home/fueladmin
+  homedir: /root
   metadata:
     group: general
     label: Operating System Access
     weight: 15
-  name: fueladmin
+  name: root
   password: PYRI8p75nGRMkBGgjlAvcQiu
   sudo: 'ALL=(ALL) NOPASSWD: ALL'
 plugins: []
