@@ -1,0 +1,13 @@
+plugins:
+- name: contrail
+  repositories:
+  - name: contrail-5.0.0
+    priority: 1100
+    section: ''
+    suite: /
+    type: deb
+    uri: http://10.109.15.2:8080/plugins/contrail-5.0/repositories/ubuntu
+  scripts:
+  - local_path: /etc/fuel/plugins/contrail-5.0/
+    remote_url: rsync://10.109.15.2:/plugins/contrail-5.0/deployment_scripts/
+
