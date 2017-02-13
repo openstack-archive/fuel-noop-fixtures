@@ -195,6 +195,9 @@ murano_settings:
     weight: 20
   murano_glance_artifacts_plugin: true
   murano_repo_url: http://storage.apps.openstack.org/
+mu_upgrade:
+  repos: "mos,mos-updates,mos-security,mos-holdback"
+  enabled: true
 mysql:
   root_password: jrKJrlkH2V33stGRS83sKcp9
   wsrep_password: 7ZWGnr7Tj6LtY9olzmNYRQI3
