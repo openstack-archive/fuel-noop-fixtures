@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 group :development, :test do
+  gem 'byebug', '9.0.6'
   gem 'puppetlabs_spec_helper', '1.1.1'
   gem 'puppet-lint', '~> 0.3.2'
   gem 'rspec-puppet', '~> 2.2.0'
