@@ -381,7 +381,7 @@ Debug related:
   Puppet modules outside of the Noop tests framework to output the
   additional debug information.
 - **SPEC_TASK_DEBUG** Enable the debug output of the task and manager objects.
-- **SPEC_DEBUG_LOG** This variable can the the debug log destination file.
+- **SPEC_DEBUG_LOG** This variable can the debug log destination file.
 
 Fixtures source related:
 
