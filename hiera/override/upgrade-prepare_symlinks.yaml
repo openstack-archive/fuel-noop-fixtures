@@ -1,4 +1,0 @@
----
-mu_upgrade:
-  repos: "mos,mos-updates,mos-security,mos-holdback"
-  enabled: true

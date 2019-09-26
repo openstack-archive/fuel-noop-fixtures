@@ -1,4 +1,0 @@
-sphinx
-cloud_sptheme
-pbr
-pip
